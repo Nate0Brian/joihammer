@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Meci amical – Warhammer</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav id="nav"></nav>
+<main>
+<h1>Meci amical</h1>
+<p id="st" class="err"></p>
+<p class="sub">Alege adversarul. Primește o invitație, iar după ce acceptă se creează meciul.</p>
+<div class="grid"><select id="opp" class="full" aria-label="Adversar"></select>
+<label class="opt full"><input type="checkbox" id="tw"> Cu twist</label>
+<button id="send" class="full">Trimite invitația</button></div>
+<h2>Invitații</h2><div id="list"></div>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="js/config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script src="js/friendly.js"></script>
+</body>
+</html>

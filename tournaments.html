@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Turnee – Warhammer</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav id="nav"></nav>
+<main>
+<h1>Turnee</h1>
+<p id="st" class="err"></p>
+<h2>Meciurile mele din turnee</h2><div id="mine"></div>
+<div id="adm" class="hidden"><h2>Admin: turneu nou</h2>
+<input id="tn" type="text" placeholder="Numele turneului">
+<div id="tp" class="tp"></div>
+<button id="tb" class="full">Creează turneul (eliminare directă)</button></div>
+<h2>Turnee</h2><div id="tlist"></div>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="js/config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script src="js/tournaments.js"></script>
+</body>
+</html>

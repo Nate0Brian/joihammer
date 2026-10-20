@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Admin – Warhammer</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav id="nav"></nav>
+<main>
+<h1>Admin</h1>
+<p id="st" class="err"></p>
+<h2>Adaugă utilizator</h2>
+<div class="grid"><input id="nu" type="text" placeholder="Username nou" autocapitalize="none"><input id="np" type="text" placeholder="Parolă (minim 6)"><button id="nb" class="full">Creează utilizator</button></div>
+<p id="amsg" class="err"></p>
+<h2>Jucători</h2><div id="plist" class="plist"></div>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="js/config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

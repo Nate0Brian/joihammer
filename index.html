@@ -120,7 +120,7 @@ footer{margin-top:32px;display:flex;justify-content:flex-end}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
 var CFG={apiKey:"AIzaSyCd6LiiAk9nCwcQc6FaD_WLwCuB5I9MCVs",authDomain:"joihammer.firebaseapp.com",projectId:"joihammer",appId:"1:633621935928:web:41858abf8544a005ea73cd"};
-var ADMIN_EMAIL="cristianaxinte867@gmail.com",DOM="@warhammer.example";
+var ADMIN_EMAIL="admin@warhammer.example",DOM="@warhammer.example";
 var FDS=["Take and Hold","Purge the Foe","Disruption","Reconnaissance","Priority Assets"];
 var FDM={"Take and Hold":["Battlefield Dominance","Immovable Object","Determined Acquisition","Purge and Secure","Inescapable Dominion"],
 "Purge the Foe":["Unstoppable Force","Meatgrinder","Punishment","Consecrate","Destroyer’s Wrath"],
@@ -227,7 +227,7 @@ var auth,db,sec,me="",isAdmin=false,players=[],rounds=[],scores={},openSet={},un
 function $(i){return document.getElementById(i)}
 function show(id,on){$(id).classList.toggle("hidden",!on)}
 function fail(e){$("st").textContent="Eroare: "+((e&&(e.code||e.message))||e)}
-function nice(e){var c=(e&&e.code)||"";if(c==="auth/weak-password")return "Parola trebuie să aibă minim 6 caractere.";if(c==="auth/email-already-in-use")return "Contul există deja în Firebase. Alege alt username.";if(c.indexOf("auth/")===0)return "Username sau parolă greșită.";if(c==="permission-denied")return "Nu ai voie să faci asta.";return (e&&e.message)||String(e)}
+function nice(e){var c=(e&&e.code)||"";if(c==="auth/weak-password")return "Parola trebuie să aibă minim 6 caractere.";if(c==="auth/email-already-in-use")return "Contul există deja în Firebase. Alege alt username.";if(c.indexOf("auth/")===0)return "Username sau parolă greșită. ("+c+")";if(c==="permission-denied")return "Nu ai voie să faci asta.";return (e&&e.message)||String(e)}
 function S(rid,ti){var k=rid+"_"+ti;if(!scores[k])scores[k]={sa:newPS(),sb:newPS()};return scores[k]}
 function met(){var m={};rounds.forEach(function(r){r.tables.forEach(function(t){m[key(t.pa.name,t.pb.name)]=1})});return m}
 

@@ -106,7 +106,7 @@ function render(){
   }
   h+='</div>';
   var first=App.me===m.b?"b":"a";
-  h+=sideHtml(first)+sideHtml(first==="a"?"b":"a");
+  h+='<div class="sides">'+sideHtml(first)+sideHtml(first==="a"?"b":"a")+'</div>';
   if(App.isAdmin)h+='<p style="margin-top:24px">'+B("del","","Șterge meciul","",false,"ghost")+'</p>';
   $("box").innerHTML=h;
   [].forEach.call(document.querySelectorAll("details[data-k]"),function(d){d.addEventListener("toggle",function(){openS[d.getAttribute("data-k")]=d.open})});

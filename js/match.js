@@ -29,7 +29,7 @@ function cardHtml(c){return '<b class="t">'+esc(c.n)+'</b><ul>'+c.r.map(function
 function sideHtml(s){
   var ps=PS(s),pl=P(s),started=M.first!=null,ended=M.turn>=10,a=actS(),mine=own(s),live=M.status==="active",r=rd(),cp=cpOf(ps);
   var h='<section class="side"><h2>'+esc(pl.name)+(App.me===M[s]?' <small>(tu)</small>':'')+'</h2><div class="info">'+esc([pl.army,pl.det].filter(Boolean).join(" · "))+'</div>';
-  if(!started&&mine&&live)h+='<label class="opt">Force Disposition <select data-act="fd" data-s="'+s+'">'+FDS.map(function(f){return '<option'+(f===pl.fd?' selected':'')+'>'+f+'</option>'}).join("")+'</select></label>';
+  if(!started&&mine&&live)h+='<label class="opt">Force Disposition <select data-act="fd" data-s="'+s+'"'+(ps.ready?' disabled':'')+'>'+FDS.map(function(f){return '<option'+(f===pl.fd?' selected':'')+'>'+f+'</option>'}).join("")+'</select></label>';
   else h+='<div class="info">Force Disposition: <b>'+esc(pl.fd)+'</b></div>';
 
   h+='<div class="board"><div><span>Primar</span><b>'+sums(ps,"pri")+'</b></div><div><span>Secundar</span><b>'+sums(ps,"sec")+'</b></div><div><span>Pictată</span><b>'+(ps.br?10:0)+'</b></div><div class="bt"><span>Total VP</span><b>'+totalPS(ps)+'</b></div><div><span>CP</span><b>'+cp+'</b></div></div>';
@@ -45,12 +45,18 @@ function sideHtml(s){
   }).join("")+'</div>';
 
   /* secundare */
-  h+='<h3>Misiuni secundare ('+(ps.mode==="T"?"Tactical":"Fixed")+')</h3>';
-  if(!started&&mine&&live){
-    h+='<select data-act="mode" data-s="'+s+'"><option value="T"'+(ps.mode==="T"?" selected":"")+'>Tactical</option><option value="F"'+(ps.mode==="F"?" selected":"")+'>Fixed</option></select>';
-    if(ps.mode==="F")h+='<div class="vpb">'+SEC.filter(function(c){return c.fx}).map(function(c){return '<label class="opt"><input type="checkbox" data-act="fix" data-s="'+s+'" data-n="'+esc(c.n)+'"'+(ps.fixed.indexOf(c.n)>=0?' checked':'')+'> '+esc(c.n)+'</label>'}).join("")+'</div><div class="legend">Alege 2 cărți Fixed.</div>';
-  }
-  if(ps.mode==="F"){
+  h+='<h3>Misiuni secundare'+(ps.mode&&started?' ('+(ps.mode==="T"?"Tactical":"Fixed")+')':'')+'</h3>';
+  if(!started){
+    var okFix=ps.mode==="T"||(ps.mode==="F"&&ps.fixed.length===2);
+    if(mine&&live&&!ps.ready){
+      h+='<div class="legend">Alege tipul de secundare înainte de start.</div><select data-act="mode" data-s="'+s+'"><option value=""'+(ps.mode?'':' selected')+'>Alege…</option><option value="T"'+(ps.mode==="T"?" selected":"")+'>Tactical (tragi cărți)</option><option value="F"'+(ps.mode==="F"?" selected":"")+'>Fixed (2 cărți fixe)</option></select>';
+      if(ps.mode==="F")h+='<div class="vpb">'+SEC.filter(function(c){return c.fx}).map(function(c){return '<label class="opt"><input type="checkbox" data-act="fix" data-s="'+s+'" data-n="'+esc(c.n)+'"'+(ps.fixed.indexOf(c.n)>=0?' checked':'')+'> '+esc(c.n)+'</label>'}).join("")+'</div><div class="legend">Alege exact 2 cărți Fixed.</div>';
+      h+='<div class="vpb">'+B("ready",s,"Confirmă alegerea",'',!okFix)+'</div>';
+    }else{
+      h+=ps.ready?'<div class="info">Alegere confirmată: <b>'+(ps.mode==="T"?"Tactical":"Fixed – "+esc(ps.fixed.join(", ")))+'</b></div>':'<div class="info">Încă nu a ales.</div>';
+      if(ps.ready&&mine&&live)h+='<div class="vpb">'+B("unready",s,"Schimbă alegerea","",false,"ghost")+'</div>';
+    }
+  }else if(ps.mode==="F"){
     h+=ps.fixed.map(function(n){
       var c=cardOf(n),used=fixedSum(ps,n);
       return '<div class="mis">'+cardHtml(c)+'<div class="legend">Acumulat: '+used+' / 20 VP (Fixed nu se aruncă)</div><div class="vpb">'+SECV[n].f.map(function(v){return B("sv",s,'+'+v+' VP',' data-n="'+esc(n)+'" data-v="'+v+'"',!(mine&&live&&started&&!ended&&used+v<=20))}).join("")+'</div></div>';
@@ -78,6 +84,7 @@ function sideHtml(s){
 function render(){
   var m=M,started=m.first!=null,ended=m.turn>=10,a=actS(),live=m.status==="active";
   [ "sa","sb" ].forEach(function(k){m[k]=Object.assign(newPS(),m[k])});
+  var rdy=!!(m.sa.ready&&m.sb.ready);
   var h='<h1>'+esc(m.pa.name)+' <span class="vs">vs</span> '+esc(m.pb.name)+'</h1>';
   h+='<div class="info">'+(m.type==="tournament"?"Meci de turneu":"Meci amical")+(m.deploy?' · Deployment: <b>'+esc(m.deploy)+'</b>':'')+(m.twist?' · Twist: <b>'+esc(m.twist)+'</b> – '+esc(TWISTS[m.twist]):'')+'</div>';
   if(m.status==="invited"){
@@ -90,7 +97,7 @@ function render(){
   if(m.status==="done"){
     h+=(m.winner==="draw"?'Remiză':'Câștigător: <b>'+esc(m.winner==="a"?m.pa.name:m.pb.name)+'</b>')+(App.isAdmin?'<div class="vpb" style="justify-content:center">'+B("reopen","","Redeschide meciul","",false,"ghost")+'</div>':'');
   }else if(!started){
-    h+='Cine joacă prima tură?<div class="vpb" style="justify-content:center">'+B("first","",esc(m.pa.name),' data-v="a"')+B("first","",esc(m.pb.name),' data-v="b"')+B("first","","Zar random",' data-v="rand"',false,"ghost")+'</div><div class="legend">Alegeți Force Disposition și tipul de secundare înainte de start.</div>';
+    h+='Cine joacă prima tură?<div class="vpb" style="justify-content:center">'+B("first","",esc(m.pa.name),' data-v="a"',!rdy)+B("first","",esc(m.pb.name),' data-v="b"',!rdy)+B("first","","Zar random",' data-v="rand"',!rdy,"ghost")+'</div><div class="legend">'+(rdy?'Ambii jucători au confirmat.':'Înainte de start, fiecare jucător își alege Force Disposition și secundarele (Tactical sau Fixed) și apasă „Confirmă alegerea”.')+'</div>';
   }else if(!ended){
     var an=m[a];
     h+='Runda <b>'+rd()+'</b> din 5 · Tura lui <b>'+esc(P(a).name)+'</b><div class="vpb" style="justify-content:center">'+B("end","","Termină tura",'',!(App.isAdmin||App.me===an))+B("back","","Tura anterioară","",false,"ghost")+'</div>';
@@ -109,7 +116,9 @@ function go(a,el){
   var s=el.getAttribute("data-s"),n=el.getAttribute("data-n"),v=+el.getAttribute("data-v"),i=+el.getAttribute("data-i");
   if(a==="acc"){upd({status:"active",pa:App.snap(M.a),pb:App.snap(M.b)});return}
   if(a==="dec"){upd({status:"declined"});return}
-  if(a==="first"){upd({first:el.getAttribute("data-v")==="rand"?pick(["a","b"]):el.getAttribute("data-v")});return}
+  if(a==="ready"){mut(s,function(ps){ps.ready=true});return}
+  if(a==="unready"){mut(s,function(ps){ps.ready=false});return}
+  if(a==="first"){if(!(M.sa.ready&&M.sb.ready))return;upd({first:el.getAttribute("data-v")==="rand"?pick(["a","b"]):el.getAttribute("data-v")});return}
   if(a==="end"){upd({turn:M.turn+1});return}
   if(a==="back"){upd({turn:Math.max(0,M.turn-1)});return}
   if(a==="reopen"){upd({status:"active",winner:null});return}
@@ -143,7 +152,7 @@ function go(a,el){
 function onChange(el){
   var a=el.getAttribute("data-act"),s=el.getAttribute("data-s");
   if(a==="br")mut(s,function(ps){ps.br=el.checked});
-  if(a==="mode")mut(s,function(ps){ps.mode=el.value;if(el.value==="T")ps.fixed=[]});
+  if(a==="mode")mut(s,function(ps){ps.mode=el.value;if(el.value!=="F")ps.fixed=[]});
   if(a==="fd"){var o={};o[s==="a"?"pa":"pb"]=Object.assign({},P(s),{fd:el.value});upd(o)}
   if(a==="fix"){
     var n=el.getAttribute("data-n"),ps=PS(s);

@@ -86,7 +86,7 @@ var WD={
 "Behind Enemy Lines":{r1:1,b:1}
 };
 
-function newPS(){return {mode:"T",fixed:[],hand:[],used:[],fresh:[],drawT:-1,rd:false,br:false,log:[]}}
+function newPS(){return {mode:"",ready:false,fixed:[],hand:[],used:[],fresh:[],drawT:-1,rd:false,br:false,log:[]}}
 function sums(ps,k){
   var by={},fin=0;
   (ps.log||[]).forEach(function(e){if(e.k!==k)return;if(e.f)fin+=e.v;else by[e.r]=(by[e.r]||0)+e.v});

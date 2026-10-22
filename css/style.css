@@ -109,3 +109,14 @@ main.wide{max-width:1100px}
 .live{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--blood);margin-right:6px;animation:pulse 1.6s infinite}
 @keyframes pulse{50%{opacity:.25}}
 @media (prefers-reduced-motion:reduce){.live{animation:none}}
+.role{font:600 12px "Source Sans 3",sans-serif;border:1px solid var(--brass);color:var(--brass);border-radius:999px;padding:1px 8px;vertical-align:middle;margin-left:6px}
+.steps{text-align:left;font-size:15px}
+.steps>div{padding:8px 0;border-top:1px solid var(--line)}
+.steps>div:first-child{border-top:0}
+.timer{font-family:Cinzel,serif}
+.tblw{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th,.tbl td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:center}
+.tbl td:nth-child(2),.tbl th:nth-child(2){text-align:left}
+.chart{width:100%;max-width:520px;height:auto;display:block;margin:8px auto}
+.summ{margin:16px 0}

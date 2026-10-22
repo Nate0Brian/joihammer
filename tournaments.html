@@ -6,6 +6,9 @@
 <title>Turnee – Warhammer</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#14171c">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 </head>
 <body>
 <nav id="nav"></nav>
@@ -15,8 +18,9 @@
 <h2>Meciurile mele din turnee</h2><div id="mine"></div>
 <div id="adm" class="hidden"><h2>Admin: turneu nou</h2>
 <input id="tn" type="text" placeholder="Numele turneului">
+<select id="tf" aria-label="Format"><option value="elim">Eliminare directă</option><option value="rr">Fiecare cu fiecare</option><option value="swiss">Sistem elvețian</option></select>
 <div id="tp" class="tp"></div>
-<button id="tb" class="full">Creează turneul (eliminare directă)</button></div>
+<button id="tb" class="full">Creează turneul</button></div>
 <h2>Turnee</h2><div id="tlist"></div>
 </main>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -25,6 +29,7 @@
 <script src="js/config.js"></script>
 <script src="js/data.js"></script>
 <script src="js/common.js"></script>
+<script src="js/tourney.js"></script>
 <script src="js/tournaments.js"></script>
 </body>
 </html>

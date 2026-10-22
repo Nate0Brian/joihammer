@@ -1,5 +1,5 @@
 var D=[],TS=[],flt="all";
-function pass(m){return flt==="all"||(flt==="t"?m.type==="tournament":m.type==="friendly")}
+function pass(m){return !m.wo&&(flt==="all"||(flt==="t"?m.type==="tournament":m.type==="friendly"))}
 function rows(){
   var R={};
   D.filter(pass).forEach(function(m){

@@ -28,7 +28,7 @@ async function create(){
 function standTable(t){
   var st=Tourney.standings(t,MS);
   return '<div class="tblw"><table class="tbl"><tr><th>#</th><th>Jucător</th><th>Pct</th><th>V</th><th>E</th><th>Î</th><th>VP +/−</th></tr>'+st.map(function(x,i){
-    return '<tr><td>'+(i+1)+'</td><td>'+esc(x.n)+'</td><td><b>'+x.pts+'</b></td><td>'+x.w+'</td><td>'+x.d+'</td><td>'+x.l+'</td><td>'+(x.vf-x.va>0?"+":"")+(x.vf-x.va)+'</td></tr>';
+    return '<tr><td>'+(i+1)+'</td><td>'+esc(x.n)+(t.out&&t.out.indexOf(x.n)>=0?' <small class="sub">(retras)</small>':'')+'</td><td><b>'+x.pts+'</b></td><td>'+x.w+'</td><td>'+x.d+'</td><td>'+x.l+'</td><td>'+(x.vf-x.va>0?"+":"")+(x.vf-x.va)+'</td></tr>';
   }).join("")+'</table></div><div class="legend">Victorie 3 puncte, remiză 1, liber 3. La egalitate contează diferența de VP.</div>';
 }
 function card(t){
@@ -42,7 +42,7 @@ function card(t){
     r.ents.forEach(function(e){
       if(e.bye){h+='<div class="ln">'+esc(e.bye)+' — liber</div>';return}
       var m=MS[e.m];if(!m){h+='<div class="ln">…</div>';return}
-      var mine=m.a===App.me||m.b===App.me,res=m.status==="done"?(m.winner==="draw"?"remiză":(m.winner==="a"?esc(m.a):esc(m.b))+" a câștigat")+' ('+App.score(m)+')':(m.status==="confirm"?'se confirmă scorul':'în desfășurare')+' ('+App.score(m)+')';
+      var mine=m.a===App.me||m.b===App.me,res=m.status==="done"?(m.winner==="draw"?"remiză":(m.winner==="a"?esc(m.a):esc(m.b))+" a câștigat"+(m.wo?" (neprezentare)":""))+' ('+App.score(m)+')':(m.status==="confirm"?'se confirmă scorul':'în desfășurare')+' ('+App.score(m)+')';
       h+='<div class="ln'+(mine?' mine':'')+'"><b>'+esc(m.a)+' vs '+esc(m.b)+'</b> · '+res+' · <a href="match.html?id='+m.id+'">'+(mine&&m.status!=="done"?"Joacă":"Vezi")+'</a></div>';
     });
   });

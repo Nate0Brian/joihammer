@@ -9,11 +9,12 @@ function status(m){
   if(m.turn>=10)return "Bătălie încheiată · punctele finale";
   var a=actSide(m);return "Runda "+curRound(m)+"/5 · tura lui "+esc(m["p"+a].name);
 }
-function primName(m,s){
+function baseP(m,s){
   var me=m["p"+s],op=m["p"+(s==="a"?"b":"a")];
   if(!me||!op||!FDM[me.fd]||!FDM[op.fd])return "";
-  return m.twist==="Scrambled Communications"?FDM[op.fd][FDS.indexOf(me.fd)]:FDM[me.fd][FDS.indexOf(op.fd)];
+  return me.prim&&PRI[me.prim]?me.prim:FDM[me.fd][FDS.indexOf(op.fd)];
 }
+function primName(m,s){return m.twist==="Scrambled Communications"?baseP(m,s==="a"?"b":"a"):baseP(m,s)}
 function cell(ps,r){
   var v=Math.min(15,Math.max(0,roundVP(ps,"pri",r)))+Math.min(15,Math.max(0,roundVP(ps,"sec",r)));
   return v;

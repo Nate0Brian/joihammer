@@ -61,9 +61,19 @@ Tourney.pairNames=function(list,played,strict){
   }
   return null;
 };
+/* jucători retrași: adversarul lor trece cu „liber” */
+Tourney.dropOut=function(pb,out){
+  var pairs=[],byes=pb.byes.filter(function(n){return out.indexOf(n)<0});
+  pb.pairs.forEach(function(p){
+    var a=out.indexOf(p[0])>=0,b=out.indexOf(p[1])>=0;
+    if(a&&b)return;
+    if(a)byes.push(p[1]);else if(b)byes.push(p[0]);else pairs.push(p);
+  });
+  return {pairs:pairs,byes:byes};
+};
 /* sistem elvețian: după clasament, fără reveniri dacă se poate */
 Tourney.swiss=function(t,MS){
-  var st=Tourney.standings(t,MS).map(function(x){return x.n}),played={},had={},byes=[];
+  var out=t.out||[],st=Tourney.standings(t,MS).map(function(x){return x.n}).filter(function(n){return out.indexOf(n)<0}),played={},had={},byes=[];
   t.rounds.forEach(function(r){r.ents.forEach(function(e){
     if(e.bye)had[e.bye]=1;else if(MS[e.m])played[pkey(MS[e.m].a,MS[e.m].b)]=1;
   })});
@@ -83,12 +93,17 @@ Tourney.advance=async function(t,MS){
     if(fmt==="elim"){
       var w=Tourney.winners(t,ri,MS);
       if(w.length===1){tx.update(tref,{status:"done",winner:w[0]});return}
-      var pairs=[];for(var i=0;i<w.length;i+=2)pairs.push([w[i],w[i+1]]);
-      tx.update(tref,{rounds:cur.rounds.concat([{name:tier(w.length),ents:Tourney.ents(t.id,ri+1,pairs,[],fmt,tx)}])});
+      var pairs=[],byes=[],out=cur.out||[];
+      for(var i=0;i<w.length;i+=2){
+        var xo=out.indexOf(w[i])>=0,yo=out.indexOf(w[i+1])>=0;
+        if(xo&&yo)byes.push(w[i]);else if(xo)byes.push(w[i+1]);else if(yo)byes.push(w[i]);else pairs.push([w[i],w[i+1]]);
+      }
+      tx.update(tref,{rounds:cur.rounds.concat([{name:tier(w.length),ents:Tourney.ents(t.id,ri+1,pairs,byes,fmt,tx)}])});
       return;
     }
     if(t.rounds.length>=t.totalRounds){tx.update(tref,{status:"done",winner:Tourney.standings(t,MS)[0].n});return}
-    var pb=fmt==="rr"?Tourney.rr(t.players,ri+1):Tourney.swiss(t,MS);
+    t.out=cur.out||[];
+    var pb=fmt==="rr"?Tourney.dropOut(Tourney.rr(t.players,ri+1),t.out):Tourney.swiss(t,MS);
     tx.update(tref,{rounds:cur.rounds.concat([{name:"Runda "+(ri+2),ents:Tourney.ents(t.id,ri+1,pb.pairs,pb.byes,fmt,tx)}])});
   });
 };

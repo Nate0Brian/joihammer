@@ -12,10 +12,13 @@ function mut(s,fn){var ps=PS(s);fn(ps);saveS(s);render()}
 function deckOf(ps){return SEC.map(function(c){return c.n}).filter(function(n){return ps.hand.indexOf(n)<0&&ps.used.indexOf(n)<0})}
 function cardOf(n){return SEC.filter(function(c){return c.n===n})[0]}
 function rm(a,n){var i=a.indexOf(n);if(i>=0)a.splice(i,1)}
-function primOf(s){
+function baseOf(s){
   var me=P(s),op=P(s==="a"?"b":"a");
-  return M.twist==="Scrambled Communications"?FDM[op.fd][FDS.indexOf(me.fd)]:FDM[me.fd][FDS.indexOf(op.fd)];
+  if(me.prim&&PRI[me.prim])return me.prim;
+  return FDM[me.fd][FDS.indexOf(op.fd)];
 }
+function primOf(s){return M.twist==="Scrambled Communications"?baseOf(s==="a"?"b":"a"):baseOf(s)}
+function fdOpts(pl){var o=Data.fdsFor(pl.army,pl.dets);if(o.indexOf(pl.fd)<0)o.unshift(pl.fd);return o}
 function B(act,s,label,extra,dis,cls){
   return '<button class="sm'+(cls?' '+cls:'')+'" data-act="'+act+'"'+(s?' data-s="'+s+'"':'')+(extra||'')+(dis?' disabled':'')+'>'+label+'</button>';
 }
@@ -29,13 +32,14 @@ function cardHtml(c){return '<b class="t">'+esc(c.n)+'</b><ul>'+c.r.map(function
 function sideHtml(s){
   var ps=PS(s),pl=P(s),started=M.first!=null,ended=M.turn>=10,a=actS(),mine=own(s),live=M.status==="active",r=rd(),cp=cpOf(ps);
   var h='<section class="side"><h2>'+esc(pl.name)+(App.me===M[s]?' <small>(tu)</small>':'')+(M.atk?' <span class="role">'+(M.atk===s?'Atacator':'Defender')+'</span>':'')+'</h2><div class="info">'+esc([pl.army,pl.det].filter(Boolean).join(" · "))+'</div>';
-  if(!started&&mine&&live)h+='<label class="opt">Force Disposition <select data-act="fd" data-s="'+s+'"'+(ps.ready?' disabled':'')+'>'+FDS.map(function(f){return '<option'+(f===pl.fd?' selected':'')+'>'+f+'</option>'}).join("")+'</select></label>';
+  if(!started&&mine&&live)h+='<label class="opt">Force Disposition <select data-act="fd" data-s="'+s+'"'+(ps.ready?' disabled':'')+'>'+fdOpts(pl).map(function(f){return '<option'+(f===pl.fd?' selected':'')+'>'+f+'</option>'}).join("")+'</select></label>';
   else h+='<div class="info">Force Disposition: <b>'+esc(pl.fd)+'</b></div>';
 
+  if(!started&&mine&&live&&!ps.ready)h+='<label class="opt">Misiune primară <select data-act="pmis" data-s="'+s+'"><option value="">Din Force Disposition</option>'+Object.keys(PRI).map(function(n){return '<option'+(n===pl.prim?' selected':'')+'>'+esc(n)+'</option>'}).join("")+'</select></label>';
   if(started)h+='<div class="info">Timp jucat: <b>'+fmtT((M.tt&&M.tt[s])||0)+'</b></div>';
   h+='<div class="board"><div><span>Primar</span><b>'+sums(ps,"pri")+'</b></div><div><span>Secundar</span><b>'+sums(ps,"sec")+'</b></div><div><span>Pictată</span><b>'+(ps.br?10:0)+'</b></div><div class="bt"><span>Total VP</span><b>'+totalPS(ps)+'</b></div><div><span>CP</span><b>'+cp+'</b></div></div>';
   h+='<div class="legend">Pe runde (max 15): primar '+[1,2,3,4,5].map(function(i){return roundVP(ps,"pri",i)}).join(" / ")+' · secundar '+[1,2,3,4,5].map(function(i){return roundVP(ps,"sec",i)}).join(" / ")+'</div>';
-  h+='<div class="vpb">'+B("cp",s,"−1 CP",' data-v="-1"',!(mine&&live),"ghost")+B("cp",s,"+1 CP",' data-v="1"',!(mine&&live),"ghost")+B("man",s,"+1 VP primar (manual)",' data-k="pri"',!(mine&&live&&started),"ghost")+B("man",s,"+1 VP secundar (manual)",' data-k="sec"',!(mine&&live&&started),"ghost")+'</div>';
+  h+='<div class="vpb">'+B("cp",s,"−1 CP",' data-v="-1"',!(mine&&live),"ghost")+B("cp",s,"+1 CP",' data-v="1"',!(mine&&live),"ghost")+B("man",s,"−1 VP primar",' data-k="pri" data-v="-1"',!(mine&&live&&started),"ghost")+B("man",s,"+1 VP primar",' data-k="pri" data-v="1"',!(mine&&live&&started),"ghost")+B("man",s,"−1 VP secundar",' data-k="sec" data-v="-1"',!(mine&&live&&started),"ghost")+B("man",s,"+1 VP secundar",' data-k="sec" data-v="1"',!(mine&&live&&started),"ghost")+'</div>';
   h+='<label class="opt" style="margin-top:8px"><input type="checkbox" data-act="br" data-s="'+s+'"'+(ps.br?' checked':'')+(mine&&live?'':' disabled')+'> Armată pictată (+10 VP)</label>';
 
   /* primară */
@@ -131,11 +135,11 @@ function render(){
     h+='<div class="banner">Invitație în așteptare.'+(App.me===m.b?'<div class="vpb" style="justify-content:center">'+B("acc","","Acceptă","")+B("dec","","Refuză","",false,"ghost")+'</div>':' Așteaptă răspunsul lui '+esc(m.b)+'.')+'</div>';
     $("box").innerHTML=h;return;
   }
-  if(m.status==="declined"){$("box").innerHTML=h+'<div class="banner">Invitația a fost refuzată sau anulată.</div>';return}
+  if(m.status==="declined"||m.status==="cancelled"){$("box").innerHTML=h+'<div class="banner">'+(m.status==="cancelled"?"Meciul a fost anulat (un jucător a fost șters).":"Invitația a fost refuzată sau anulată.")+'</div>';return}
 
   h+='<div class="banner"><div class="bigsc">'+totalPS(m.sa)+' – '+totalPS(m.sb)+'</div>';
   if(m.status==="done"){
-    h+=(m.winner==="draw"?'Remiză':'Câștigător: <b>'+esc(m.winner==="a"?m.pa.name:m.pb.name)+'</b>')+(App.isAdmin?'<div class="vpb" style="justify-content:center">'+B("reopen","","Redeschide meciul","",false,"ghost")+'</div>':'');
+    h+=(m.winner==="draw"?'Remiză':'Câștigător: <b>'+esc(m.winner==="a"?m.pa.name:m.pb.name)+'</b>'+(m.wo?' (neprezentare)':''))+(App.isAdmin?'<div class="vpb" style="justify-content:center">'+B("reopen","","Redeschide meciul","",false,"ghost")+'</div>':'');
   }else if(m.status==="confirm"){
     var pn=esc(m["p"+m.pBy].name),res=m.pw==="draw"?'remiză':'câștigă <b>'+esc(m["p"+m.pw].name)+'</b>',other=m.pBy==="a"?"b":"a";
     h+='<div>'+pn+' propune scorul final <b>'+m.pta+' – '+m.ptb+'</b>, '+res+'.</div>';
@@ -202,13 +206,14 @@ function go(a,el){
   if(a==="draw"){mut(s,function(ps){var d=shuffle(deckOf(ps));ps.fresh=[];for(var k=0;k<2&&k<d.length;k++){ps.hand.push(d[k]);ps.fresh.push(d[k])}ps.drawT=M.turn});return}
   if(a==="rm"){mut(s,function(ps){ps.log.splice(i,1)});return}
   if(a==="cp"){mut(s,function(ps){logAdd(ps,"cp",v,"manual")});return}
-  if(a==="man"){var k=el.getAttribute("data-k");mut(s,function(ps){logAdd(ps,k,1,"manual")});return}
+  if(a==="man"){var k=el.getAttribute("data-k");mut(s,function(ps){logAdd(ps,k,v,"manual")});return}
 }
 
 function onChange(el){
   var a=el.getAttribute("data-act"),s=el.getAttribute("data-s");
   if(a==="br")mut(s,function(ps){ps.br=el.checked});
   if(a==="mode")mut(s,function(ps){ps.mode=el.value;if(el.value!=="F")ps.fixed=[]});
+  if(a==="pmis"){var o2={};o2[s==="a"?"pa":"pb"]=Object.assign({},P(s),{prim:el.value});upd(o2)}
   if(a==="fd"){var o={};o[s==="a"?"pa":"pb"]=Object.assign({},P(s),{fd:el.value});upd(o)}
   if(a==="fix"){
     var n=el.getAttribute("data-n"),ps=PS(s);

@@ -11,27 +11,27 @@ var App={me:"",isAdmin:false,players:[],auth:null,db:null,onPlayers:function(){}
 App.start=function(cb,onOut){
   if(CFG.apiKey==="PUNE_AICI"){document.body.insertAdjacentHTML("afterbegin",'<p class="err" style="padding:16px">Completează datele Firebase în js/config.js</p>');return}
   firebase.initializeApp(CFG);App.auth=firebase.auth();App.db=firebase.firestore();
-  App.auth.onAuthStateChanged(function(u){
+  Data.load().then(function(){App.auth.onAuthStateChanged(function(u){
     if(!u){if(onOut)onOut();else location.href="index.html";return}
     App.me=u.email.split(".")[0];App.isAdmin=u.email===ADMIN_EMAIL;
     if($("nav")){App.nav();App.watchInvites()}
     App.db.collection("players").onSnapshot(function(s){
-      App.players=s.docs.map(function(d){var x=d.data();return {name:d.id,army:x.army||"",det:x.det||"",fd:x.fd||FDS[0]}}).sort(function(a,b){return a.name<b.name?-1:1});
+      App.players=s.docs.map(function(d){var x=d.data();return {name:d.id,army:x.army||"",det:x.det||"",dets:x.dets||[],fd:x.fd||FDS[0]}}).sort(function(a,b){return a.name<b.name?-1:1});
       App.onPlayers();
     },fail);
     cb();
-  });
+  })}).catch(function(e){document.body.insertAdjacentHTML("afterbegin",'<p class="err" style="padding:16px">Nu pot citi fișierele din folderul data/ ('+esc(e.message||e)+')</p>')});
 };
 App.nav=function(){
   var cur=location.pathname.split("/").pop()||"index.html";
-  var L=[["index.html","Acasă"],["friendly.html","Meci amical"],["tournaments.html","Turnee"],["watch.html","Live"],["stats.html","Clasament"],["profile.html","Profil"]];
+  var L=[["index.html","Acasă"],["friendly.html","Meci amical"],["tournaments.html","Turnee"],["watch.html","Live"],["missions.html","Misiuni"],["stats.html","Clasament"],["profile.html","Profil"]];
   if(App.isAdmin)L.push(["admin.html","Admin"]);
   $("nav").innerHTML=L.map(function(l){return '<a href="'+l[0]+'"'+(cur===l[0]?' class="on"':'')+'>'+l[1]+'</a>'}).join("")+'<a href="#" id="out">Ieși ('+esc(App.me)+')</a>';
   $("out").onclick=function(e){e.preventDefault();App.auth.signOut()};
 };
 App.snap=function(n){
-  var p=App.players.filter(function(x){return x.name===n})[0]||{name:n,army:"",det:"",fd:FDS[0]};
-  return {name:p.name,army:p.army,det:p.det,fd:p.fd};
+  var p=App.players.filter(function(x){return x.name===n})[0]||{name:n,army:"",det:"",dets:[],fd:FDS[0]};
+  return {name:p.name,army:p.army,det:p.det,dets:p.dets||[],fd:p.fd};
 };
 App.newMatch=function(o){
   return Object.assign({n:Date.now(),atk:null,first:null,turn:0,sa:newPS(),sb:newPS(),deploy:pick(DEPLOYS)},o);
@@ -45,8 +45,8 @@ App.watchMatches=function(cb){
 };
 App.score=function(m){return totalPS(Object.assign(newPS(),m.sa))+" – "+totalPS(Object.assign(newPS(),m.sb))};
 App.matchRow=function(m){
-  var st={invited:"Invitație",declined:"Refuzat",active:"În desfășurare",confirm:"Așteaptă confirmarea scorului",done:"Încheiat"}[m.status]||m.status;
-  var res=m.status==="done"&&m.winner?" · "+(m.winner==="draw"?"remiză":"câștigă "+esc(m.winner==="a"?m.a:m.b)):"";
+  var st={invited:"Invitație",declined:"Refuzat",cancelled:"Anulat",active:"În desfășurare",confirm:"Așteaptă confirmarea scorului",done:"Încheiat"}[m.status]||m.status;
+  var res=m.status==="done"&&m.winner?" · "+(m.winner==="draw"?"remiză":"câștigă "+esc(m.winner==="a"?m.a:m.b)+(m.wo?" (neprezentare)":"")):"";
   return '<a class="card rowlink" href="match.html?id='+m.id+'"><b>'+(m.type==="tournament"?"Turneu":"Amical")+' · '+esc(m.a)+' vs '+esc(m.b)+'</b><span>'+st+(m.status==="invited"||m.status==="declined"?"":" · "+App.score(m))+res+'</span></a>';
 };
 

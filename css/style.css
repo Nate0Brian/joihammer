@@ -115,6 +115,10 @@ main.wide{max-width:1100px}
 .steps>div:first-child{border-top:0}
 .timer{font-family:Cinzel,serif}
 .tblw{overflow-x:auto}
+.dets{display:grid;gap:6px;max-height:340px;overflow-y:auto;border:1px solid var(--line);border-radius:6px;padding:8px}
+.dl{align-items:flex-start}
+.dl small{display:block;color:var(--muted);font-size:13px}
+.chips button.on{background:var(--btn);color:var(--btn-ink)}
 .tbl{width:100%;border-collapse:collapse;font-size:14px}
 .tbl th,.tbl td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:center}
 .tbl td:nth-child(2),.tbl th:nth-child(2){text-align:left}

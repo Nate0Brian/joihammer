@@ -4,6 +4,7 @@ function norm(m){m.sa=Object.assign(newPS(),m.sa);m.sb=Object.assign(newPS(),m.s
 function actSide(m){if(m.first==null||m.turn>=10)return null;return m.turn%2===0?m.first:(m.first==="a"?"b":"a")}
 function curRound(m){return m.turn>=10?5:Math.floor(m.turn/2)+1}
 function status(m){
+  if(m.status==="confirm")return "Se confirmă scorul final";
   if(m.first==null)return "Pregătire";
   if(m.turn>=10)return "Bătălie încheiată · punctele finale";
   var a=actSide(m);return "Runda "+curRound(m)+"/5 · tura lui "+esc(m["p"+a].name);
@@ -31,7 +32,7 @@ function events(m){
 }
 function side(m,s,lead){
   var ps=m["s"+s],pl=m["p"+s],started=m.first!=null,a=actSide(m);
-  return '<div class="ws'+(lead?' lead':'')+'"><div class="pn">'+(a===s?'▶ ':'')+esc(pl.name)+'</div><small>'+esc([pl.army,pl.fd].filter(Boolean).join(" · "))+'</small>'
+  return '<div class="ws'+(lead?' lead':'')+'"><div class="pn">'+(a===s?'▶ ':'')+esc(pl.name)+'</div><small>'+esc([m.atk?(m.atk===s?"Atacator":"Defender"):"",pl.army,pl.fd].filter(Boolean).join(" · "))+'</small>'
     +'<div class="num">'+totalPS(ps)+'</div>'
     +'<div class="st">CP <b>'+cpOf(ps)+'</b> · Primar <b>'+sums(ps,"pri")+'</b> · Secundar <b>'+sums(ps,"sec")+'</b>'+(ps.br?' · Pictată +10':'')+'</div>'
     +(started?'<div class="st">'+esc(primName(m,s))+'</div>':'')
@@ -70,7 +71,7 @@ function render(){
 }
 App.start(function(){
   $("flt").addEventListener("click",function(e){var b=e.target.closest("button[data-f]");if(b){flt=b.getAttribute("data-f");render()}});
-  App.db.collection("matches").where("status","==","active").onSnapshot(function(s){
+  App.db.collection("matches").where("status","in",["active","confirm"]).onSnapshot(function(s){
     MS=s.docs.map(function(d){return Object.assign({id:d.id},d.data())}).sort(function(x,y){return y.n-x.n});
     render();
   },fail);

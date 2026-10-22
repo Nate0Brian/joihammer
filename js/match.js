@@ -28,10 +28,11 @@ function cardHtml(c){return '<b class="t">'+esc(c.n)+'</b><ul>'+c.r.map(function
 
 function sideHtml(s){
   var ps=PS(s),pl=P(s),started=M.first!=null,ended=M.turn>=10,a=actS(),mine=own(s),live=M.status==="active",r=rd(),cp=cpOf(ps);
-  var h='<section class="side"><h2>'+esc(pl.name)+(App.me===M[s]?' <small>(tu)</small>':'')+'</h2><div class="info">'+esc([pl.army,pl.det].filter(Boolean).join(" · "))+'</div>';
+  var h='<section class="side"><h2>'+esc(pl.name)+(App.me===M[s]?' <small>(tu)</small>':'')+(M.atk?' <span class="role">'+(M.atk===s?'Atacator':'Defender')+'</span>':'')+'</h2><div class="info">'+esc([pl.army,pl.det].filter(Boolean).join(" · "))+'</div>';
   if(!started&&mine&&live)h+='<label class="opt">Force Disposition <select data-act="fd" data-s="'+s+'"'+(ps.ready?' disabled':'')+'>'+FDS.map(function(f){return '<option'+(f===pl.fd?' selected':'')+'>'+f+'</option>'}).join("")+'</select></label>';
   else h+='<div class="info">Force Disposition: <b>'+esc(pl.fd)+'</b></div>';
 
+  if(started)h+='<div class="info">Timp jucat: <b>'+fmtT((M.tt&&M.tt[s])||0)+'</b></div>';
   h+='<div class="board"><div><span>Primar</span><b>'+sums(ps,"pri")+'</b></div><div><span>Secundar</span><b>'+sums(ps,"sec")+'</b></div><div><span>Pictată</span><b>'+(ps.br?10:0)+'</b></div><div class="bt"><span>Total VP</span><b>'+totalPS(ps)+'</b></div><div><span>CP</span><b>'+cp+'</b></div></div>';
   h+='<div class="legend">Pe runde (max 15): primar '+[1,2,3,4,5].map(function(i){return roundVP(ps,"pri",i)}).join(" / ")+' · secundar '+[1,2,3,4,5].map(function(i){return roundVP(ps,"sec",i)}).join(" / ")+'</div>';
   h+='<div class="vpb">'+B("cp",s,"−1 CP",' data-v="-1"',!(mine&&live),"ghost")+B("cp",s,"+1 CP",' data-v="1"',!(mine&&live),"ghost")+B("man",s,"+1 VP primar (manual)",' data-k="pri"',!(mine&&live&&started),"ghost")+B("man",s,"+1 VP secundar (manual)",' data-k="sec"',!(mine&&live&&started),"ghost")+'</div>';
@@ -45,7 +46,7 @@ function sideHtml(s){
   }).join("")+'</div>';
 
   /* secundare */
-  h+='<h3>Misiuni secundare'+(ps.mode&&started?' ('+(ps.mode==="T"?"Tactical":"Fixed")+')':'')+'</h3>';
+  h+='<h3>Misiuni secundare'+(ps.mode&&started?' ('+(ps.mode==="T"?"Tactical":"Fixed")+')':'')+'</h3>'+(M.atk&&started?'<div class="legend">Pachetul de secundare al '+(M.atk===s?'Atacatorului':'Defender-ului')+' (cărțile sunt identice în ambele pachete).</div>':'');
   if(!started){
     var okFix=ps.mode==="T"||(ps.mode==="F"&&ps.fixed.length===2);
     if(mine&&live&&!ps.ready){
@@ -81,11 +82,50 @@ function sideHtml(s){
   return h;
 }
 
+function fmtT(ms){
+  var s=Math.max(0,Math.floor(ms/1000)),h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;
+  return (h?h+":"+(m<10?"0":""):"")+m+":"+(x<10?"0":"")+x;
+}
+function cumul(ps){
+  var out=[],t=0;
+  for(var r=1;r<=5;r++){t+=Math.min(15,Math.max(0,roundVP(ps,"pri",r)))+Math.min(15,Math.max(0,roundVP(ps,"sec",r)));out.push(t)}
+  out.push(totalPS(ps));
+  return out;
+}
+function chart(ca,cb){
+  var W=320,H=150,px=30,py=14,mx=Math.max(10,Math.max.apply(null,ca.concat(cb))),L=["R1","R2","R3","R4","R5","Final"];
+  function X(i){return px+i*(W-px-12)/5}
+  function Y(v){return H-22-(v/mx)*(H-22-py)}
+  function line(c,col){return '<polyline fill="none" stroke-width="3" style="stroke:'+col+'" points="'+c.map(function(v,i){return X(i)+","+Y(v)}).join(" ")+'"/>'+c.map(function(v,i){return '<circle cx="'+X(i)+'" cy="'+Y(v)+'" r="3.5" style="fill:'+col+'"/>'}).join("")}
+  return '<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="VP cumulat pe runde"><line x1="'+px+'" y1="'+Y(0)+'" x2="'+(W-12)+'" y2="'+Y(0)+'" style="stroke:var(--line)"/>'
+    +L.map(function(l,i){return '<text x="'+X(i)+'" y="'+(H-6)+'" text-anchor="middle" font-size="11" style="fill:var(--muted)">'+l+'</text>'}).join("")
+    +'<text x="2" y="'+(py+4)+'" font-size="11" style="fill:var(--muted)">'+mx+'</text>'+line(ca,"var(--brass)")+line(cb,"var(--blood)")+'</svg>';
+}
+function summaryHtml(){
+  var m=M,na=esc(m.pa.name),nb=esc(m.pb.name);
+  var h='<section class="summ"><h2>Rezumat</h2>'+chart(cumul(m.sa),cumul(m.sb))+'<div class="legend"><span style="color:var(--brass)">■</span> '+na+' · <span style="color:var(--blood)">■</span> '+nb+' · VP cumulat pe runde</div>';
+  h+='<div class="tblw"><table class="tbl"><tr><th></th><th>Jucător</th>'+[1,2,3,4,5].map(function(i){return '<th>R'+i+'</th>'}).join("")+'<th>F</th><th>+10</th><th>Total</th></tr>';
+  ["a","b"].forEach(function(s){
+    var ps=m["s"+s],fin=ps.log.reduce(function(a,e){return a+(e.f?e.v:0)},0);
+    h+='<tr><td>'+(m.atk?(m.atk===s?"A":"D"):"")+'</td><td>'+esc(m["p"+s].name)+'</td>'+[1,2,3,4,5].map(function(i){return '<td>'+(Math.min(15,Math.max(0,roundVP(ps,"pri",i)))+Math.min(15,Math.max(0,roundVP(ps,"sec",i))))+'</td>'}).join("")+'<td>'+fin+'</td><td>'+(ps.br?10:0)+'</td><td><b>'+totalPS(ps)+'</b></td></tr>';
+  });
+  h+='</table></div>';
+  ["a","b"].forEach(function(s){
+    var ps=m["s"+s],gain=0,spent=0;
+    ps.log.forEach(function(e){if(e.k==="cp"){if(e.v>0)gain+=e.v;else spent-=e.v}});
+    var top=ps.log.filter(function(e){return e.k!=="cp"&&e.v>0}).sort(function(x,y){return y.v-x.v}).slice(0,3);
+    h+='<div class="info"><b>'+esc(m["p"+s].name)+'</b> · Primar '+sums(ps,"pri")+' · Secundar '+sums(ps,"sec")+' · CP câștigat '+gain+', folosit '+spent+(m.tt&&m.tt[s]?' · timp jucat '+fmtT(m.tt[s]):'')
+      +(top.length?'<div class="wev">Cele mai mari punctaje: '+top.map(function(e){return '+'+e.v+' '+(e.k==="pri"?"Primar":"Secundar")+' (R'+e.r+')'}).join(", ")+'</div>':'')+'</div>';
+  });
+  if(m.atk)h+='<div class="info">Atacator: <b>'+esc(m["p"+m.atk].name)+'</b> · Defender: <b>'+esc(m["p"+(m.atk==="a"?"b":"a")].name)+'</b></div>';
+  return h+'</section>';
+}
+
 function render(){
   var m=M,started=m.first!=null,ended=m.turn>=10,a=actS(),live=m.status==="active";
-  [ "sa","sb" ].forEach(function(k){m[k]=Object.assign(newPS(),m[k])});
-  var rdy=!!(m.sa.ready&&m.sb.ready);
-  var h='<h1>'+esc(m.pa.name)+' <span class="vs">vs</span> '+esc(m.pb.name)+'</h1>';
+  ["sa","sb"].forEach(function(k){m[k]=Object.assign(newPS(),m[k])});
+  var rdy=!!(m.sa.ready&&m.sb.ready),roleOk=!!m.atk,na=esc(m.pa.name),nb=esc(m.pb.name);
+  var h='<h1>'+na+' <span class="vs">vs</span> '+nb+'</h1>';
   h+='<div class="info">'+(m.type==="tournament"?"Meci de turneu":"Meci amical")+(m.deploy?' · Deployment: <b>'+esc(m.deploy)+'</b>':'')+(m.twist?' · Twist: <b>'+esc(m.twist)+'</b> – '+esc(TWISTS[m.twist]):'')+'</div>';
   if(m.status==="invited"){
     h+='<div class="banner">Invitație în așteptare.'+(App.me===m.b?'<div class="vpb" style="justify-content:center">'+B("acc","","Acceptă","")+B("dec","","Refuză","",false,"ghost")+'</div>':' Așteaptă răspunsul lui '+esc(m.b)+'.')+'</div>';
@@ -96,15 +136,26 @@ function render(){
   h+='<div class="banner"><div class="bigsc">'+totalPS(m.sa)+' – '+totalPS(m.sb)+'</div>';
   if(m.status==="done"){
     h+=(m.winner==="draw"?'Remiză':'Câștigător: <b>'+esc(m.winner==="a"?m.pa.name:m.pb.name)+'</b>')+(App.isAdmin?'<div class="vpb" style="justify-content:center">'+B("reopen","","Redeschide meciul","",false,"ghost")+'</div>':'');
+  }else if(m.status==="confirm"){
+    var pn=esc(m["p"+m.pBy].name),res=m.pw==="draw"?'remiză':'câștigă <b>'+esc(m["p"+m.pw].name)+'</b>',other=m.pBy==="a"?"b":"a";
+    h+='<div>'+pn+' propune scorul final <b>'+m.pta+' – '+m.ptb+'</b>, '+res+'.</div>';
+    if(App.isAdmin||App.me===m[other])h+='<div class="vpb" style="justify-content:center">'+B("confirm","","Confirmă scorul")+B("contest","","Contestă","",false,"ghost")+'</div>';
+    else h+='<div class="legend">Se așteaptă confirmarea adversarului.</div><div class="vpb" style="justify-content:center">'+B("withdraw","","Retrage propunerea","",false,"ghost")+'</div>';
   }else if(!started){
-    h+='Cine joacă prima tură?<div class="vpb" style="justify-content:center">'+B("first","",esc(m.pa.name),' data-v="a"',!rdy)+B("first","",esc(m.pb.name),' data-v="b"',!rdy)+B("first","","Zar random",' data-v="rand"',!rdy,"ghost")+'</div><div class="legend">'+(rdy?'Ambii jucători au confirmat.':'Înainte de start, fiecare jucător își alege Force Disposition și secundarele (Tactical sau Fixed) și apasă „Confirmă alegerea”.')+'</div>';
+    var oth=m.atk==="a"?"b":"a";
+    h+='<div class="steps"><div><b>1. Rolul</b> (câștigătorul zarului alege)<div class="vpb">'
+      +(m.atk?'Atacator: <b>'+esc(m["p"+m.atk].name)+'</b> · Defender: <b>'+esc(m["p"+oth].name)+'</b> '+B("atk","","Inversează",' data-v="'+oth+'"',false,"ghost"):B("atk","",na+" atacator",' data-v="a"')+B("atk","",nb+" atacator",' data-v="b"'))
+      +'</div>'+(m.atk?'<div class="legend">Defender-ul își așază primul unitățile, iar Atacatorul începe redeployment-ul.</div>':'')+'</div>'
+      +'<div><b>2. Alegerile</b> (Force Disposition și secundare): '+na+(m.sa.ready?' ✓':' …')+' · '+nb+(m.sb.ready?' ✓':' …')+'</div>'
+      +'<div><b>3. Cine joacă prima tură</b> (zar, câștigătorul decide)<div class="vpb">'+B("first","",na,' data-v="a"',!(rdy&&roleOk))+B("first","",nb,' data-v="b"',!(rdy&&roleOk))+B("first","","Zar random",' data-v="rand"',!(rdy&&roleOk),"ghost")+'</div></div></div>';
   }else if(!ended){
     var an=m[a];
-    h+='Runda <b>'+rd()+'</b> din 5 · Tura lui <b>'+esc(P(a).name)+'</b><div class="vpb" style="justify-content:center">'+B("end","","Termină tura",'',!(App.isAdmin||App.me===an))+B("back","","Tura anterioară","",false,"ghost")+'</div>';
+    h+='Runda <b>'+rd()+'</b> din 5 · Tura lui <b>'+esc(P(a).name)+'</b> · <span class="timer" id="tmr" data-ts="'+(m.ts||0)+'"></span><div class="vpb" style="justify-content:center">'+B("end","","Termină tura",'',!(App.isAdmin||App.me===an))+B("back","","Tura anterioară","",false,"ghost")+'</div>';
   }else{
-    h+='Bătălia s-a încheiat. Adaugă punctele „Final bătălie” (F), apoi încheie meciul.<div class="vpb" style="justify-content:center">'+B("finish","","Încheie meciul","")+B("back","","Tura anterioară","",false,"ghost")+'</div>';
+    h+='Bătălia s-a încheiat. Adaugă punctele „Final bătălie” (F), apoi propune scorul final.<div class="vpb" style="justify-content:center">'+((App.me===m.a||App.me===m.b)?B("propose","","Propune scorul final",""):'')+(App.isAdmin?B("finish","","Încheie direct (admin)","",false,"ghost"):'')+B("back","","Tura anterioară","",false,"ghost")+'</div>';
   }
   h+='</div>';
+  if(m.status==="done")h+=summaryHtml();
   var first=App.me===m.b?"b":"a";
   h+='<div class="sides">'+sideHtml(first)+sideHtml(first==="a"?"b":"a")+'</div>';
   if(App.isAdmin)h+='<p style="margin-top:24px">'+B("del","","Șterge meciul","",false,"ghost")+'</p>';
@@ -112,22 +163,27 @@ function render(){
   [].forEach.call(document.querySelectorAll("details[data-k]"),function(d){d.addEventListener("toggle",function(){openS[d.getAttribute("data-k")]=d.open})});
 }
 
+function afterDone(){if(M.type==="tournament"&&M.tid)Tourney.tryAdvance(M.tid).catch(fail)}
+function verdict(){
+  var ta=totalPS(M.sa),tb=totalPS(M.sb),w=ta>tb?"a":(tb>ta?"b":"draw");
+  if(w==="draw"&&M.type==="tournament"&&(M.fmt||"elim")==="elim")w=confirm("Egalitate "+ta+"–"+tb+". "+M.pa.name+" trece mai departe? OK = "+M.pa.name+", Anulează = "+M.pb.name)?"a":"b";
+  return {ta:ta,tb:tb,w:w};
+}
+
 function go(a,el){
   var s=el.getAttribute("data-s"),n=el.getAttribute("data-n"),v=+el.getAttribute("data-v"),i=+el.getAttribute("data-i");
   if(a==="acc"){upd({status:"active",pa:App.snap(M.a),pb:App.snap(M.b)});return}
   if(a==="dec"){upd({status:"declined"});return}
-  if(a==="ready"){mut(s,function(ps){ps.ready=true});return}
-  if(a==="unready"){mut(s,function(ps){ps.ready=false});return}
-  if(a==="first"){if(!(M.sa.ready&&M.sb.ready))return;upd({first:el.getAttribute("data-v")==="rand"?pick(["a","b"]):el.getAttribute("data-v")});return}
-  if(a==="end"){upd({turn:M.turn+1});return}
-  if(a==="back"){upd({turn:Math.max(0,M.turn-1)});return}
-  if(a==="reopen"){upd({status:"active",winner:null});return}
+  if(a==="atk"){upd({atk:el.getAttribute("data-v")});return}
+  if(a==="first"){if(!(M.sa.ready&&M.sb.ready&&M.atk))return;upd({first:el.getAttribute("data-v")==="rand"?pick(["a","b"]):el.getAttribute("data-v"),ts:Date.now()});return}
+  if(a==="end"){var cur=actS(),o={turn:M.turn+1,ts:Date.now()};if(cur&&M.ts)o["tt."+cur]=firebase.firestore.FieldValue.increment(Date.now()-M.ts);upd(o);return}
+  if(a==="back"){upd({turn:Math.max(0,M.turn-1),ts:Date.now()});return}
+  if(a==="reopen"){upd({status:"active",winner:null,pw:null,pBy:null});return}
   if(a==="del"){if(confirm("Ștergi meciul definitiv?"))App.db.collection("matches").doc(mid).delete().then(function(){location.href="index.html"}).catch(fail);return}
-  if(a==="finish"){
-    var ta=totalPS(M.sa),tb=totalPS(M.sb),w=ta>tb?"a":(tb>ta?"b":"draw");
-    if(w==="draw"&&M.type==="tournament")w=confirm("Egalitate "+ta+"–"+tb+". "+M.pa.name+" trece mai departe? OK = "+M.pa.name+", Anulează = "+M.pb.name)?"a":"b";
-    upd({status:"done",winner:w});return;
-  }
+  if(a==="finish"){var f=verdict();upd({status:"done",winner:f.w,fta:f.ta,ftb:f.tb}).then(afterDone);return}
+  if(a==="propose"){var q=verdict();upd({status:"confirm",pw:q.w,pBy:App.me===M.b?"b":"a",pta:q.ta,ptb:q.tb});return}
+  if(a==="confirm"){upd({status:"done",winner:M.pw,fta:M.pta,ftb:M.ptb}).then(afterDone);return}
+  if(a==="contest"||a==="withdraw"){upd({status:"active",pw:null,pBy:null});return}
   if(a==="pv"){var pn=primOf(s),L=parseLine(PRI[pn].r[i]);mut(s,function(ps){logAdd(ps,"pri",v,pn+" – "+L.text.slice(0,45),L.w==="F")});return}
   if(a==="sv"){mut(s,function(ps){logAdd(ps,"sec",v,n);if(ps.mode==="T"){rm(ps.hand,n);rm(ps.fresh,n);ps.used.push(n)}});return}
   if(a==="toss"){mut(s,function(ps){logAdd(ps,"cp",1,"Aruncat: "+n);rm(ps.hand,n);rm(ps.fresh,n);ps.used.push(n)});return}
@@ -162,6 +218,7 @@ function onChange(el){
 }
 
 App.start(function(){
+  setInterval(function(){var e=$("tmr");if(e){var ts=+e.getAttribute("data-ts");e.textContent=ts?fmtT(Date.now()-ts):""}},1000);
   App.db.collection("matches").doc(mid).onSnapshot(function(d){
     if(!d.exists){$("box").innerHTML='<p class="err">Meciul nu există.</p>';return}
     M=Object.assign({id:d.id},d.data());render();

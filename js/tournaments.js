@@ -1,56 +1,52 @@
 var T=[],MS={},adv={};
+var FMT={elim:"Eliminare directă",rr:"Fiecare cu fiecare",swiss:"Sistem elvețian"};
 
-function tier(n){return n===2?"Finala":n===4?"Semifinale":n===8?"Sferturi":n===16?"Optimi de finală":"Runda de "+n}
-function mkMatch(tid,ri,a,b,batch){
-  var ref=App.db.collection("matches").doc();
-  batch.set(ref,App.newMatch({type:"tournament",tid:tid,ri:ri,a:a,b:b,status:"active",pa:App.snap(a),pb:App.snap(b)}));
-  return ref.id;
-}
 async function create(){
-  var name=$("tn").value.trim(),sel=[].map.call(document.querySelectorAll("#tp input:checked"),function(x){return x.value});
+  var name=$("tn").value.trim(),fmt=$("tf").value,sel=[].map.call(document.querySelectorAll("#tp input:checked"),function(x){return x.value});
   if(!name){alert("Dă un nume turneului.");return}
   if(sel.length<2){alert("Alege cel puțin 2 jucători.");return}
-  var L=shuffle(sel),size=1;while(size<L.length)size*=2;
-  var byes=size-L.length,rest=L.slice(byes),b=App.db.batch(),tref=App.db.collection("tournaments").doc(),ents=[];
-  L.slice(0,byes).forEach(function(n){ents.push({bye:n})});
-  for(var i=0;i<rest.length;i+=2)ents.push({m:mkMatch(tref.id,0,rest[i],rest[i+1],b)});
-  b.set(tref,{name:name,n:Date.now(),status:"active",players:sel,winner:null,rounds:[{name:tier(size),ents:ents}]});
+  var L=shuffle(sel),b=App.db.batch(),tref=App.db.collection("tournaments").doc(),doc={name:name,n:Date.now(),status:"active",players:L,winner:null,fmt:fmt},ents;
+  if(fmt==="elim"){
+    var size=1;while(size<L.length)size*=2;
+    var byes=size-L.length,rest=L.slice(byes),pairs=[];
+    for(var i=0;i<rest.length;i+=2)pairs.push([rest[i],rest[i+1]]);
+    ents=Tourney.ents(tref.id,0,pairs,L.slice(0,byes),fmt,b);
+    doc.totalRounds=Math.round(Math.log2(size));doc.rounds=[{name:tier(size),ents:ents}];
+  }else if(fmt==="rr"){
+    var r0=Tourney.rr(L,0);
+    ents=Tourney.ents(tref.id,0,r0.pairs,r0.byes,fmt,b);
+    doc.totalRounds=L.length+(L.length%2)-1;doc.rounds=[{name:"Runda 1",ents:ents}];
+  }else{
+    var bye=L.length%2?[L[L.length-1]]:[],rest2=L.slice(0,L.length-bye.length),p2=[];
+    for(var j=0;j<rest2.length;j+=2)p2.push([rest2[j],rest2[j+1]]);
+    ents=Tourney.ents(tref.id,0,p2,bye,fmt,b);
+    doc.totalRounds=Math.max(2,Math.ceil(Math.log2(L.length)));doc.rounds=[{name:"Runda 1",ents:ents}];
+  }
+  b.set(tref,doc);
   try{await b.commit();$("tn").value=""}catch(e){alert(nice(e))}
 }
-function winnersOf(t,ri){
-  var out=[];
-  for(var k=0;k<t.rounds[ri].ents.length;k++){
-    var e=t.rounds[ri].ents[k];
-    if(e.bye){out.push(e.bye);continue}
-    var m=MS[e.m];
-    if(!m||m.status!=="done"||(m.winner!=="a"&&m.winner!=="b"))return null;
-    out.push(m.winner==="a"?m.a:m.b);
-  }
-  return out;
-}
-async function advance(t){
-  var ri=t.rounds.length-1,w=winnersOf(t,ri);
-  if(!w||t.status==="done")return;
-  var tref=App.db.collection("tournaments").doc(t.id);
-  if(w.length===1){await tref.update({status:"done",winner:w[0]});return}
-  var b=App.db.batch(),ents=[];
-  for(var i=0;i<w.length;i+=2)ents.push({m:mkMatch(t.id,ri+1,w[i],w[i+1],b)});
-  b.update(tref,{rounds:t.rounds.concat([{name:tier(w.length),ents:ents}])});
-  await b.commit();
+function standTable(t){
+  var st=Tourney.standings(t,MS);
+  return '<div class="tblw"><table class="tbl"><tr><th>#</th><th>Jucător</th><th>Pct</th><th>V</th><th>E</th><th>Î</th><th>VP +/−</th></tr>'+st.map(function(x,i){
+    return '<tr><td>'+(i+1)+'</td><td>'+esc(x.n)+'</td><td><b>'+x.pts+'</b></td><td>'+x.w+'</td><td>'+x.d+'</td><td>'+x.l+'</td><td>'+(x.vf-x.va>0?"+":"")+(x.vf-x.va)+'</td></tr>';
+  }).join("")+'</table></div><div class="legend">Victorie 3 puncte, remiză 1, liber 3. La egalitate contează diferența de VP.</div>';
 }
 function card(t){
-  var h='<div class="card"><h2 style="margin-top:0">'+esc(t.name)+'</h2>';
+  var fmt=t.fmt||"elim";
+  var h='<div class="card"><h2 style="margin-top:0">'+esc(t.name)+' <span class="role">'+FMT[fmt]+'</span></h2>';
   if(t.status==="done")h+='<div class="banner">Câștigător: <b>'+esc(t.winner)+'</b></div>';
-  t.rounds.forEach(function(r,ri){
+  else if(t.totalRounds)h+='<div class="legend">Runda '+t.rounds.length+' din '+t.totalRounds+'</div>';
+  if(fmt!=="elim")h+=standTable(t);
+  t.rounds.forEach(function(r){
     h+='<h3>'+esc(r.name)+'</h3>';
     r.ents.forEach(function(e){
-      if(e.bye){h+='<div class="ln">'+esc(e.bye)+' — liber, trece mai departe</div>';return}
+      if(e.bye){h+='<div class="ln">'+esc(e.bye)+' — liber</div>';return}
       var m=MS[e.m];if(!m){h+='<div class="ln">…</div>';return}
-      var mine=m.a===App.me||m.b===App.me;
-      h+='<div class="ln'+(mine?' mine':'')+'"><b>'+esc(m.a)+' vs '+esc(m.b)+'</b> · '+(m.status==="done"?(m.winner==="a"?esc(m.a):esc(m.b))+' a câștigat ('+App.score(m)+')':'în desfășurare ('+App.score(m)+')')+' · <a href="match.html?id='+m.id+'">'+(mine&&m.status!=="done"?"Joacă":"Vezi")+'</a></div>';
+      var mine=m.a===App.me||m.b===App.me,res=m.status==="done"?(m.winner==="draw"?"remiză":(m.winner==="a"?esc(m.a):esc(m.b))+" a câștigat")+' ('+App.score(m)+')':(m.status==="confirm"?'se confirmă scorul':'în desfășurare')+' ('+App.score(m)+')';
+      h+='<div class="ln'+(mine?' mine':'')+'"><b>'+esc(m.a)+' vs '+esc(m.b)+'</b> · '+res+' · <a href="match.html?id='+m.id+'">'+(mine&&m.status!=="done"?"Joacă":"Vezi")+'</a></div>';
     });
   });
-  if(t.status!=="done")h+='<div class="legend">Runda următoare apare automat după ce se încheie toate meciurile rundei curente'+(App.isAdmin?' (cât timp ai pagina asta deschisă)':'')+'.</div>';
+  if(t.status!=="done")h+='<div class="legend">Runda următoare apare automat când se încheie toate meciurile rundei curente.</div>';
   if(App.isAdmin)h+='<div class="vpb"><button class="sm ghost" data-act="deltour" data-id="'+t.id+'">Șterge turneul</button></div>';
   return h+'</div>';
 }
@@ -60,17 +56,17 @@ function drawForm(){
   $("tp").innerHTML=App.players.map(function(p){return '<label class="opt"><input type="checkbox" value="'+esc(p.name)+'"'+(checked[p.name]===false?'':' checked')+'> '+esc(p.name)+'</label>'}).join("");
 }
 function render(){
-  var mine=Object.keys(MS).map(function(k){return MS[k]}).filter(function(m){return (m.a===App.me||m.b===App.me)&&m.status==="active"});
+  var mine=Object.keys(MS).map(function(k){return MS[k]}).filter(function(m){return (m.a===App.me||m.b===App.me)&&m.status!=="done"});
   $("mine").innerHTML=mine.length?mine.map(App.matchRow).join(""):'<p class="empty">Nu ai meciuri de turneu în desfășurare.</p>';
   $("tlist").innerHTML=T.length?T.map(card).join(""):'<p class="empty">Niciun turneu încă.</p>';
-  if(App.isAdmin)T.forEach(function(t){
-    if(t.status==="done")return;
-    var k=t.id+":"+t.rounds.length;
-    if(!adv[k]&&winnersOf(t,t.rounds.length-1)){adv[k]=1;advance(t).catch(fail)}
+  T.forEach(function(t){
+    if(t.status==="done"||!(App.isAdmin||t.players.indexOf(App.me)>=0))return;
+    var ri=t.rounds.length-1,k=t.id+":"+t.rounds.length;
+    if(!adv[k]&&Tourney.roundDone(t,ri,MS)){adv[k]=1;Tourney.advance(t,MS).catch(fail)}
   });
 }
 App.start(function(){
-  show();
+  if(App.isAdmin)$("adm").classList.remove("hidden");
   App.onPlayers=drawForm;
   App.db.collection("tournaments").orderBy("n","desc").onSnapshot(function(s){T=s.docs.map(function(d){return Object.assign({id:d.id},d.data())});render()},fail);
   App.db.collection("matches").where("type","==","tournament").onSnapshot(function(s){MS={};s.docs.forEach(function(d){MS[d.id]=Object.assign({id:d.id},d.data())});render()},fail);
@@ -83,4 +79,3 @@ App.start(function(){
     try{await b.commit()}catch(x){alert(nice(x))}
   });
 });
-function show(){if(App.isAdmin)$("adm").classList.remove("hidden")}

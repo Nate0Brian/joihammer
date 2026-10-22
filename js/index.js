@@ -3,7 +3,7 @@ var MS=[];
 function draw(ms){
   MS=ms;
   var inv=ms.filter(function(m){return m.status==="invited"&&m.b===App.me});
-  var act=ms.filter(function(m){return m.status==="active"});
+  var act=ms.filter(function(m){return m.status==="active"||m.status==="confirm"});
   var done=ms.filter(function(m){return m.status==="done"}).slice(0,8);
   $("inv").innerHTML=inv.length?inv.map(function(m){return '<div class="card"><b>'+esc(m.a)+'</b> te invită la un meci amical.<div class="vpb"><button class="sm" data-act="acc" data-id="'+m.id+'">Acceptă</button><button class="sm ghost" data-act="dec" data-id="'+m.id+'">Refuză</button></div></div>'}).join(""):'<p class="empty">Nicio invitație.</p>';
   $("act").innerHTML=act.length?act.map(App.matchRow).join(""):'<p class="empty">Niciun meci în desfășurare.</p>';

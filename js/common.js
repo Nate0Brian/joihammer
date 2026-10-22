@@ -14,7 +14,7 @@ App.start=function(cb,onOut){
   App.auth.onAuthStateChanged(function(u){
     if(!u){if(onOut)onOut();else location.href="index.html";return}
     App.me=u.email.split(".")[0];App.isAdmin=u.email===ADMIN_EMAIL;
-    if($("nav"))App.nav();
+    if($("nav")){App.nav();App.watchInvites()}
     App.db.collection("players").onSnapshot(function(s){
       App.players=s.docs.map(function(d){var x=d.data();return {name:d.id,army:x.army||"",det:x.det||"",fd:x.fd||FDS[0]}}).sort(function(a,b){return a.name<b.name?-1:1});
       App.onPlayers();
@@ -24,7 +24,7 @@ App.start=function(cb,onOut){
 };
 App.nav=function(){
   var cur=location.pathname.split("/").pop()||"index.html";
-  var L=[["index.html","Acasă"],["friendly.html","Meci amical"],["tournaments.html","Turnee"],["watch.html","Live"],["profile.html","Profil"]];
+  var L=[["index.html","Acasă"],["friendly.html","Meci amical"],["tournaments.html","Turnee"],["watch.html","Live"],["stats.html","Clasament"],["profile.html","Profil"]];
   if(App.isAdmin)L.push(["admin.html","Admin"]);
   $("nav").innerHTML=L.map(function(l){return '<a href="'+l[0]+'"'+(cur===l[0]?' class="on"':'')+'>'+l[1]+'</a>'}).join("")+'<a href="#" id="out">Ieși ('+esc(App.me)+')</a>';
   $("out").onclick=function(e){e.preventDefault();App.auth.signOut()};
@@ -34,7 +34,7 @@ App.snap=function(n){
   return {name:p.name,army:p.army,det:p.det,fd:p.fd};
 };
 App.newMatch=function(o){
-  return Object.assign({n:Date.now(),first:null,turn:0,sa:newPS(),sb:newPS(),deploy:pick(DEPLOYS)},o);
+  return Object.assign({n:Date.now(),atk:null,first:null,turn:0,sa:newPS(),sb:newPS(),deploy:pick(DEPLOYS)},o);
 };
 App.watchMatches=function(cb){
   var A=[],B=[],q=App.db.collection("matches");
@@ -45,7 +45,24 @@ App.watchMatches=function(cb){
 };
 App.score=function(m){return totalPS(Object.assign(newPS(),m.sa))+" – "+totalPS(Object.assign(newPS(),m.sb))};
 App.matchRow=function(m){
-  var st={invited:"Invitație",declined:"Refuzat",active:"În desfășurare",done:"Încheiat"}[m.status]||m.status;
+  var st={invited:"Invitație",declined:"Refuzat",active:"În desfășurare",confirm:"Așteaptă confirmarea scorului",done:"Încheiat"}[m.status]||m.status;
   var res=m.status==="done"&&m.winner?" · "+(m.winner==="draw"?"remiză":"câștigă "+esc(m.winner==="a"?m.a:m.b)):"";
   return '<a class="card rowlink" href="match.html?id='+m.id+'"><b>'+(m.type==="tournament"?"Turneu":"Amical")+' · '+esc(m.a)+' vs '+esc(m.b)+'</b><span>'+st+(m.status==="invited"||m.status==="declined"?"":" · "+App.score(m))+res+'</span></a>';
 };
+
+/* notificare: număr de invitații pe meniu + notificare de browser (cât timp aplicația e deschisă) */
+App.badge=function(n){var a=document.querySelector('#nav a[href="friendly.html"]');if(a)a.textContent="Meci amical"+(n?" ("+n+")":"")};
+App.notify=function(t,b){
+  try{new Notification(t,{body:b})}catch(e){
+    if(navigator.serviceWorker)navigator.serviceWorker.ready.then(function(r){r.showNotification(t,{body:b})}).catch(function(){});
+  }
+};
+App.watchInvites=function(){
+  var first=true;
+  App.db.collection("matches").where("b","==",App.me).where("status","==","invited").onSnapshot(function(s){
+    App.badge(s.size);
+    if(!first&&"Notification" in window&&Notification.permission==="granted")s.docChanges().forEach(function(c){if(c.type==="added")App.notify("Invitație la meci",c.doc.data().a+" te invită la un meci amical.")});
+    first=false;
+  },function(){});
+};
+if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})});

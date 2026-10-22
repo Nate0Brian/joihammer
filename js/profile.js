@@ -8,6 +8,7 @@ function draw(){
 }
 App.start(function(){
   App.onPlayers=draw;
+  var nb=$("nt");if(nb){if(!("Notification" in window))nb.classList.add("hidden");else nb.onclick=function(){Notification.requestPermission().then(function(r){$("st").textContent=r==="granted"?"Notificările sunt active (merg cât timp aplicația e deschisă).":"Notificările nu au fost permise."})}}
   $("chp").onclick=async function(){
     var cur=prompt("Parola actuală:");if(!cur)return;
     var nw=prompt("Parola nouă (minim 6 caractere):");if(!nw)return;

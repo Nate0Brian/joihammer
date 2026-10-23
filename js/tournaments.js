@@ -20,7 +20,7 @@ async function create(){
     var bye=L.length%2?[L[L.length-1]]:[],rest2=L.slice(0,L.length-bye.length),p2=[];
     for(var j=0;j<rest2.length;j+=2)p2.push([rest2[j],rest2[j+1]]);
     ents=Tourney.ents(tref.id,0,p2,bye,fmt,b);
-    doc.totalRounds=Math.max(2,Math.ceil(Math.log2(L.length)));doc.rounds=[{name:"Runda 1",ents:ents}];
+    doc.totalRounds=Math.min(L.length-1,Math.max(2,Math.ceil(Math.log2(L.length))));doc.rounds=[{name:"Runda 1",ents:ents}];
   }
   b.set(tref,doc);
   try{await b.commit();$("tn").value=""}catch(e){alert(nice(e))}

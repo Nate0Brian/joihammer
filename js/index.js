@@ -25,7 +25,7 @@ App.start(function(){
     var el=e.target.closest("button[data-act]");if(!el)return;
     var m=MS.filter(function(x){return x.id===el.getAttribute("data-id")})[0];if(!m)return;
     var ref=App.db.collection("matches").doc(m.id);
-    if(el.getAttribute("data-act")==="acc")ref.update({status:"active",pa:App.snap(m.a),pb:App.snap(m.b)}).then(function(){location.href="match.html?id="+m.id}).catch(fail);
+    if(el.getAttribute("data-act")==="acc")ref.update({status:"active",pa:App.snapOr(m.a,m.pa),pb:App.snapOr(m.b,m.pb)}).then(function(){location.href="match.html?id="+m.id}).catch(fail);
     else ref.update({status:"declined"}).catch(fail);
   });
 },showLogin);

@@ -34,7 +34,7 @@ var Data={
       if(!d.fd){any=true;return}
       if(!seen[d.fd]){seen[d.fd]=1;out.push(d.fd)}
     });
-    return (any||!out.length)?FDS.slice():out;
+    return any?FDS.slice():out;
   }
 };
 

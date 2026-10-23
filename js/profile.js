@@ -6,7 +6,7 @@ function dpOf(army,dets){
 }
 function paint(){
   var dets=Data.detsOf(cur.army),fdo=Data.fdsFor(cur.army,cur.dets);
-  if(fdo.indexOf(cur.fd)<0)cur.fd=fdo[0];
+  if(fdo.length&&fdo.indexOf(cur.fd)<0)cur.fd=fdo[0];
   var h='<div class="grid"><select id="army" class="full" aria-label="Armata"><option value="">— alege armata —</option>'+Data.armies().map(function(a){return '<option'+(a===cur.army?' selected':'')+'>'+esc(a)+'</option>'}).join("")+'</select></div>';
   if(cur.army){
     h+='<h3>Detașamente</h3><div class="dets">'+dets.map(function(d){
@@ -14,11 +14,12 @@ function paint(){
     }).join("")+'</div>';
     var dp=dpOf(cur.army,cur.dets);
     h+='<div class="legend">Total detașamente: <b>'+dp+' DP</b> (2 DP la 1000 puncte, 3 DP la 2000 puncte).</div>';
-    h+='<label class="opt">Force Disposition al armatei <select id="fd">'+fdo.map(function(f){return '<option'+(f===cur.fd?' selected':'')+'>'+esc(f)+'</option>'}).join("")+'</select></label>';
-    h+='<div class="legend">'+(fdo.length===1?'Din detașamentele alese.':'Alege unul dintre Force Disposition-urile detașamentelor tale.')+'</div>';
+    if(!fdo.length)h+='<div class="legend">Bifează cel puțin un detașament. Force Disposition-ul se alege doar dintre cele ale detașamentelor tale.</div>';
+    else h+='<label class="opt">Force Disposition al armatei <select id="fd">'+fdo.map(function(f){return '<option'+(f===cur.fd?' selected':'')+'>'+esc(f)+'</option>'}).join("")+'</select></label>'+'<div class="legend">'+(fdo.length===1?'Din detașamentul ales.':'Alege unul dintre Force Disposition-urile detașamentelor tale.')+'</div>';
   }
   h+='<p><button id="save">Salvează</button></p>';
   $("pf").innerHTML=h;
+  if(!fdo.length){$("pm").innerHTML='<p class="empty">Alege un detașament ca să vezi misiunile tale.</p>';return}
   var rows=FDS.map(function(opp,i){return '<tr><td>'+esc(opp)+'</td><td><b>'+esc(FDM[cur.fd][i])+'</b></td></tr>'}).join("");
   $("pm").innerHTML='<div class="tblw"><table class="tbl"><tr><th>Dacă adversarul are</th><th>Misiunea ta primară</th></tr>'+rows+'</table></div><div class="legend">Regulile fiecărei misiuni sunt în pagina <a href="missions.html">Misiuni</a>.</div>';
 }
@@ -44,6 +45,8 @@ App.start(function(){
   });
   $("pf").addEventListener("click",function(e){
     if(e.target.id!=="save")return;
+    var allowed=Data.fdsFor(cur.army,cur.dets);
+    if(!cur.army||!cur.dets.length||allowed.indexOf(cur.fd)<0){$("st").textContent="Alege armata, cel puțin un detașament și un Force Disposition permis de ele.";return}
     App.db.collection("players").doc(App.me).update({army:cur.army,dets:cur.dets,det:cur.dets.join(", "),fd:cur.fd})
       .then(function(){$("st").textContent="Salvat.";cur=null}).catch(fail);
   });

@@ -12,7 +12,7 @@ function status(m){
 function baseP(m,s){
   var me=m["p"+s],op=m["p"+(s==="a"?"b":"a")];
   if(!me||!op||!FDM[me.fd]||!FDM[op.fd])return "";
-  return me.prim&&PRI[me.prim]?me.prim:FDM[me.fd][FDS.indexOf(op.fd)];
+  return FDM[me.fd][FDS.indexOf(op.fd)];
 }
 function primName(m,s){return m.twist==="Scrambled Communications"?baseP(m,s==="a"?"b":"a"):baseP(m,s)}
 function cell(ps,r){

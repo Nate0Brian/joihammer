@@ -14,7 +14,6 @@ function cardOf(n){return SEC.filter(function(c){return c.n===n})[0]}
 function rm(a,n){var i=a.indexOf(n);if(i>=0)a.splice(i,1)}
 function baseOf(s){
   var me=P(s),op=P(s==="a"?"b":"a");
-  if(me.prim&&PRI[me.prim])return me.prim;
   return FDM[me.fd][FDS.indexOf(op.fd)];
 }
 function primOf(s){return M.twist==="Scrambled Communications"?baseOf(s==="a"?"b":"a"):baseOf(s)}
@@ -37,7 +36,6 @@ function sideHtml(s){
     else h+='<label class="opt">Force Disposition <select data-act="fd" data-s="'+s+'"'+(ps.ready?' disabled':'')+'>'+(fdOk?'':'<option value="">Alege…</option>')+fo.map(function(f){return '<option'+(f===pl.fd?' selected':'')+'>'+f+'</option>'}).join("")+'</select></label><div class="legend">Poți alege doar dintre Force Disposition-urile detașamentelor tale.</div>';
   }else h+='<div class="info">Force Disposition: <b>'+(fdOk||started?esc(pl.fd):'neales')+'</b></div>';
 
-  if(!started&&mine&&live&&!ps.ready)h+='<label class="opt">Misiune primară <select data-act="pmis" data-s="'+s+'"><option value="">Din Force Disposition</option>'+Object.keys(PRI).map(function(n){return '<option'+(n===pl.prim?' selected':'')+'>'+esc(n)+'</option>'}).join("")+'</select></label>';
   if(started)h+='<div class="info">Timp jucat: <b>'+fmtT((M.tt&&M.tt[s])||0)+'</b></div>';
   h+='<div class="board"><div><span>Primar</span><b>'+sums(ps,"pri")+'</b></div><div><span>Secundar</span><b>'+sums(ps,"sec")+'</b></div><div><span>Pictată</span><b>'+(ps.br?10:0)+'</b></div><div class="bt"><span>Total VP</span><b>'+totalPS(ps)+'</b></div><div><span>CP</span><b>'+cp+'</b></div></div>';
   h+='<div class="legend">Pe runde (max 15): primar '+[1,2,3,4,5].map(function(i){return roundVP(ps,"pri",i)}).join(" / ")+' · secundar '+[1,2,3,4,5].map(function(i){return roundVP(ps,"sec",i)}).join(" / ")+'</div>';
@@ -228,7 +226,6 @@ function onChange(el){
   var a=el.getAttribute("data-act"),s=el.getAttribute("data-s");
   if(a==="br")mut(s,function(ps){ps.br=el.checked});
   if(a==="mode")mut(s,function(ps){ps.mode=el.value;if(el.value!=="F")ps.fixed=[]});
-  if(a==="pmis"){var o2={};o2[s==="a"?"pa":"pb"]=Object.assign({},P(s),{prim:el.value});upd(o2)}
   if(a==="fd"){if(!el.value||Data.fdsFor(P(s).army,P(s).dets).indexOf(el.value)<0)return;var o={};o[s==="a"?"pa":"pb"]=Object.assign({},P(s),{fd:el.value});upd(o)}
   if(a==="fix"){
     var n=el.getAttribute("data-n"),ps=PS(s);

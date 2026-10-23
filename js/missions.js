@@ -30,8 +30,11 @@ function viewDet(){
   }else h+='<p class="empty">Alege o armată și un detașament ca să vezi Force Disposition-ul și misiunile lui.</p>';
   return h;
 }
+var fdSel="";
 function viewPrim(){
-  return FDS.map(function(fd){return '<h2>'+esc(fd)+'</h2>'+fdTable(fd)}).join("");
+  if(!fdSel){var me=App.players.filter(function(x){return x.name===App.me})[0];fdSel=(me&&FDM[me.fd]&&me.fd)||FDS[0]}
+  return '<div class="legend">Alege un Force Disposition. Misiunea ta primară depinde de Force Disposition-ul tău și de al adversarului.</div><div class="chips">'
+    +FDS.map(function(f){return '<button data-pf="'+esc(f)+'"'+(f===fdSel?' class="on"':'')+'>'+esc(f)+'</button>'}).join("")+'</div>'+fdTable(fdSel);
 }
 function viewSec(){
   return '<div class="legend">Tactical: tragi 2 cărți la începutul fazei Command. Fixed: alegi 2 cărți care nu se aruncă. Marcajul „Fixed” arată cărțile permise ca Fixed.</div>'+SEC.map(function(c){
@@ -53,6 +56,7 @@ App.start(function(){
     if(e.target.id==="md"){sel.det=e.target.value;render()}
   });
   $("mv").addEventListener("click",function(e){
+    var p=e.target.closest("button[data-pf]");if(p){fdSel=p.getAttribute("data-pf");render();return}
     var b=e.target.closest("button[data-fd]");if(b)$("fdx").innerHTML=fdTable(b.getAttribute("data-fd"));
   });
   render();

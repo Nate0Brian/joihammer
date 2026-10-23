@@ -132,17 +132,17 @@ function render(){
   var h='<h1>'+na+' <span class="vs">vs</span> '+nb+'</h1>';
   h+='<div class="info">'+(m.type==="tournament"?"Meci de turneu":"Meci amical")+(m.deploy?' · Deployment: <b>'+esc(m.deploy)+'</b>':'')+(m.twist?' · Twist: <b>'+esc(m.twist)+'</b> – '+esc(TWISTS[m.twist]):'')+'</div>';
   if(m.status==="invited"){
-    h+='<div class="banner">Invitație în așteptare.'+(App.me===m.b?'<div class="vpb" style="justify-content:center">'+B("acc","","Acceptă","")+B("dec","","Refuză","",false,"ghost")+'</div>':' Așteaptă răspunsul lui '+esc(m.b)+'.')+'</div>';
+    h+='<div class="banner">Invitație în așteptare.'+(App.me===m.b?'<div class="vpb" style="justify-content:center">'+B("acc","","Acceptă","")+B("dec","","Refuză","",false,"ghost")+'</div>':' Așteaptă răspunsul lui '+esc(m.b)+'.'+(App.me===m.a?'<div class="vpb" style="justify-content:center">'+B("dec","","Anulează invitația","",false,"ghost")+'</div>':''))+'</div>';
     $("box").innerHTML=h;return;
   }
-  if(m.status==="declined"||m.status==="cancelled"){$("box").innerHTML=h+'<div class="banner">'+(m.status==="cancelled"?"Meciul a fost anulat (un jucător a fost șters).":"Invitația a fost refuzată sau anulată.")+'</div>';return}
+  if(m.status==="declined"||m.status==="cancelled"){$("box").innerHTML=h+'<div class="banner">'+(m.status==="cancelled"?"Meciul a fost anulat.":"Invitația a fost refuzată sau anulată.")+'</div>';return}
 
   h+='<div class="banner"><div class="bigsc">'+totalPS(m.sa)+' – '+totalPS(m.sb)+'</div>';
   if(m.status==="done"){
-    h+=(m.winner==="draw"?'Remiză':'Câștigător: <b>'+esc(m.winner==="a"?m.pa.name:m.pb.name)+'</b>'+(m.wo?' (neprezentare)':''))+(App.isAdmin?'<div class="vpb" style="justify-content:center">'+B("reopen","","Redeschide meciul","",false,"ghost")+'</div>':'');
+    h+=(m.winner==="draw"?'Remiză':'Câștigător: <b>'+esc(m.winner==="a"?m.pa.name:m.pb.name)+'</b>'+(m.wo?' (neprezentare)':'')+(m.early?' (încheiat anticipat)':''))+(App.isAdmin?'<div class="vpb" style="justify-content:center">'+B("reopen","","Redeschide meciul","",false,"ghost")+'</div>':'');
   }else if(m.status==="confirm"){
     var pn=esc(m["p"+m.pBy].name),res=m.pw==="draw"?'remiză':'câștigă <b>'+esc(m["p"+m.pw].name)+'</b>',other=m.pBy==="a"?"b":"a";
-    h+='<div>'+pn+' propune scorul final <b>'+m.pta+' – '+m.ptb+'</b>, '+res+'.</div>';
+    h+='<div>'+pn+' propune '+(m.early?'încheierea anticipată cu scorul':'scorul final')+' <b>'+m.pta+' – '+m.ptb+'</b>, '+res+'.</div>';
     if(App.isAdmin||App.me===m[other])h+='<div class="vpb" style="justify-content:center">'+B("confirm","","Confirmă scorul")+B("contest","","Contestă","",false,"ghost")+'</div>';
     else h+='<div class="legend">Se așteaptă confirmarea adversarului.</div><div class="vpb" style="justify-content:center">'+B("withdraw","","Retrage propunerea","",false,"ghost")+'</div>';
   }else if(!started){
@@ -158,6 +158,8 @@ function render(){
   }else{
     h+='Bătălia s-a încheiat. Adaugă punctele „Final bătălie” (F), apoi propune scorul final.<div class="vpb" style="justify-content:center">'+((App.me===m.a||App.me===m.b)?B("propose","","Propune scorul final",""):'')+(App.isAdmin?B("finish","","Încheie direct (admin)","",false,"ghost"):'')+B("back","","Tura anterioară","",false,"ghost")+'</div>';
   }
+  var fr=m.type==="friendly"&&m.status==="active"&&(App.isAdmin||App.me===m.a||App.me===m.b);
+  if(fr)h+='<div class="vpb" style="justify-content:center">'+B("early","","Încheie cu scorul de acum",'',!started,"ghost")+B("cancel","","Anulează meciul",'',false,"ghost")+'</div><div class="legend">Doar la meciurile amicale. „Anulează” nu se numără în statistici; încheierea anticipată se numără și cere confirmarea adversarului.</div>';
   h+='</div>';
   if(m.status==="done")h+=summaryHtml();
   var first=App.me===m.b?"b":"a";
@@ -200,7 +202,9 @@ function go(a,el){
   if(a==="finish"){var f=verdict();upd({status:"done",winner:f.w,fta:f.ta,ftb:f.tb}).then(afterDone);return}
   if(a==="propose"){var q=verdict();upd({status:"confirm",pw:q.w,pBy:App.me===M.b?"b":"a",pta:q.ta,ptb:q.tb});return}
   if(a==="confirm"){upd({status:"done",winner:M.pw,fta:M.pta,ftb:M.ptb}).then(afterDone);return}
-  if(a==="contest"||a==="withdraw"){upd({status:"active",pw:null,pBy:null});return}
+  if(a==="contest"||a==="withdraw"){upd({status:"active",pw:null,pBy:null,early:false});return}
+  if(a==="cancel"){if(confirm("Anulezi meciul? Nu se va număra în statistici și dispare din Live."))upd({status:"cancelled",pw:null,pBy:null});return}
+  if(a==="early"){var e=verdict();if(confirm("Încheii meciul cu scorul de acum ("+e.ta+" – "+e.tb+")? Adversarul trebuie să confirme."))upd({status:"confirm",pw:e.w,pBy:App.me===M.b?"b":"a",pta:e.ta,ptb:e.tb,early:true});return}
   if(a==="pv"){var pn=primOf(s),L=parseLine(PRI[pn].r[i]);mut(s,function(ps){logAdd(ps,"pri",v,pn+" – "+L.text.slice(0,45),L.w==="F")});return}
   if(a==="sv"){mut(s,function(ps){logAdd(ps,"sec",v,n);if(ps.mode==="T"){rm(ps.hand,n);rm(ps.fresh,n);ps.used.push(n)}});return}
   if(a==="toss"){mut(s,function(ps){logAdd(ps,"cp",1,"Aruncat: "+n);rm(ps.hand,n);rm(ps.fresh,n);ps.used.push(n)});return}

@@ -28,7 +28,7 @@ function fixedSum(ps,n){return ps.log.reduce(function(a,e){return a+(e.k==="sec"
 function cardHtml(c){return '<b class="t">'+esc(c.n)+'</b><ul>'+c.r.map(function(x){return '<li>'+esc(x)+'</li>'}).join("")+'</ul>'}
 
 function sideHtml(s){
-  var ps=PS(s),pl=P(s),started=M.first!=null,ended=M.turn>=10,a=actS(),mine=own(s),live=M.status==="active",r=rd(),cp=cpOf(ps);
+  var ps=PS(s),pl=P(s),started=M.first!=null,ended=M.turn>=10,a=actS(),mine=own(s),live=M.status==="active",r=rd(),cp=cpOf(ps),capP={t:sums(ps,"pri")>=45,r:roundVP(ps,"pri",r)>=15},capS={t:sums(ps,"sec")>=45,r:roundVP(ps,"sec",r)>=15};
   var h='<section class="side"><h2>'+esc(pl.name)+(App.me===M[s]?' <small>(tu)</small>':'')+(M.atk?' <span class="role">'+(M.atk===s?'Atacator':'Defender')+'</span>':'')+'</h2><div class="info">'+esc([pl.army,pl.det].filter(Boolean).join(" · "))+'</div>';
   var fo=Data.fdsFor(pl.army,pl.dets),fdOk=fo.indexOf(pl.fd)>=0;
   if(!started&&mine&&live){
@@ -39,13 +39,14 @@ function sideHtml(s){
   if(started)h+='<div class="info">Timp jucat: <b>'+fmtT((M.tt&&M.tt[s])||0)+'</b></div>';
   h+='<div class="board"><div><span>Primar</span><b>'+sums(ps,"pri")+'</b></div><div><span>Secundar</span><b>'+sums(ps,"sec")+'</b></div><div><span>Pictată</span><b>'+(ps.br?10:0)+'</b></div><div class="bt"><span>Total VP</span><b>'+totalPS(ps)+'</b></div><div><span>CP</span><b>'+cp+'</b></div></div>';
   h+='<div class="legend">Pe runde (max 15): primar '+[1,2,3,4,5].map(function(i){return roundVP(ps,"pri",i)}).join(" / ")+' · secundar '+[1,2,3,4,5].map(function(i){return roundVP(ps,"sec",i)}).join(" / ")+'</div>';
-  h+='<div class="vpb">'+B("cp",s,"−1 CP",' data-v="-1"',!(mine&&live),"ghost")+B("cp",s,"+1 CP",' data-v="1"',!(mine&&live),"ghost")+B("man",s,"−1 VP primar",' data-k="pri" data-v="-1"',!(mine&&live&&started),"ghost")+B("man",s,"+1 VP primar",' data-k="pri" data-v="1"',!(mine&&live&&started),"ghost")+B("man",s,"−1 VP secundar",' data-k="sec" data-v="-1"',!(mine&&live&&started),"ghost")+B("man",s,"+1 VP secundar",' data-k="sec" data-v="1"',!(mine&&live&&started),"ghost")+'</div>';
+  if(capP.t||capP.r||capS.t||capS.r)h+='<div class="legend">'+(capP.t?'Primar: maxim 45 VP atins. ':capP.r?'Primar: 15/15 VP în runda curentă. ':'')+(capS.t?'Secundar: maxim 45 VP atins. ':capS.r?'Secundar: 15/15 VP în runda curentă. ':'')+'Se pot doar scădea puncte.</div>';
+  h+='<div class="vpb">'+B("cp",s,"−1 CP",' data-v="-1"',!(mine&&live),"ghost")+B("cp",s,"+1 CP",' data-v="1"',!(mine&&live),"ghost")+B("man",s,"−1 VP primar",' data-k="pri" data-v="-1"',!(mine&&live&&started),"ghost")+B("man",s,"+1 VP primar",' data-k="pri" data-v="1"',!(mine&&live&&started)||capP.t||capP.r,"ghost")+B("man",s,"−1 VP secundar",' data-k="sec" data-v="-1"',!(mine&&live&&started),"ghost")+B("man",s,"+1 VP secundar",' data-k="sec" data-v="1"',!(mine&&live&&started)||capS.t||capS.r,"ghost")+'</div>';
   h+='<label class="opt" style="margin-top:8px"><input type="checkbox" data-act="br" data-s="'+s+'"'+(ps.br?' checked':'')+(mine&&live?'':' disabled')+'> Armată pictată (+10 VP)</label>';
 
   /* primară */
   var pn=primOf(s),pr=PRI[pn];
   h+='<h3>Misiune primară: '+esc(pn)+'</h3><div class="mis">'+(pr.a?'<div class="act">'+esc(pr.a)+'</div>':'')+pr.r.map(function(line,i){
-    var L=parseLine(line),ok=mine&&live&&started&&((L.w==="F"&&ended)||(L.w!=="F"&&!ended&&a===s&&r>=L.min&&r<=L.max));
+    var L=parseLine(line),ok=mine&&live&&started&&((L.w==="F"&&ended)||(L.w!=="F"&&!ended&&a===s&&r>=L.min&&r<=L.max))&&!(capP.t||(L.w!=="F"&&capP.r));
     return '<div class="ln"><span class="tag">'+tag(L)+'</span> '+esc(L.text)+'<div class="vpb">'+L.v.map(function(v){return B("pv",s,'+'+v+' VP',' data-i="'+i+'" data-v="'+v+'"',!ok)}).join("")+'</div></div>';
   }).join("")+'</div>';
 
@@ -64,7 +65,7 @@ function sideHtml(s){
   }else if(ps.mode==="F"){
     h+=ps.fixed.map(function(n){
       var c=cardOf(n),used=fixedSum(ps,n);
-      return '<div class="mis">'+cardHtml(c)+'<div class="legend">Acumulat: '+used+' / 20 VP (Fixed nu se aruncă)</div><div class="vpb">'+SECV[n].f.map(function(v){return B("sv",s,'+'+v+' VP',' data-n="'+esc(n)+'" data-v="'+v+'"',!(mine&&live&&started&&used+v<=20))}).join("")+'</div></div>';
+      return '<div class="mis">'+cardHtml(c)+'<div class="legend">Acumulat: '+used+' / 20 VP (Fixed nu se aruncă)</div><div class="vpb">'+SECV[n].f.map(function(v){return B("sv",s,'+'+v+' VP',' data-n="'+esc(n)+'" data-v="'+v+'"',!(mine&&live&&started&&used+v<=20&&!capS.t&&!capS.r))}).join("")+'</div></div>';
     }).join("")||'<div class="legend">Nicio carte Fixed aleasă.</div>';
   }else{
     var deck=deckOf(ps),canDraw=mine&&live&&started&&!ended&&a===s&&ps.drawT!==M.turn&&deck.length>0;
@@ -73,7 +74,7 @@ function sideHtml(s){
     h+=ps.hand.map(function(n){
       var c=cardOf(n),w=WD[n],myT=mine&&live&&started&&!ended&&a===s;
       var canW=w&&myT&&ps.fresh.indexOf(n)>=0&&ps.drawT===M.turn&&(!w.o||ps.hand.indexOf(w.o)>=0)&&(!w.r1||r===1);
-      return '<div class="mis">'+cardHtml(c)+'<div class="vpb">'+SECV[n].t.map(function(v){return B("sv",s,'+'+v+' VP îndeplinită',' data-n="'+esc(n)+'" data-v="'+v+'"',!(mine&&live&&started))}).join("")
+      return '<div class="mis">'+cardHtml(c)+'<div class="vpb">'+SECV[n].t.map(function(v){return B("sv",s,'+'+v+' VP îndeplinită',' data-n="'+esc(n)+'" data-v="'+v+'"',!(mine&&live&&started&&!capS.t&&!capS.r))}).join("")
         +B("toss",s,"Aruncă (+1 CP)",' data-n="'+esc(n)+'"',!myT,"ghost")
         +B("mull",s,"Re-trage (1 CP, o dată)",' data-n="'+esc(n)+'"',!(myT&&ps.drawT===M.turn&&!ps.rd&&cp>=1),"ghost")
         +(w?B("wd",s,"Re-trage („când e trasă”)",' data-n="'+esc(n)+'"',!canW,"ghost"):'')+'</div></div>';
@@ -81,7 +82,7 @@ function sideHtml(s){
   }
 
   h+='<details data-k="log'+s+'"'+(openS["log"+s]?' open':'')+'><summary>Istoric ('+ps.log.length+')</summary>'+ps.log.map(function(e,i){
-    return '<div class="lg">R'+e.r+' · '+(e.k==="cp"?"CP":e.k==="pri"?"Primar":"Secundar")+' '+(e.v>0?"+":"")+e.v+' · '+esc(e.l)+(mine&&live?' '+B("rm",s,"×",' data-i="'+i+'"',false,"ghost"):'')+'</div>';
+    return '<div class="lg">R'+e.r+' · '+(e.k==="cp"?"CP":e.k==="pri"?"Primar":"Secundar")+' '+(e.v>0?"+":"")+e.v+' · '+esc(e.l)+(App.isAdmin&&live?' '+B("rm",s,"×",' data-i="'+i+'"',false,"ghost"):'')+'</div>';
   }).reverse().join("")+'</details></section>';
   return h;
 }
@@ -221,7 +222,7 @@ function go(a,el){
     });return;
   }
   if(a==="draw"){mut(s,function(ps){var d=shuffle(deckOf(ps));ps.fresh=[];for(var k=0;k<2&&k<d.length;k++){ps.hand.push(d[k]);ps.fresh.push(d[k])}ps.drawT=M.turn});return}
-  if(a==="rm"){mut(s,function(ps){ps.log.splice(i,1)});return}
+  if(a==="rm"){if(!App.isAdmin)return;mut(s,function(ps){ps.log.splice(i,1)});return}
   if(a==="cp"){mut(s,function(ps){logAdd(ps,"cp",v,"manual")});return}
   if(a==="man"){var k=el.getAttribute("data-k");mut(s,function(ps){logAdd(ps,k,v,"manual")});return}
 }

@@ -40,7 +40,7 @@ function sideHtml(s){
   h+='<div class="board"><div><span>Primar</span><b>'+sums(ps,"pri")+'</b></div><div><span>Secundar</span><b>'+sums(ps,"sec")+'</b></div><div><span>Pictată</span><b>'+(ps.br?10:0)+'</b></div><div class="bt"><span>Total VP</span><b>'+totalPS(ps)+'</b></div><div><span>CP</span><b>'+cp+'</b></div></div>';
   h+='<div class="legend">Pe runde (max 15): primar '+[1,2,3,4,5].map(function(i){return roundVP(ps,"pri",i)}).join(" / ")+' · secundar '+[1,2,3,4,5].map(function(i){return roundVP(ps,"sec",i)}).join(" / ")+'</div>';
   if(capP.t||capP.r||capS.t||capS.r)h+='<div class="legend">'+(capP.t?'Primar: maxim 45 VP atins. ':capP.r?'Primar: 15/15 VP în runda curentă. ':'')+(capS.t?'Secundar: maxim 45 VP atins. ':capS.r?'Secundar: 15/15 VP în runda curentă. ':'')+'Se pot doar scădea puncte.</div>';
-  h+='<div class="vpb">'+B("cp",s,"−1 CP",' data-v="-1"',!(mine&&live),"ghost")+B("cp",s,"+1 CP",' data-v="1"',!(mine&&live),"ghost")+B("man",s,"−1 VP primar",' data-k="pri" data-v="-1"',!(mine&&live&&started),"ghost")+B("man",s,"+1 VP primar",' data-k="pri" data-v="1"',!(mine&&live&&started)||capP.t||capP.r,"ghost")+B("man",s,"−1 VP secundar",' data-k="sec" data-v="-1"',!(mine&&live&&started),"ghost")+B("man",s,"+1 VP secundar",' data-k="sec" data-v="1"',!(mine&&live&&started)||capS.t||capS.r,"ghost")+'</div>';
+  h+='<div class="vpb">'+B("cp",s,"−1 CP",' data-v="-1"',!(mine&&live)||cp<=0,"ghost")+B("cp",s,"+1 CP",' data-v="1"',!(mine&&live),"ghost")+B("man",s,"−1 VP primar",' data-k="pri" data-v="-1"',!(mine&&live&&started)||roundVP(ps,"pri",r)<=0,"ghost")+B("man",s,"+1 VP primar",' data-k="pri" data-v="1"',!(mine&&live&&started)||capP.t||capP.r,"ghost")+B("man",s,"−1 VP secundar",' data-k="sec" data-v="-1"',!(mine&&live&&started)||roundVP(ps,"sec",r)<=0,"ghost")+B("man",s,"+1 VP secundar",' data-k="sec" data-v="1"',!(mine&&live&&started)||capS.t||capS.r,"ghost")+'</div>';
   h+='<label class="opt" style="margin-top:8px"><input type="checkbox" data-act="br" data-s="'+s+'"'+(ps.br?' checked':'')+(mine&&live?'':' disabled')+'> Armată pictată (+10 VP)</label>';
 
   /* primară */
@@ -222,9 +222,15 @@ function go(a,el){
     });return;
   }
   if(a==="draw"){mut(s,function(ps){var d=shuffle(deckOf(ps));ps.fresh=[];for(var k=0;k<2&&k<d.length;k++){ps.hand.push(d[k]);ps.fresh.push(d[k])}ps.drawT=M.turn});return}
-  if(a==="rm"){if(!App.isAdmin)return;mut(s,function(ps){ps.log.splice(i,1)});return}
-  if(a==="cp"){mut(s,function(ps){logAdd(ps,"cp",v,"manual")});return}
-  if(a==="man"){var k=el.getAttribute("data-k");mut(s,function(ps){logAdd(ps,k,v,"manual")});return}
+  if(a==="rm"){
+    if(!App.isAdmin)return;
+    var t=JSON.parse(JSON.stringify(PS(s)));t.log.splice(i,1);
+    var neg=cpOf(t)<0;["pri","sec"].forEach(function(k){for(var q=1;q<=5;q++)if(roundVP(t,k,q)<0)neg=true});
+    if(neg){alert("Nu se poate șterge: CP-ul sau VP-ul unei runde ar deveni negativ. Șterge mai întâi scăderile de după.");return}
+    mut(s,function(ps){ps.log.splice(i,1)});return;
+  }
+  if(a==="cp"){if(v<0&&cpOf(PS(s))+v<0)return;mut(s,function(ps){logAdd(ps,"cp",v,"manual")});return}
+  if(a==="man"){var k=el.getAttribute("data-k");if(v<0&&roundVP(PS(s),k,rd())+v<0)return;mut(s,function(ps){logAdd(ps,k,v,"manual")});return}
 }
 
 function onChange(el){

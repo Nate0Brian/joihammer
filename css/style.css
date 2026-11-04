@@ -140,3 +140,5 @@ main.wide{max-width:1100px}
 .cpnum b{font-family:Cinzel,serif;font-size:46px;line-height:1.05;color:var(--blood)}
 .setup select{margin:4px 0}
 .setup .info{border-top:0;padding-top:2px}
+
+.dep-reveal{margin:10px 0 4px}.dep-reveal summary{display:inline-flex;align-items:center;cursor:pointer;list-style:none;padding:9px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text);font-weight:600}.dep-reveal summary::-webkit-details-marker{display:none}.dep-reveal[open] summary{margin-bottom:10px}.dep-reveal .depbig{margin-top:4px}.depbig .dep{width:100%;max-width:520px;max-height:75vh;object-fit:contain;object-position:left top}

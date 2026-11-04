@@ -34,7 +34,7 @@
 .core-strat-tags span{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:4px 8px;color:var(--muted)}
 .core-strat-tools input,#matchStratQ{width:100%;min-height:46px;font-size:16px}
 .strat-modal{align-items:flex-start!important}
-.strat-modal-panel{max-height:calc(100dvh - 16px)!important;overflow-y:auto!important;overscroll-behavior:contain}
+.strat-modal-panel{max-height:calc(100dvh - 16px)!important;overflow-y:auto!important;overscroll-behavior:contain;touch-action:pan-y}
 .strat-modal-head{position:sticky;top:-10px;z-index:3;background:var(--bg);padding:4px 0 8px}
 .match-strat-list .core-strat-card{background:var(--surface)}
 @media(min-width:760px){.core-strat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -44,7 +44,7 @@
 <nav id="nav"></nav>
 <main class="wide">
 <div class="match-tools"><button id="openCoreStratagems" type="button">⚔ Core Stratagems</button><span>Referință rapidă · fără să părăsești meciul</span></div>
-<div id="coreStratagemModal" class="strat-modal" hidden><div class="strat-modal-panel" role="dialog" aria-modal="true" aria-labelledby="stratModalTitle"><div class="strat-modal-head"><div><h2 id="stratModalTitle">Core Stratagems</h2><p>Regulament Core Rules · sec. 15.02–15.12 · Același stratagem: o dată/fază; aceeași unitate: o dată țintă/fază, în mod normal.</p></div><button id="closeCoreStratagems" class="ghost" type="button" aria-label="Închide">✕</button></div><input id="matchStratQ" type="search" placeholder="Caută stratagemă, fază sau efect…"><div id="matchCoreStratagemList" class="match-strat-list"></div></div></div>
+<div id="coreStratagemModal" class="strat-modal" hidden><div class="strat-modal-panel" role="dialog" aria-modal="true" aria-labelledby="stratModalTitle"><div class="strat-modal-head"><div><h2 id="stratModalTitle">Core Stratagems</h2><p>Regulament Core Rules · sec. 15.02–15.12 · Același stratagem: o dată/fază; aceeași unitate: o dată țintă/fază, în mod normal.</p></div><button id="closeCoreStratagems" class="ghost" type="button" aria-label="Închide">✕</button></div><div class="core-strat-legend" aria-label="Legendă disponibilitate"><span class="either">● Tura oricărui jucător</span><span class="your">● Tura ta</span><span class="opponent">● Tura adversarului</span></div><input id="matchStratQ" type="search" placeholder="Caută stratagemă, fază sau efect…"><div id="matchCoreStratagemList" class="match-strat-list"></div></div></div>
 <p id="st" class="err"></p><div id="box"></div>
 </main>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>

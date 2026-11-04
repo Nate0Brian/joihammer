@@ -124,3 +124,19 @@ main.wide{max-width:1100px}
 .tbl td:nth-child(2),.tbl th:nth-child(2){text-align:left}
 .chart{width:100%;max-width:520px;height:auto;display:block;margin:8px auto}
 .summ{margin:16px 0}
+
+.depbar{display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
+.depbar .dep{width:150px;max-width:38vw;flex:none}
+.dep,.thumb{display:block;height:auto;border-radius:6px;border:1px solid var(--line);background:#f6f2e8}
+.thumb{width:110px;margin-bottom:4px}
+.depbig .dep{width:100%;max-width:480px}
+.ok{color:var(--brass);font:600 13px "Source Sans 3",sans-serif;margin-left:6px}
+.board{grid-template-columns:repeat(4,1fr)}
+.cpbox{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:10px;margin:12px 0;align-items:stretch}
+.cpbox.ro{grid-template-columns:1fr}
+.cpbox button{font-size:36px;font-weight:800;line-height:1;min-height:64px;padding:0}
+.cpnum{text-align:center;border:2px solid var(--brass);border-radius:8px;background:var(--surface);display:flex;flex-direction:column;justify-content:center;padding:6px 4px}
+.cpnum span{font-size:12px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+.cpnum b{font-family:Cinzel,serif;font-size:46px;line-height:1.05;color:var(--blood)}
+.setup select{margin:4px 0}
+.setup .info{border-top:0;padding-top:2px}

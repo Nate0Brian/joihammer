@@ -1,5 +1,5 @@
 {
-  "_note": "Structural audit performed 2026-10-23. Preserves the five Force Dispositions and their order; 25 primary missions are mapped once; 18 secondaries, 6 deployments and 6 twists are present. Scoring text and card wording have not been independently verified line-by-line against the physical 2026-27 Mission Deck; use the official deck as authority for gameplay wording and scores.",
+  "_note": "Cărțile din Mission Deck 2026-27 (ediția 11). Poți edita acest fișier; aplicația îl citește la fiecare deschidere.",
   "fds": [
     "Take and Hold",
     "Purge the Foe",
@@ -510,5 +510,22 @@
     "Martial Pride": "Unitățile BATTLELINE pot începe o acțiune după advance și pot trage după ce au început o acțiune.",
     "Ruinscape": "La normal sau advance move, modelele au MOBILE până la finalul mutării.",
     "Night Fighting": "Unitățile sunt vizibile doar la 18\"; fără INDIRECT FIRE dincolo de 18\"."
-  }
+  },
+  "deployment_images": {
+    "Tipping Point": "https://wahapedia.ru/wh40k11ed/img/maps/cards/CA7_TippingPoint.png",
+    "Sweeping Engagement": "https://wahapedia.ru/wh40k11ed/img/maps/cards/CA7_SweepingEngagement.png",
+    "Search and Destroy": "https://wahapedia.ru/wh40k11ed/img/maps/cards/CA7_SearchAndDestroy.png",
+    "Hammer and Anvil": "https://wahapedia.ru/wh40k11ed/img/maps/cards/CA7_HammerAndAnvil.png",
+    "Dawn of War": "https://wahapedia.ru/wh40k11ed/img/maps/cards/CA7_DawnOfWar.png",
+    "Crucible of Battle": "https://wahapedia.ru/wh40k11ed/img/maps/cards/CA7_CrucibleOfBattle.png"
+  },
+  "deployment_notes": {
+    "Tipping Point": "Zonele sunt pe laturile scurte; flancul drept al fiecărui jucător e împins înainte în trepte.",
+    "Sweeping Engagement": "Zonele sunt pe laturile lungi; flancul stâng al fiecărui jucător e împins înainte în trepte.",
+    "Search and Destroy": "Zonele sunt în sferturi opuse ale mesei, fără 9\" în jurul centrului.",
+    "Hammer and Anvil": "Zonele sunt pe laturile scurte, drepte, adânci de 18\".",
+    "Dawn of War": "Zonele sunt pe laturile lungi, drepte, adânci de 10\".",
+    "Crucible of Battle": "Zonele sunt pe laturile scurte; flancul drept e împins înainte în diagonală, de la mijlocul laturii lungi din dreapta până în colțul din spate stânga."
+  },
+  "_note_images": "Imagini ale diagramelor de deployment din pachetul Chapter Approved 2026-27, reproduse de Wahapedia; sunt linkuri externe, nu scheme SVG generate local."
 }

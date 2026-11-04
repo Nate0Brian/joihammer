@@ -24,7 +24,7 @@ App.start=function(cb,onOut){
 };
 App.nav=function(){
   var cur=location.pathname.split("/").pop()||"index.html";
-  var L=[["index.html","Acasă"],["friendly.html","Meci amical"],["tournaments.html","Turnee"],["watch.html","Live"],["missions.html","Misiuni"],["stats.html","Clasament"],["profile.html","Profil"]];
+  var L=[["index.html","Acasă"],["friendly.html","Meci amical"],["tournaments.html","Turnee"],["watch.html","Live"],["missions.html","Misiuni"],["stats.html","Clasament"],["rules.html","Reguli"],["army-stats.html","Armate"],["profile.html","Profil"]];
   if(App.isAdmin)L.push(["admin.html","Admin"]);
   $("nav").innerHTML=L.map(function(l){return '<a href="'+l[0]+'"'+(cur===l[0]?' class="on"':'')+'>'+l[1]+'</a>'}).join("")+'<a href="#" id="out">Ieși ('+esc(App.me)+')</a>';
   $("out").onclick=function(e){e.preventDefault();App.auth.signOut().then(function(){location.href="index.html"})};

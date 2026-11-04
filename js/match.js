@@ -156,7 +156,7 @@ function render(){
   ["sa","sb"].forEach(function(k){m[k]=Object.assign(newPS(),m[k])});
   var rdy=!!(m.sa.ready&&m.sb.ready),roleOk=!!m.atk,na=esc(m.pa.name),nb=esc(m.pb.name);
   var h='<h1>'+na+' <span class="vs">vs</span> '+nb+'</h1>';
-  h+='<div class="depbar"><div class="info">'+(m.type==="tournament"?"Meci de turneu":"Meci amical")+(m.deploy?' · Deployment: <b>'+esc(m.deploy)+'</b>'+(DEPNOTE[m.deploy]?'<br><small>'+esc(DEPNOTE[m.deploy])+'</small>':''):'')+(m.twist?' · Twist: <b>'+esc(m.twist)+'</b> – '+esc(TWISTS[m.twist]):'')+'</div></div>'+(m.deploy?'<details class="dep-reveal"><summary>Arată harta deployment</summary><div class="depbig">'+Data.depImg(m.deploy)+'</div></details>':'');
+  h+='<div class="depbar"><div class="info">'+(m.type==="tournament"?"Meci de turneu":"Meci amical")+(m.deploy?' · Deployment: <b>'+esc(m.deploy)+'</b>'+(DEPNOTE[m.deploy]?'<br><small>'+esc(DEPNOTE[m.deploy])+'</small>':''):'')+(m.twist?' · Twist: <b>'+esc(m.twist)+'</b> – '+esc(TWISTS[m.twist]):'')+'</div>'+(m.deploy?Data.depImg(m.deploy):'')+'</div>';
   if(m.status==="invited"){
     h+='<div class="banner">Invitație în așteptare.'+(App.me===m.b?'<div class="vpb" style="justify-content:center">'+B("acc","","Acceptă","")+B("dec","","Refuză","",false,"ghost")+'</div>':' Așteaptă răspunsul lui '+esc(m.b)+'.'+(App.me===m.a?'<div class="vpb" style="justify-content:center">'+B("dec","","Anulează invitația","",false,"ghost")+'</div>':''))+'</div>';
     $("box").innerHTML=h;return;
@@ -273,6 +273,14 @@ function onChange(el){
 }
 
 App.start(function(){
+  var stratModal=$("coreStratagemModal"),stratSearch=$("matchStratQ"),stratList=$("matchCoreStratagemList");
+  function closeStratagems(){if(stratModal)stratModal.hidden=true}
+  function openStratagems(){if(!stratModal)return;stratModal.hidden=false;renderCoreStratagems(stratList,stratSearch.value);stratSearch.focus()}
+  $("openCoreStratagems").addEventListener("click",openStratagems);
+  $("closeCoreStratagems").addEventListener("click",closeStratagems);
+  stratModal.addEventListener("click",function(e){if(e.target===stratModal)closeStratagems()});
+  stratSearch.addEventListener("input",function(){renderCoreStratagems(stratList,stratSearch.value)});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")closeStratagems()});
   App.onPlayers=syncProfile;
   setInterval(function(){var e=$("tmr");if(e){var ts=+e.getAttribute("data-ts");e.textContent=ts?fmtT(Date.now()-ts):""}},1000);
   App.db.collection("matches").doc(mid).onSnapshot(function(d){

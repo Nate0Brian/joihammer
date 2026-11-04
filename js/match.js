@@ -275,7 +275,7 @@ function onChange(el){
 App.start(function(){
   var stratModal=$("coreStratagemModal"),stratSearch=$("matchStratQ"),stratList=$("matchCoreStratagemList");
   function closeStratagems(){if(stratModal)stratModal.hidden=true}
-  function openStratagems(){if(!stratModal)return;stratModal.hidden=false;renderCoreStratagems(stratList,stratSearch.value);stratSearch.focus()}
+  function openStratagems(){if(!stratModal)return;stratModal.hidden=false;renderCoreStratagems(stratList,stratSearch.value)}
   $("openCoreStratagems").addEventListener("click",openStratagems);
   $("closeCoreStratagems").addEventListener("click",closeStratagems);
   stratModal.addEventListener("click",function(e){if(e.target===stratModal)closeStratagems()});

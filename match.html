@@ -9,10 +9,15 @@
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#14171c">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+.match-tools{display:flex;align-items:center;gap:10px;margin:0 0 14px;position:sticky;top:6px;z-index:20}.match-tools button{font-weight:800}.match-tools span{font-size:12px;color:var(--muted)}.strat-modal[hidden]{display:none}.strat-modal{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;padding:12px}.strat-modal-panel{width:min(900px,100%);max-height:92vh;overflow:auto;background:var(--bg);border:1px solid var(--brass);border-radius:10px;padding:14px}.strat-modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.strat-modal-head h2{margin:0}.strat-modal-head p{margin:3px 0 12px;color:var(--muted);font-size:13px}.strat-modal-panel>input{width:100%;margin:0 0 12px}.match-strat-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:9px}.match-strat-list .core-strat-card{background:var(--surface)}@media(max-width:520px){.match-tools{top:0}.match-tools span{display:none}.strat-modal{padding:5px}.strat-modal-panel{max-height:96vh;padding:10px}}
+</style>
 </head>
 <body>
 <nav id="nav"></nav>
 <main class="wide">
+<div class="match-tools"><button id="openCoreStratagems" type="button">⚔ Core Stratagems</button><span>Referință rapidă · fără să părăsești meciul</span></div>
+<div id="coreStratagemModal" class="strat-modal" hidden><div class="strat-modal-panel" role="dialog" aria-modal="true" aria-labelledby="stratModalTitle"><div class="strat-modal-head"><div><h2 id="stratModalTitle">Core Stratagems</h2><p>Regulament Core Rules · sec. 15.02–15.12 · Același stratagem: o dată/fază; aceeași unitate: o dată țintă/fază, în mod normal.</p></div><button id="closeCoreStratagems" class="ghost" type="button" aria-label="Închide">✕</button></div><input id="matchStratQ" type="search" placeholder="Caută stratagemă, fază sau efect…"><div id="matchCoreStratagemList" class="match-strat-list"></div></div></div>
 <p id="st" class="err"></p><div id="box"></div>
 </main>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -22,6 +27,7 @@
 <script src="js/data.js"></script>
 <script src="js/common.js"></script>
 <script src="js/tourney.js"></script>
+<script src="js/core-stratagems.js"></script>
 <script src="js/match.js"></script>
 </body>
 </html>

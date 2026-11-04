@@ -44,7 +44,7 @@ function viewSec(){
   }).join("");
 }
 function viewTw(){return Object.keys(TWISTS).map(function(n){return '<div class="mis"><b class="t">'+esc(n)+'</b><div>'+esc(TWISTS[n])+'</div></div>'}).join("")}
-function viewDep(){return '<div class="legend">Câmpul de luptă are 44" × 60". Imaginile sunt scheme orientative ale zonelor de așezare; desenul oficial, cu terenul și obiectivele, e în Mission Deck sau în aplicația oficială Warhammer 40,000.</div>'+DEPLOYS.map(function(n){return '<div class="mis"><b class="t">'+esc(n)+'</b>'+(DEPNOTE[n]?'<div class="legend">'+esc(DEPNOTE[n])+'</div>':'')+'<div class="depbig">'+Data.depImg(n)+'</div></div>'}).join("")}
+function viewDep(){return '<div class="legend">Diagramele deployment din Chapter Approved 2026–27. Apasă butonul pentru a deschide harta.</div>'+DEPLOYS.map(function(n){return '<div class="mis"><b class="t">'+esc(n)+'</b>'+(DEPNOTE[n]?'<div class="legend">'+esc(DEPNOTE[n])+'</div>':'')+'<details class="dep-reveal"><summary>Arată harta</summary><div class="depbig">'+Data.depImg(n)+'</div></details></div>'}).join("")}
 function render(){
   $("tabs").innerHTML=TABS.map(function(t){return '<button data-t="'+t[0]+'"'+(t[0]===tab?' class="on"':'')+'>'+t[1]+'</button>'}).join("");
   $("mv").innerHTML={det:viewDet,prim:viewPrim,sec:viewSec,tw:viewTw,dep:viewDep}[tab]();

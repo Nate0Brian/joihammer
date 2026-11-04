@@ -7,6 +7,33 @@
 .refsearch{margin:12px 0}.refsearch input{width:100%}.refcats{display:flex;gap:7px;overflow-x:auto;padding:5px 0 10px}.refcats button{white-space:nowrap;background:transparent;color:var(--ink);border:1px solid var(--line);padding:6px 10px;font-size:13px}.refcats button.on{background:var(--btn);color:var(--btn-ink)}
 .refitem{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--brass);border-radius:6px;padding:12px 14px;margin:9px 0}.refitem h3{margin:0 0 4px}.refmeta{font-size:12px;color:var(--brass);font-weight:600}.refitem p{margin:7px 0}.refitem .example{font-size:14px;color:var(--muted);border-top:1px solid var(--line);padding-top:7px;margin-top:8px}.refitem .seealso{font-size:12px;color:var(--muted)}
 .core-strat-section{margin:16px 0 22px;padding:14px;background:var(--surface);border:1px solid var(--brass);border-radius:8px}.core-strat-section h2{margin:0 0 5px}.core-strat-intro{color:var(--muted);font-size:14px;margin:0 0 10px}.core-strat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,310px),1fr));gap:10px}.core-strat-card{background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:12px;margin:0}.core-strat-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.core-strat-top h3{margin:0;font-size:18px}.core-strat-ref{font-size:11px;color:var(--muted)}.core-strat-cp{white-space:nowrap;background:var(--btn);color:var(--btn-ink);border-radius:5px;padding:5px 9px;font-weight:800}.core-strat-field{margin-top:9px}.core-strat-field b{font-size:11px;letter-spacing:.08em;color:var(--brass)}.core-strat-field p{margin:2px 0;font-size:14px}.core-strat-restriction{margin-top:8px;padding:7px;border-left:3px solid var(--blood);background:var(--surface);font-size:13px}.core-strat-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}.core-strat-tags span{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:3px 7px;color:var(--muted)}.core-strat-tools{display:flex;gap:8px;align-items:center;margin:10px 0}.core-strat-tools input{width:100%}
+
+/* Core Stratagems: compact, readable, expandable cards */
+.core-strat-grid,.match-strat-list{display:grid;grid-template-columns:1fr;gap:8px;align-items:start}
+.core-strat-card{display:block;min-width:0;height:auto!important;max-height:none!important;overflow:visible!important;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--brass);border-radius:9px;margin:0}
+.core-strat-card>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:13px;min-height:66px;cursor:pointer}
+.core-strat-card>summary::-webkit-details-marker{display:none}
+.core-strat-summary-main{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px}
+.core-strat-summary-main strong{font:600 17px/1.25 Cinzel,Georgia,serif;color:var(--ink)}
+.core-strat-summary-main small{font-size:11px;letter-spacing:.04em;color:var(--muted)}
+.core-strat-cp{flex:none;white-space:nowrap;background:var(--btn);color:var(--btn-ink);border-radius:6px;padding:7px 10px;font-weight:800;font-size:14px}
+.core-strat-chevron{color:var(--brass);font-size:20px;font-weight:700}
+.core-strat-card[open]>summary{border-bottom:1px solid var(--line)}
+.core-strat-card[open] .core-strat-chevron{transform:rotate(45deg)}
+.core-strat-details{padding:5px 14px 14px}
+.core-strat-field{margin-top:12px}
+.core-strat-field b{display:block;font-size:11px;letter-spacing:.1em;color:var(--brass);margin-bottom:3px}
+.core-strat-field p{font-size:15px;line-height:1.55;margin:0;color:var(--ink);overflow-wrap:anywhere}
+.core-strat-restriction{margin-top:12px;padding:9px 11px;border-left:3px solid var(--blood);background:var(--bg);border-radius:4px;font-size:14px}
+.core-strat-restriction p{margin:3px 0 0}
+.core-strat-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.core-strat-tags span{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:4px 8px;color:var(--muted)}
+.core-strat-tools input,#matchStratQ{width:100%;min-height:46px;font-size:16px}
+.strat-modal{align-items:flex-start!important}
+.strat-modal-panel{max-height:calc(100dvh - 16px)!important;overflow-y:auto!important;overscroll-behavior:contain}
+.strat-modal-head{position:sticky;top:-10px;z-index:3;background:var(--bg);padding:4px 0 8px}
+.match-strat-list .core-strat-card{background:var(--surface)}
+@media(min-width:760px){.core-strat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style></head>
 <body><nav id="nav"></nav><main><h1>Rules Reference</h1><p class="sub">Ghid rapid bazat pe Core Rules PDF atașat. Caută după regulă, keyword sau situație de joc.</p>
 <p class="legend">Sursa: Core Rules, secțiunile și paginile tipărite indicate pe fiecare fișă. Rezumatele sunt orientative; textul regulamentului are prioritate.</p>

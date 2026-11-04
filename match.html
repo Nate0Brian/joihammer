@@ -11,6 +11,33 @@
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <style>
 .match-tools{display:flex;align-items:center;gap:10px;margin:0 0 14px;position:sticky;top:6px;z-index:20}.match-tools button{font-weight:800}.match-tools span{font-size:12px;color:var(--muted)}.strat-modal[hidden]{display:none}.strat-modal{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;padding:12px}.strat-modal-panel{width:min(900px,100%);max-height:92vh;overflow:auto;background:var(--bg);border:1px solid var(--brass);border-radius:10px;padding:14px}.strat-modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.strat-modal-head h2{margin:0}.strat-modal-head p{margin:3px 0 12px;color:var(--muted);font-size:13px}.strat-modal-panel>input{width:100%;margin:0 0 12px}.match-strat-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:9px}.match-strat-list .core-strat-card{background:var(--surface)}@media(max-width:520px){.match-tools{top:0}.match-tools span{display:none}.strat-modal{padding:5px}.strat-modal-panel{max-height:96vh;padding:10px}}
+
+/* Core Stratagems: compact, readable, expandable cards */
+.core-strat-grid,.match-strat-list{display:grid;grid-template-columns:1fr;gap:8px;align-items:start}
+.core-strat-card{display:block;min-width:0;height:auto!important;max-height:none!important;overflow:visible!important;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--brass);border-radius:9px;margin:0}
+.core-strat-card>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:13px;min-height:66px;cursor:pointer}
+.core-strat-card>summary::-webkit-details-marker{display:none}
+.core-strat-summary-main{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px}
+.core-strat-summary-main strong{font:600 17px/1.25 Cinzel,Georgia,serif;color:var(--ink)}
+.core-strat-summary-main small{font-size:11px;letter-spacing:.04em;color:var(--muted)}
+.core-strat-cp{flex:none;white-space:nowrap;background:var(--btn);color:var(--btn-ink);border-radius:6px;padding:7px 10px;font-weight:800;font-size:14px}
+.core-strat-chevron{color:var(--brass);font-size:20px;font-weight:700}
+.core-strat-card[open]>summary{border-bottom:1px solid var(--line)}
+.core-strat-card[open] .core-strat-chevron{transform:rotate(45deg)}
+.core-strat-details{padding:5px 14px 14px}
+.core-strat-field{margin-top:12px}
+.core-strat-field b{display:block;font-size:11px;letter-spacing:.1em;color:var(--brass);margin-bottom:3px}
+.core-strat-field p{font-size:15px;line-height:1.55;margin:0;color:var(--ink);overflow-wrap:anywhere}
+.core-strat-restriction{margin-top:12px;padding:9px 11px;border-left:3px solid var(--blood);background:var(--bg);border-radius:4px;font-size:14px}
+.core-strat-restriction p{margin:3px 0 0}
+.core-strat-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.core-strat-tags span{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:4px 8px;color:var(--muted)}
+.core-strat-tools input,#matchStratQ{width:100%;min-height:46px;font-size:16px}
+.strat-modal{align-items:flex-start!important}
+.strat-modal-panel{max-height:calc(100dvh - 16px)!important;overflow-y:auto!important;overscroll-behavior:contain}
+.strat-modal-head{position:sticky;top:-10px;z-index:3;background:var(--bg);padding:4px 0 8px}
+.match-strat-list .core-strat-card{background:var(--surface)}
+@media(min-width:760px){.core-strat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body>

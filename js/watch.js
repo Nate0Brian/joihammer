@@ -56,7 +56,7 @@ function card(m){
       return '<div>R'+e.r+' · <b>'+nm+'</b> '+(e.v>0?"+":"")+e.v+' '+kind+(e.k==="cp"?"":" · "+esc(e.l.slice(0,38)))+(e.k==="cp"&&e.l?" · "+esc(e.l.slice(0,30)):"")+'</div>';
     }).join("")+'</div>';
   }
-  h+='<div class="wmh"><span>'+(m.deploy?'Deployment: '+esc(m.deploy):'')+(m.twist?' · Twist: '+esc(m.twist):'')+'</span><a href="match.html?id='+m.id+'">Deschide</a></div></article>';
+  h+='<div class="wmh"><span>'+(m.deploy?Data.depImg(m.deploy,"thumb")+'<br>Deployment: '+esc(m.deploy):'')+(m.twist?' · Twist: '+esc(m.twist):'')+'</span><a href="match.html?id='+m.id+'">Deschide</a></div></article>';
   return h;
 }
 function render(){

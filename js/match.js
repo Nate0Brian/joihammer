@@ -27,6 +27,30 @@ function tag(L){
 function fixedSum(ps,n){return ps.log.reduce(function(a,e){return a+(e.k==="sec"&&e.l===n?e.v:0)},0)}
 function cardHtml(c){return '<b class="t">'+esc(c.n)+'</b><ul>'+c.r.map(function(x){return '<li>'+esc(x)+'</li>'}).join("")+'</ul>'}
 
+/* înainte de start: tot ce alege un jucător e sus, într-un singur card, cu butonul de salvare */
+function setupHtml(s){
+  var ps=PS(s),pl=P(s),mine=own(s),live=M.status==="active";
+  var fo=Data.fdsFor(pl.army,pl.dets),fdOk=fo.indexOf(pl.fd)>=0;
+  var okFix=fdOk&&(ps.mode==="T"||(ps.mode==="F"&&ps.fixed.length===2));
+  var pn=primOf(s),pr=PRI[pn];
+  var h='<section class="side setup"><h2>'+esc(pl.name)+(App.me===M[s]?' <small>(tu)</small>':'')+(M.atk?' <span class="role">'+(M.atk===s?'Atacator':'Defender')+'</span>':'')+(ps.ready?' <span class="ok">✓ salvat</span>':'')+'</h2><div class="info">'+esc([pl.army,pl.det].filter(Boolean).join(" · ")||"Armata nu e aleasă")+'</div>';
+  if(mine&&live&&!ps.ready){
+    if(!fo.length)h+='<div class="legend">Alege armata și detașamentul în <a href="profile.html">Profil</a>; se preiau automat aici.</div>';
+    else h+='<label class="opt">Force Disposition <select data-act="fd" data-s="'+s+'">'+(fdOk?'':'<option value="">Alege…</option>')+fo.map(function(f){return '<option'+(f===pl.fd?' selected':'')+'>'+f+'</option>'}).join("")+'</select></label>';
+    h+='<div class="info">Misiune primară: <b>'+esc(pn)+'</b></div>';
+    h+='<details class="mis" data-k="pr'+s+'"'+(openS["pr"+s]?' open':'')+'><summary>Regulile misiunii</summary>'+(pr.a?'<div class="act">'+esc(pr.a)+'</div>':'')+'<ul>'+pr.r.map(function(l){var L=parseLine(l);return '<li><span class="tag">'+tag(L)+'</span> '+esc(L.text)+'</li>'}).join("")+'</ul></details>';
+    h+='<label class="opt">Secundare <select data-act="mode" data-s="'+s+'"><option value=""'+(ps.mode?'':' selected')+'>Alege…</option><option value="T"'+(ps.mode==="T"?" selected":"")+'>Tactical (tragi cărți)</option><option value="F"'+(ps.mode==="F"?" selected":"")+'>Fixed (2 cărți fixe)</option></select></label>';
+    if(ps.mode==="F")h+='<div class="vpb">'+SEC.filter(function(c){return c.fx}).map(function(c){return '<label class="opt"><input type="checkbox" data-act="fix" data-s="'+s+'" data-n="'+esc(c.n)+'"'+(ps.fixed.indexOf(c.n)>=0?' checked':'')+'> '+esc(c.n)+'</label>'}).join("")+'</div>';
+    h+='<div class="vpb">'+B("ready",s,"Salvează alegerea",'',!okFix)+'</div>';
+    if(!okFix)h+='<div class="legend">'+(!fdOk?'Alege un Force Disposition permis de detașamentele tale.':!ps.mode?'Alege tipul de secundare.':'Alege exact 2 cărți Fixed.')+'</div>';
+  }else{
+    h+='<div class="info">Force Disposition: <b>'+(fdOk?esc(pl.fd):'neales')+'</b></div><div class="info">Misiune primară: <b>'+esc(pn)+'</b></div>';
+    h+=ps.ready?'<div class="info">Secundare: <b>'+(ps.mode==="T"?"Tactical":"Fixed – "+esc(ps.fixed.join(", ")))+'</b></div>':'<div class="info">Încă nu a salvat alegerile.</div>';
+    if(ps.ready&&mine&&live)h+='<div class="vpb">'+B("unready",s,"Schimbă alegerea","",false,"ghost")+'</div>';
+  }
+  return h+'</section>';
+}
+
 function sideHtml(s){
   var ps=PS(s),pl=P(s),started=M.first!=null,ended=M.turn>=10,a=actS(),mine=own(s),live=M.status==="active",r=rd(),cp=cpOf(ps),capP={t:sums(ps,"pri")>=45,r:roundVP(ps,"pri",r)>=15},capS={t:sums(ps,"sec")>=45,r:roundVP(ps,"sec",r)>=15};
   var h='<section class="side"><h2>'+esc(pl.name)+(App.me===M[s]?' <small>(tu)</small>':'')+(M.atk?' <span class="role">'+(M.atk===s?'Atacator':'Defender')+'</span>':'')+'</h2><div class="info">'+esc([pl.army,pl.det].filter(Boolean).join(" · "))+'</div>';
@@ -37,10 +61,11 @@ function sideHtml(s){
   }else h+='<div class="info">Force Disposition: <b>'+(fdOk||started?esc(pl.fd):'neales')+'</b></div>';
 
   if(started)h+='<div class="info">Timp jucat: <b>'+fmtT((M.tt&&M.tt[s])||0)+'</b></div>';
-  h+='<div class="board"><div><span>Primar</span><b>'+sums(ps,"pri")+'</b></div><div><span>Secundar</span><b>'+sums(ps,"sec")+'</b></div><div><span>Pictată</span><b>'+(ps.br?10:0)+'</b></div><div class="bt"><span>Total VP</span><b>'+totalPS(ps)+'</b></div><div><span>CP</span><b>'+cp+'</b></div></div>';
+  h+='<div class="board"><div><span>Primar</span><b>'+sums(ps,"pri")+'</b></div><div><span>Secundar</span><b>'+sums(ps,"sec")+'</b></div><div><span>Pictată</span><b>'+(ps.br?10:0)+'</b></div><div class="bt"><span>Total VP</span><b>'+totalPS(ps)+'</b></div></div>';
+  h+='<div class="cpbox'+(mine&&live?'':' ro')+'">'+(mine&&live?B("cp",s,"−",' data-v="-1" aria-label="Scade CP"',cp<=0):'')+'<div class="cpnum"><span>CP</span><b>'+cp+'</b></div>'+(mine&&live?B("cp",s,"+",' data-v="1" aria-label="Adaugă CP"',false):'')+'</div>';
   h+='<div class="legend">Pe runde (max 15): primar '+[1,2,3,4,5].map(function(i){return roundVP(ps,"pri",i)}).join(" / ")+' · secundar '+[1,2,3,4,5].map(function(i){return roundVP(ps,"sec",i)}).join(" / ")+'</div>';
   if(capP.t||capP.r||capS.t||capS.r)h+='<div class="legend">'+(capP.t?'Primar: maxim 45 VP atins. ':capP.r?'Primar: 15/15 VP în runda curentă. ':'')+(capS.t?'Secundar: maxim 45 VP atins. ':capS.r?'Secundar: 15/15 VP în runda curentă. ':'')+'Se pot doar scădea puncte.</div>';
-  h+='<div class="vpb">'+B("cp",s,"−1 CP",' data-v="-1"',!(mine&&live)||cp<=0,"ghost")+B("cp",s,"+1 CP",' data-v="1"',!(mine&&live),"ghost")+B("man",s,"−1 VP primar",' data-k="pri" data-v="-1"',!(mine&&live&&started)||roundVP(ps,"pri",r)<=0,"ghost")+B("man",s,"+1 VP primar",' data-k="pri" data-v="1"',!(mine&&live&&started)||capP.t||capP.r,"ghost")+B("man",s,"−1 VP secundar",' data-k="sec" data-v="-1"',!(mine&&live&&started)||roundVP(ps,"sec",r)<=0,"ghost")+B("man",s,"+1 VP secundar",' data-k="sec" data-v="1"',!(mine&&live&&started)||capS.t||capS.r,"ghost")+'</div>';
+  h+='<div class="vpb">'+B("man",s,"−1 VP primar",' data-k="pri" data-v="-1"',!(mine&&live&&started)||roundVP(ps,"pri",r)<=0,"ghost")+B("man",s,"+1 VP primar",' data-k="pri" data-v="1"',!(mine&&live&&started)||capP.t||capP.r,"ghost")+B("man",s,"−1 VP secundar",' data-k="sec" data-v="-1"',!(mine&&live&&started)||roundVP(ps,"sec",r)<=0,"ghost")+B("man",s,"+1 VP secundar",' data-k="sec" data-v="1"',!(mine&&live&&started)||capS.t||capS.r,"ghost")+'</div>';
   h+='<label class="opt" style="margin-top:8px"><input type="checkbox" data-act="br" data-s="'+s+'"'+(ps.br?' checked':'')+(mine&&live?'':' disabled')+'> Armată pictată (+10 VP)</label>';
 
   /* primară */
@@ -131,14 +156,15 @@ function render(){
   ["sa","sb"].forEach(function(k){m[k]=Object.assign(newPS(),m[k])});
   var rdy=!!(m.sa.ready&&m.sb.ready),roleOk=!!m.atk,na=esc(m.pa.name),nb=esc(m.pb.name);
   var h='<h1>'+na+' <span class="vs">vs</span> '+nb+'</h1>';
-  h+='<div class="info">'+(m.type==="tournament"?"Meci de turneu":"Meci amical")+(m.deploy?' · Deployment: <b>'+esc(m.deploy)+'</b>':'')+(m.twist?' · Twist: <b>'+esc(m.twist)+'</b> – '+esc(TWISTS[m.twist]):'')+'</div>';
+  h+='<div class="depbar"><div class="info">'+(m.type==="tournament"?"Meci de turneu":"Meci amical")+(m.deploy?' · Deployment: <b>'+esc(m.deploy)+'</b>'+(DEPNOTE[m.deploy]?'<br><small>'+esc(DEPNOTE[m.deploy])+'</small>':''):'')+(m.twist?' · Twist: <b>'+esc(m.twist)+'</b> – '+esc(TWISTS[m.twist]):'')+'</div>'+(m.deploy?Data.depImg(m.deploy):'')+'</div>';
   if(m.status==="invited"){
     h+='<div class="banner">Invitație în așteptare.'+(App.me===m.b?'<div class="vpb" style="justify-content:center">'+B("acc","","Acceptă","")+B("dec","","Refuză","",false,"ghost")+'</div>':' Așteaptă răspunsul lui '+esc(m.b)+'.'+(App.me===m.a?'<div class="vpb" style="justify-content:center">'+B("dec","","Anulează invitația","",false,"ghost")+'</div>':''))+'</div>';
     $("box").innerHTML=h;return;
   }
   if(m.status==="declined"||m.status==="cancelled"){$("box").innerHTML=h+'<div class="banner">'+(m.status==="cancelled"?"Meciul a fost anulat.":"Invitația a fost refuzată sau anulată.")+'</div>';return}
 
-  h+='<div class="banner"><div class="bigsc">'+totalPS(m.sa)+' – '+totalPS(m.sb)+'</div>';
+  var head=h;
+  h='<div class="banner">'+(started||m.status!=="active"?'<div class="bigsc">'+totalPS(m.sa)+' – '+totalPS(m.sb)+'</div>':'');
   if(m.status==="done"){
     h+=(m.winner==="draw"?'Remiză':'Câștigător: <b>'+esc(m.winner==="a"?m.pa.name:m.pb.name)+'</b>'+(m.wo?' (neprezentare)':'')+(m.early?' (încheiat anticipat)':''))+(App.isAdmin?'<div class="vpb" style="justify-content:center">'+B("reopen","","Redeschide meciul","",false,"ghost")+'</div>':'');
   }else if(m.status==="confirm"){
@@ -151,7 +177,7 @@ function render(){
     h+='<div class="steps"><div><b>1. Rolul</b> (câștigătorul zarului alege)<div class="vpb">'
       +(m.atk?'Atacator: <b>'+esc(m["p"+m.atk].name)+'</b> · Defender: <b>'+esc(m["p"+oth].name)+'</b> '+B("atk","","Inversează",' data-v="'+oth+'"',false,"ghost"):B("atk","",na+" atacator",' data-v="a"')+B("atk","",nb+" atacator",' data-v="b"'))
       +'</div>'+(m.atk?'<div class="legend">Defender-ul își așază primul unitățile, iar Atacatorul începe redeployment-ul.</div>':'')+'</div>'
-      +'<div><b>2. Alegerile</b> (Force Disposition și secundare): '+na+(m.sa.ready?' ✓':' …')+' · '+nb+(m.sb.ready?' ✓':' …')+'</div>'
+      +'<div><b>2. Alegerile</b> (salvate de fiecare jucător în cardul lui): '+na+(m.sa.ready?' ✓':' …')+' · '+nb+(m.sb.ready?' ✓':' …')+'</div>'
       +'<div><b>3. Cine joacă prima tură</b> (zar, câștigătorul decide)<div class="vpb">'+B("first","",na,' data-v="a"',!(rdy&&roleOk))+B("first","",nb,' data-v="b"',!(rdy&&roleOk))+B("first","","Zar random",' data-v="rand"',!(rdy&&roleOk),"ghost")+'</div></div></div>';
   }else if(!ended){
     var an=m[a];
@@ -162,9 +188,10 @@ function render(){
   var fr=m.type==="friendly"&&m.status==="active"&&(App.isAdmin||App.me===m.a||App.me===m.b);
   if(fr)h+='<div class="vpb" style="justify-content:center">'+B("early","","Încheie cu scorul de acum",'',!started,"ghost")+B("cancel","","Anulează meciul",'',false,"ghost")+'</div><div class="legend">Doar la meciurile amicale. „Anulează” nu se numără în statistici; încheierea anticipată se numără și cere confirmarea adversarului.</div>';
   h+='</div>';
-  if(m.status==="done")h+=summaryHtml();
-  var first=App.me===m.b?"b":"a";
-  h+='<div class="sides">'+sideHtml(first)+sideHtml(first==="a"?"b":"a")+'</div>';
+  var bn=h;h=head;
+  var first=App.me===m.b?"b":"a",second=first==="a"?"b":"a",pre=!started&&m.status==="active";
+  var sd='<div class="sides">'+(pre?setupHtml(first)+setupHtml(second):sideHtml(first)+sideHtml(second))+'</div>';
+  h+=pre?sd+bn:bn+(m.status==="done"?summaryHtml():'')+sd;
   if(App.isAdmin)h+='<p style="margin-top:24px">'+B("del","","Șterge meciul","",false,"ghost")+'</p>';
   $("box").innerHTML=h;
   [].forEach.call(document.querySelectorAll("details[data-k]"),function(d){d.addEventListener("toggle",function(){openS[d.getAttribute("data-k")]=d.open})});

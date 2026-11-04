@@ -1,5 +1,5 @@
 /* Datele (misiuni, detașamente, Force Disposition) se citesc din folderul data/ la deschiderea aplicației. */
-var FDS=[],FDM={},PRI={},SEC=[],SECV={},WD={},DEPLOYS=[],TWISTS={},DET={};
+var FDS=[],FDM={},PRI={},SEC=[],SECV={},WD={},DEPLOYS=[],TWISTS={},DET={},DEPIMG={},DEPNOTE={};
 var Data={
   ready:null,
   load:function(){
@@ -8,7 +8,7 @@ var Data={
       fetch("data/detachments.json",{cache:"no-cache"}).then(function(r){if(!r.ok)throw new Error("data/detachments.json: "+r.status);return r.json()})
     ]).then(function(x){
       var m=x[0];
-      FDS=m.fds;FDM=m.fdm;PRI=m.primaries;DEPLOYS=m.deployments;TWISTS=m.twists;
+      FDS=m.fds;FDM=m.fdm;PRI=m.primaries;DEPLOYS=m.deployments;TWISTS=m.twists;DEPIMG=m.deployment_images||{};DEPNOTE=m.deployment_notes||{};
       SEC=[];SECV={};WD={};
       m.secondaries.forEach(function(c){
         SEC.push({n:c.n,fx:c.fx,r:c.r});SECV[c.n]={t:c.t||[],f:c.f||[]};if(c.wd)WD[c.n]=c.wd;
@@ -16,6 +16,10 @@ var Data={
       DET=x[1].armies;
     });
     return Data.ready;
+  },
+  depImg:function(name,cls){
+    var p=DEPIMG[name];
+    return p?'<a class="depa" href="'+esc(p)+'" target="_blank" rel="noopener"><img class="'+(cls||"dep")+'" src="'+esc(p)+'" alt="Harta '+esc(name)+'" loading="lazy"></a>':'';
   },
   armies:function(){return Object.keys(DET).sort()},
   /* detașamentele unei armate (inclusiv cele moștenite, ex. Space Marines pentru capitole) */

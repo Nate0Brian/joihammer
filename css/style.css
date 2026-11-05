@@ -264,11 +264,36 @@ body.modal-open{overflow:hidden}
 .depa.dep-preview-trigger img{display:block;width:100%;max-width:none;height:auto}
 @media (min-width:900px){.depbig .depa.dep-preview-trigger{width:340px;max-width:340px}}
 
-/* JOIHAMMER GRIMDARK AUTH / PAGE TRANSITION LOADER */
-html.jh-auth-pending, html.jh-auth-pending body{overflow:hidden!important}
-html.jh-auth-pending body::before{content:"";position:fixed;inset:0;z-index:99990;background:radial-gradient(ellipse at 50% 42%,rgba(91,67,35,.20),transparent 38%),linear-gradient(145deg,#090909 0%,#17130f 48%,#080808 100%);}
-html.jh-auth-pending body::after{content:"✠\A\A ESTABLISHING NOOSPHERIC LINK\A\A Accessing the Imperial archives";white-space:pre;position:fixed;z-index:99991;left:50%;top:50%;width:min(90vw,440px);transform:translate(-50%,-50%);padding:112px 20px 28px;text-align:center;color:#c7a66a;font:600 12px/2.1 'Cinzel',Georgia,serif;letter-spacing:.13em;border:1px solid rgba(173,137,75,.48);border-radius:4px;background:linear-gradient(180deg,rgba(30,25,19,.96),rgba(12,11,10,.98));box-shadow:0 0 0 5px rgba(0,0,0,.45),0 18px 70px #000,inset 0 0 36px rgba(164,119,48,.08);animation:jh-loader-pulse 2.8s ease-in-out infinite;}
-html.jh-auth-pending body .jh-loader-seal{display:none}
-html.jh-auth-pending body #nav,html.jh-auth-pending body main{visibility:hidden}
-@keyframes jh-loader-pulse{0%,100%{text-shadow:0 0 5px rgba(190,151,83,.18);border-color:rgba(173,137,75,.35)}50%{text-shadow:0 0 14px rgba(190,151,83,.65);border-color:rgba(205,169,104,.8)}}
-@media(prefers-reduced-motion:reduce){html.jh-auth-pending body::after{animation:none}}
+
+/* MOBILE NAVIGATION POSITION + RESPONSIVE WIDTH FIX */
+@media screen and (max-width:760px){
+  /* A transformed/filtering ancestor creates a containing block for fixed children.
+     Keep the nav itself free of filters so the bottom bar and More panel anchor to viewport. */
+  body #nav{
+    -webkit-backdrop-filter:none!important;
+    backdrop-filter:none!important;
+    filter:none!important;
+    transform:none!important;
+    perspective:none!important;
+    contain:none!important;
+    overflow:visible!important;
+  }
+  body #nav .nav-mobile-links{
+    position:fixed!important;left:0!important;right:0!important;top:auto!important;bottom:0!important;
+    width:100%!important;box-sizing:border-box!important;
+    display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    padding:7px 10px calc(7px + env(safe-area-inset-bottom,0px))!important;
+    margin:0!important;z-index:1001!important;
+  }
+  body #nav .nav-mobile-links>a,body #nav .nav-mobile-links>button{
+    min-width:0!important;width:100%!important;box-sizing:border-box!important;
+    overflow:hidden!important;white-space:nowrap!important;
+  }
+  body #nav .nav-more-panel{
+    position:fixed!important;left:10px!important;right:10px!important;top:auto!important;
+    bottom:calc(72px + env(safe-area-inset-bottom,0px))!important;
+    width:auto!important;max-width:none!important;max-height:min(60vh,460px)!important;
+    overflow:auto!important;z-index:1002!important;
+  }
+  body #nav .nav-more-panel[hidden]{display:none!important}
+}

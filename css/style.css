@@ -237,3 +237,10 @@ button:disabled{opacity:.48;cursor:not-allowed;transform:none}
   #nav .nav-mobile-links{padding-bottom:max(7px,env(safe-area-inset-bottom))}
   body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 }
+
+/* Final palette lock: keep the approved Grimdark palette regardless of OS theme. */
+:root:not([data-theme="light"]){
+ --bg:#111114;--surface:#201d1a;--surface-2:#2b2520;--surface-3:#332b23;
+ --ink:#e8ddc8;--muted:#a69a86;--line:#494035;--brass:#a98743;
+ --blood:#741f25;--btn:#a98743;--btn-ink:#17130d;color-scheme:dark;
+}

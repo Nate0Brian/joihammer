@@ -256,3 +256,10 @@ button:disabled{opacity:.48;cursor:not-allowed;transform:none}
 .dep-preview-close{font-size:20px;line-height:1;padding:7px 11px;flex:none}
 .dep-preview-panel>img{display:block;width:100%;height:auto;max-height:calc(100dvh - 90px);object-fit:contain;margin:0 auto}
 body.modal-open{overflow:hidden}
+
+
+/* Deployment map thumbnails: keep them compact on desktop; click still opens the full modal. */
+.depbar .depa.dep-preview-trigger{width:150px;max-width:24vw;flex:0 0 150px}
+.depbig .depa.dep-preview-trigger{width:min(360px,100%);max-width:360px}
+.depa.dep-preview-trigger img{display:block;width:100%;max-width:none;height:auto}
+@media (min-width:900px){.depbig .depa.dep-preview-trigger{width:340px;max-width:340px}}

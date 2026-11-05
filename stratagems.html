@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Core Stratagems – JoiHammer</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<meta name="theme-color" content="#111114">
+<style>
+.strat-page-intro{color:var(--muted);max-width:760px}.core-strat-legend{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0;font-size:12px}.core-strat-legend span{padding:6px 9px;border:1px solid var(--line);border-radius:5px;background:var(--surface)}.core-strat-legend .your{border-left:4px solid #005078}.core-strat-legend .either{border-left:4px solid #00836f}.core-strat-legend .opponent{border-left:4px solid #c00000}.core-strat-tools{margin:12px 0}.core-strat-tools input{width:100%;min-height:46px;font-size:16px}.core-strat-grid{display:grid;grid-template-columns:1fr;gap:9px}.core-strat-card{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--brass);border-radius:9px;margin:0;overflow:hidden}.core-strat-card>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:13px;min-height:66px;cursor:pointer}.core-strat-card>summary::-webkit-details-marker{display:none}.core-strat-summary-main{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px}.core-strat-summary-main strong{font:600 16px/1.25 Cinzel,Georgia,serif;color:var(--ink)}.core-strat-summary-main small{font-size:11px;color:var(--muted)}.core-strat-cp{white-space:nowrap;background:var(--btn);color:var(--btn-ink);border-radius:6px;padding:6px 9px;font-weight:800}.core-strat-chevron{color:var(--brass);font-size:20px}.core-strat-card[open]>summary{border-bottom:1px solid var(--line)}.core-strat-details{padding:5px 14px 14px}.core-strat-field{margin-top:12px}.core-strat-field b{display:block;font-size:11px;letter-spacing:.1em;color:var(--brass)}.core-strat-field p{margin:3px 0;font-size:14px;line-height:1.5;overflow-wrap:anywhere}.core-strat-restriction{margin-top:10px;padding:9px;border-left:3px solid var(--blood);background:var(--bg)}.core-strat-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.core-strat-tags span{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:4px 8px;color:var(--muted)}
+@media(min-width:900px){.core-strat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<nav id="nav"></nav>
+<main>
+  <div class="command-heading"><div><div class="command-eyebrow">FIELD REFERENCE / 15</div><h1>CORE STRATAGEMS</h1><p class="strat-page-intro">Referință rapidă pentru cele 10 Core Stratagems din regulamentul folosit de JoiHammer. Deschide un stratagem pentru WHEN, TARGET, EFFECT și eventualele restricții.</p></div></div>
+  <div class="core-strat-legend" aria-label="Legendă disponibilitate"><span class="either">● Tura oricărui jucător</span><span class="your">● Tura ta</span><span class="opponent">● Tura adversarului</span></div>
+  <div class="core-strat-tools"><input id="stratQ" type="search" placeholder="Caută după nume, fază, țintă sau efect…" autocomplete="off"></div>
+  <p id="stratCount" class="sub"></p>
+  <section class="core-strat-grid" id="coreStratagemList"></section>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="js/config.js"></script><script src="js/data.js"></script><script src="js/common.js"></script><script src="js/core-stratagems.js"></script>
+<script>
+App.start(function(){
+  var input=document.getElementById('stratQ'),list=document.getElementById('coreStratagemList'),count=document.getElementById('stratCount');
+  function render(){var n=renderCoreStratagems(list,input.value);count.textContent=n+' din '+CORE_STRATAGEMS.length+' stratageme';}
+  input.addEventListener('input',render);render();
+});
+</script>
+</body>
+</html>

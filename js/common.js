@@ -41,7 +41,6 @@ App.nav=function(){
   var cur=location.pathname.split("/").pop()||"index.html";
   var items=[
     ["index.html","Home","⌂","primary"],
-    ["index.html#act","Matches","⚔","primary"],
     ["rules.html","Rules","▤","primary"],
     ["stratagems.html","Strats","✦","primary"],
     ["friendly.html","Friendly","⚔","more"],

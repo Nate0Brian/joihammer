@@ -1,5 +1,5 @@
 // Network-first: mereu versiunea nouă când ești online, copie salvată când nu ești.
-var V="wh-v19-mobile-nav-viewport-fix";
+var V="wh-v24-mobile-nav-loader-restored";
 self.addEventListener("install",function(){self.skipWaiting()});
 self.addEventListener("activate",function(e){
   e.waitUntil(caches.keys().then(function(ks){return Promise.all(ks.filter(function(k){return k!==V}).map(function(k){return caches.delete(k)}))}).then(function(){return self.clients.claim()}));

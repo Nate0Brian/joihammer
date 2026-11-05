@@ -25,19 +25,45 @@ App.start=function(cb,onOut){
 App.nav=function(){
   var cur=location.pathname.split("/").pop()||"index.html";
   var items=[
-    ["index.html","Home","⌂","primary"],["friendly.html","Match","⚔","primary"],["rules.html","Rules","▤","primary"],["rules.html#core-strat-section","Strats","✦","primary"],
-    ["tournaments.html","Tournaments","♜","more"],["watch.html","Live","◉","more"],["missions.html","Missions","◇","more"],["stats.html","Leaderboard","▥","more"],["army-stats.html","Army Stats","♙","more"],["profile.html","Profile","◉","more"]
+    ["index.html","Home","⌂","primary"],
+    ["match.html","Match","⚔","primary"],
+    ["rules.html","Rules","▤","primary"],
+    ["rules.html#core-strat-section","Strats","✦","primary"],
+    ["friendly.html","Friendly","⚔","more"],
+    ["tournaments.html","Tournaments","♜","more"],
+    ["watch.html","Live","◉","more"],
+    ["missions.html","Missions","◇","more"],
+    ["stats.html","Leaderboard","▥","more"],
+    ["army-stats.html","Army Stats","♙","more"],
+    ["profile.html","Profile","◉","more"]
   ];
   if(App.isAdmin)items.push(["admin.html","Admin","⚙","more"]);
-  var primary=items.filter(function(x){return x[3]==="primary"}),secondary=items.filter(function(x){return x[3]==="more"});
-  function link(x,cls){var active=x[0].indexOf("#")>=0?(cur===x[0].split("#")[0]&&location.hash===x[0].substring(x[0].indexOf("#"))):(cur===x[0]||(x[0]==="friendly.html"&&cur==="match.html"));return '<a class="'+(active?'on ' :'')+(cls||'')+'" href="'+x[0]+'">'+'<span class="nav-glyph" aria-hidden="true">'+x[2]+'</span><span class="nav-label">'+x[1]+'</span></a>'}
-  $("nav").innerHTML='<div class="nav-brand"><span class="brand-seal">✠</span><span class="brand-copy"><b>JOIHAMMER</b><small>IMPERIAL COMMAND SYSTEM</small></span></div>'+
-    '<div class="nav-desktop-links">'+primary.map(function(x){return link(x,'nav-primary')}).join('')+'<div class="nav-group-label">COMMAND ARCHIVE</div>'+secondary.map(function(x){return link(x,'nav-secondary')}).join('')+'<button class="nav-logout" id="out" type="button"><span class="nav-glyph">⇥</span><span>Sign out · '+esc(App.me)+'</span></button></div>'+ 
-    '<div class="nav-mobile-links">'+primary.map(function(x){return link(x,'nav-mobile-primary')}).join('')+'<button type="button" id="moreNav" class="nav-more '+(secondary.some(function(x){return cur===x[0]})?'on':'')+'" aria-expanded="false"><span class="nav-glyph">☷</span><span class="nav-label">More</span></button></div>'+ 
-    '<div class="nav-more-panel" id="moreNavPanel" hidden>'+secondary.map(function(x){return link(x,'nav-more-link')}).join('')+'<button class="nav-logout" id="outMobile" type="button">⇥ Sign out · '+esc(App.me)+'</button></div>';
+  var primary=items.filter(function(x){return x[3]==="primary"});
+  var secondary=items.filter(function(x){return x[3]==="more"});
+  function isActive(x){
+    if(x[0].indexOf("#")>=0)return cur===x[0].split("#")[0]&&location.hash===x[0].substring(x[0].indexOf("#"));
+    return cur===x[0];
+  }
+  function link(x,cls){return '<a class="'+(isActive(x)?'on ':'')+(cls||'')+'" href="'+x[0]+'"><span class="nav-glyph" aria-hidden="true">'+x[2]+'</span><span class="nav-label">'+x[1]+'</span></a>'}
+  var nav=$("nav");
+  nav.innerHTML=
+    '<div class="nav-brand"><span class="brand-seal">✠</span><span class="brand-copy"><b>JOIHAMMER</b><small>IMPERIAL COMMAND SYSTEM</small></span></div>'+
+    '<div class="nav-desktop-links">'+primary.map(function(x){return link(x,'nav-primary')}).join('')+
+      '<div class="nav-group-label">COMMAND ARCHIVE</div>'+secondary.map(function(x){return link(x,'nav-secondary')}).join('')+
+      '<button class="nav-logout" id="out" type="button"><span class="nav-glyph">⇥</span><span>Sign out · '+esc(App.me)+'</span></button></div>'+
+    '<div class="nav-mobile-links">'+primary.map(function(x){return link(x,'nav-mobile-primary')}).join('')+
+      '<button type="button" id="moreNav" class="nav-more" aria-expanded="false" aria-controls="moreNavPanel"><span class="nav-glyph">☷</span><span class="nav-label">More</span></button></div>'+
+    '<div class="nav-more-panel" id="moreNavPanel" hidden>'+secondary.map(function(x){return link(x,'nav-more-link')}).join('')+
+      '<button class="nav-logout" id="outMobile" type="button">⇥ Sign out · '+esc(App.me)+'</button></div>';
   function signOut(e){if(e)e.preventDefault();App.auth.signOut().then(function(){location.href="index.html"})}
-  $("out").onclick=signOut;$("outMobile").onclick=signOut;
-  $("moreNav").onclick=function(){var panel=$("moreNavPanel");panel.hidden=!panel.hidden;$("moreNav").setAttribute("aria-expanded",String(!panel.hidden))};
+  $("out").onclick=signOut;
+  $("outMobile").onclick=signOut;
+  var more=$("moreNav"),panel=$("moreNavPanel");
+  function closeMore(){panel.hidden=true;more.setAttribute("aria-expanded","false");more.classList.remove("on")}
+  more.onclick=function(e){e.preventDefault();e.stopPropagation();var opening=panel.hidden;panel.hidden=!opening;more.setAttribute("aria-expanded",String(opening));more.classList.toggle("on",opening)};
+  panel.addEventListener("click",function(e){e.stopPropagation()});
+  document.addEventListener("click",function(e){if(!panel.hidden&&!panel.contains(e.target)&&e.target!==more)closeMore()});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")closeMore()});
 };
 App.snap=function(n){
   var p=App.players.filter(function(x){return x.name===n})[0]||{name:n,army:"",det:"",dets:[],fd:FDS[0]};

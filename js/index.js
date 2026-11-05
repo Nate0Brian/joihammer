@@ -1,12 +1,18 @@
 function showLogin(){$("login").classList.remove("hidden");$("dash").classList.add("hidden")}
 var MS=[];
 function draw(ms){
-  MS=ms;
-  var inv=ms.filter(function(m){return m.status==="invited"&&m.b===App.me});
-  var act=ms.filter(function(m){return m.status==="active"||m.status==="confirm"});
-  var done=ms.filter(function(m){return m.status==="done"}).slice(0,8);
-  $("inv").innerHTML=inv.length?inv.map(function(m){return '<div class="card"><b>'+esc(m.a)+'</b> te invită la un meci amical.<div class="vpb"><button class="sm" data-act="acc" data-id="'+m.id+'">Acceptă</button><button class="sm ghost" data-act="dec" data-id="'+m.id+'">Refuză</button></div></div>'}).join(""):'<p class="empty">Nicio invitație.</p>';
-  $("act").innerHTML=act.length?act.map(App.matchRow).join(""):'<p class="empty">Niciun meci în desfășurare.</p>';
+  MS=ms||[];
+  var inv=MS.filter(function(m){return m.status==="invited"&&(m.a===App.me||m.b===App.me)});
+  var active=MS.filter(function(m){return m.status==="active"||m.status==="confirm"});
+  var done=MS.filter(function(m){return m.status==="done"}).slice(0,8);
+  var other=MS.filter(function(m){return ["declined","cancelled"].indexOf(m.status)<0&&["invited","active","confirm","done"].indexOf(m.status)<0});
+  var invitationHtml=inv.length?inv.map(function(m){
+    var incoming=m.b===App.me;
+    return '<div class="card"><b>'+esc(m.a)+' vs '+esc(m.b)+'</b><p class="sub">'+(incoming?'Ai primit o invitație.':'Invitație trimisă · în așteptare.')+'</p>'+(incoming?'<div class="vpb"><button class="sm" data-act="acc" data-id="'+m.id+'">Acceptă</button><button class="sm ghost" data-act="dec" data-id="'+m.id+'">Refuză</button></div>':'')+'</div>';
+  }).join(""):'<p class="empty">Nicio invitație.</p>';
+  $("inv").innerHTML=invitationHtml;
+  var allVisible=active.concat(other);
+  $("act").innerHTML=allVisible.length?allVisible.map(App.matchRow).join(""):'<p class="empty">Nu ai meciuri active momentan.</p>';
   $("done").innerHTML=done.length?done.map(App.matchRow).join(""):'<p class="empty">Încă niciun meci încheiat.</p>';
 }
 async function login(){

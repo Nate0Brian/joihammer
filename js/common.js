@@ -28,7 +28,7 @@ App.nav=function(){
     ["index.html","Home","⌂","primary"],
     ["match.html","Match","⚔","primary"],
     ["rules.html","Rules","▤","primary"],
-    ["rules.html#core-strat-section","Strats","✦","primary"],
+    ["stratagems.html","Strats","✦","primary"],
     ["friendly.html","Friendly","⚔","more"],
     ["tournaments.html","Tournaments","♜","more"],
     ["watch.html","Live","◉","more"],
@@ -61,8 +61,17 @@ App.nav=function(){
   var more=$("moreNav"),panel=$("moreNavPanel");
   if(secondary.some(isActive))more.classList.add("on");
   function closeMore(){panel.hidden=true;more.setAttribute("aria-expanded","false");more.classList.remove("on")}
-  more.onclick=function(e){e.preventDefault();e.stopPropagation();var opening=panel.hidden;panel.hidden=!opening;more.setAttribute("aria-expanded",String(opening));more.classList.toggle("on",opening)};
-  panel.addEventListener("click",function(e){e.stopPropagation()});
+  more.addEventListener("click",function(e){
+    e.preventDefault();e.stopPropagation();
+    var opening=panel.hidden;
+    panel.hidden=!opening;
+    more.setAttribute("aria-expanded",opening?"true":"false");
+    more.classList.toggle("on",opening||secondary.some(isActive));
+  });
+  panel.addEventListener("click",function(e){
+    e.stopPropagation();
+    if(e.target.closest("a")) closeMore();
+  });
   if(!App._navEventsBound){
     document.addEventListener("click",function(e){var p=$("moreNavPanel"),m=$("moreNav");if(p&&!p.hidden&&!p.contains(e.target)&&e.target!==m&&!m.contains(e.target)){p.hidden=true;m.setAttribute("aria-expanded","false");m.classList.remove("on")}});
     document.addEventListener("keydown",function(e){if(e.key==="Escape"){var p=$("moreNavPanel"),m=$("moreNav");if(p&&m){p.hidden=true;m.setAttribute("aria-expanded","false");m.classList.remove("on")}}});
@@ -84,8 +93,8 @@ App.watchMatches=function(cb){
   var A=[],B=[],q=App.db.collection("matches");
   function out(){var m={};A.concat(B).forEach(function(x){m[x.id]=x});cb(Object.keys(m).map(function(k){return m[k]}).sort(function(x,y){return y.n-x.n}))}
   function map(s){return s.docs.map(function(d){return Object.assign({id:d.id},d.data())})}
-  q.where("a","==",App.me).onSnapshot(function(s){A=map(s);out()},fail);
-  q.where("b","==",App.me).onSnapshot(function(s){B=map(s);out()},fail);
+  q.where("a","==",App.me).onSnapshot(function(s){A=map(s);out()},function(e){fail(e);});
+  q.where("b","==",App.me).onSnapshot(function(s){B=map(s);out()},function(e){fail(e);});
 };
 App.score=function(m){return totalPS(Object.assign(newPS(),m.sa))+" – "+totalPS(Object.assign(newPS(),m.sb))};
 App.matchRow=function(m){

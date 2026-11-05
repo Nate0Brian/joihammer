@@ -9,11 +9,10 @@ function nice(e){var c=(e&&e.code)||"";if(c==="auth/weak-password")return "Parol
 var App={me:"",isAdmin:false,players:[],auth:null,db:null,onPlayers:function(){}};
 
 App.start=function(cb,onOut){
-  function hideLoading(){document.documentElement.classList.remove("jh-auth-pending")}
-  if(CFG.apiKey==="PUNE_AICI"){hideLoading();document.body.insertAdjacentHTML("afterbegin",'<p class="err" style="padding:16px">Completează datele Firebase în js/config.js</p>');return}
+  if(CFG.apiKey==="PUNE_AICI"){document.body.insertAdjacentHTML("afterbegin",'<p class="err" style="padding:16px">Completează datele Firebase în js/config.js</p>');return}
   firebase.initializeApp(CFG);App.auth=firebase.auth();App.db=firebase.firestore();
   Data.load().then(function(){App.auth.onAuthStateChanged(async function(u){
-    if(!u){if(onOut){onOut();hideLoading()}else{location.replace("index.html")}return}
+    if(!u){if(onOut)onOut();else location.href="index.html";return}
     App.isAdmin=u.email===ADMIN_EMAIL;
     if(App.isAdmin){App.me="admin";}
     else {
@@ -27,15 +26,15 @@ App.start=function(cb,onOut){
           throw new Error("Contul autentificat nu corespunde documentului logins/"+candidate+". Verifică emailul din Firebase Authentication și câmpul email din Firestore.");
         }
         App.me=loginDoc.id;
-      } catch(e) { fail(e); if(onOut){onOut();hideLoading()}else{location.replace("index.html")} return; }
+      } catch(e) { fail(e); if(onOut)onOut(); return; }
     }
     if($("nav")){App.nav();App.watchInvites()}
     App.db.collection("players").onSnapshot(function(s){
       App.players=s.docs.map(function(d){var x=d.data();return {name:d.id,army:x.army||"",det:x.det||"",dets:x.dets||[],fd:x.fd||FDS[0]}}).sort(function(a,b){return a.name<b.name?-1:1});
       App.onPlayers();
     },fail);
-    try{cb();}finally{hideLoading()}
-  })}).catch(function(e){hideLoading();document.body.insertAdjacentHTML("afterbegin",'<p class="err" style="padding:16px">Nu pot citi fișierele din folderul data/ ('+esc(e.message||e)+')</p>')});
+    cb();
+  })}).catch(function(e){document.body.insertAdjacentHTML("afterbegin",'<p class="err" style="padding:16px">Nu pot citi fișierele din folderul data/ ('+esc(e.message||e)+')</p>')});
 };
 App.nav=function(){
   var cur=location.pathname.split("/").pop()||"index.html";
@@ -43,7 +42,7 @@ App.nav=function(){
     ["index.html","Home","⌂","primary"],
     ["index.html#act","Matches","⚔","primary"],
     ["rules.html","Rules","▤","primary"],
-    ["rules.html#core-strat-section","Strats","✦","primary"],
+    ["stratagems.html","Strats","✦","primary"],
     ["friendly.html","Friendly","⚔","more"],
     ["tournaments.html","Tournaments","♜","more"],
     ["watch.html","Live","◉","more"],

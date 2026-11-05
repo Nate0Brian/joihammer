@@ -3,17 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Acasă – Warhammer</title>
+<title>Command Center – JoiHammer</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#14171c">
+<meta name="theme-color" content="#111114">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 </head>
 <body>
 <nav id="nav"></nav>
 <main class="">
-<h1>Warhammer 40k</h1>
+<div class="command-heading"><div><div class="command-eyebrow">IMPERIAL COMMAND SYSTEM / 01</div><h1>COMMAND CENTER</h1><p>Battle operations and campaign intelligence.</p></div></div>
 <p id="st" class="err"></p>
 <section id="login">
   <p class="sub">Intră cu username-ul și parola primite de la admin.</p>
@@ -25,10 +25,10 @@
   <p id="lerr" class="err"></p>
 </section>
 <section id="dash" class="hidden">
-  <div class="menu"><a href="friendly.html">Meci amical</a><a href="tournaments.html">Turnee</a><a href="watch.html">Live</a></div>
-  <h2>Invitații primite</h2><div id="inv"></div>
-  <h2>Meciurile mele</h2><div id="act"></div>
-  <h2>Încheiate recent</h2><div id="done"></div>
+  <section class="dashboard-section"><h2>Operations</h2><div class="dashboard-ops"><a href="friendly.html"><span class="op-glyph">⚔</span><span>Friendly Match</span></a><a href="tournaments.html"><span class="op-glyph">♜</span><span>Tournaments</span></a><a href="watch.html"><span class="op-glyph">◉</span><span>Live Battles</span></a><a href="missions.html"><span class="op-glyph">◇</span><span>Mission Archive</span></a></div></section>
+  <section class="dashboard-section"><h2>Incoming transmissions</h2><div id="inv"></div></section>
+  <section class="dashboard-section"><h2>Active battles</h2><div id="act"></div></section>
+  <section class="dashboard-section"><h2>Recent records</h2><div id="done"></div></section>
 </section>
 </main>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>

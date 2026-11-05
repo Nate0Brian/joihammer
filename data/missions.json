@@ -512,12 +512,12 @@
     "Night Fighting": "Unitățile sunt vizibile doar la 18\"; fără INDIRECT FIRE dincolo de 18\"."
   },
   "deployment_images": {
-    "Tipping Point": "images/deploy/tipping-point.svg",
-    "Sweeping Engagement": "images/deploy/sweeping-engagement.svg",
-    "Search and Destroy": "images/deploy/search-and-destroy.svg",
-    "Hammer and Anvil": "images/deploy/hammer-and-anvil.svg",
-    "Dawn of War": "images/deploy/dawn-of-war.svg",
-    "Crucible of Battle": "images/deploy/crucible-of-battle.svg"
+    "Tipping Point": "images/deploy/tipping-point.png",
+    "Sweeping Engagement": "images/deploy/sweeping-engagement.png",
+    "Search and Destroy": "images/deploy/search-and-destroy.png",
+    "Hammer and Anvil": "images/deploy/hammer-and-anvil.png",
+    "Dawn of War": "images/deploy/dawn-of-war.png",
+    "Crucible of Battle": "images/deploy/crucible-of-battle.png"
   },
   "deployment_notes": {
     "Tipping Point": "Zonele sunt pe laturile scurte; flancul drept al fiecărui jucător e împins înainte în trepte.",

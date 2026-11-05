@@ -19,7 +19,7 @@ var Data={
   },
   depImg:function(name,cls){
     var p=DEPIMG[name];
-    return p?'<a class="depa" href="'+esc(p)+'" target="_blank" rel="noopener"><img class="'+(cls||"dep")+'" src="'+esc(p)+'" alt="Harta '+esc(name)+'" loading="lazy"></a>':'';
+    return p?'<button class="depa dep-preview-trigger" type="button" data-dep-preview="'+esc(p)+'" data-dep-title="'+esc(name)+'" aria-label="Mărește harta '+esc(name)+'"><img class="'+(cls||"dep")+'" src="'+esc(p)+'" alt="Harta '+esc(name)+'" loading="lazy"></button>':'';
   },
   armies:function(){return Object.keys(DET).sort()},
   /* detașamentele unei armate (inclusiv cele moștenite, ex. Space Marines pentru capitole) */
@@ -63,3 +63,23 @@ function parseLine(s){
   (m[6].match(/\d+(?=VP)/g)||[]).forEach(function(x){if(!seen[x]){seen[x]=1;vs.push(+x)}});
   return {w:w,min:min,max:max,text:m[6],v:vs};
 }
+
+
+/* Preview pentru hărțile deployment: modal în aplicație, fără tab/pagină nouă. */
+(function(){
+  if(window.__jhDeploymentPreviewBound)return;window.__jhDeploymentPreviewBound=true;
+  var modal=null;
+  function close(){if(!modal)return;modal.hidden=true;document.body.classList.remove("modal-open");var img=modal.querySelector("img");if(img)img.removeAttribute("src");}
+  function open(src,title){
+    if(!modal){
+      modal=document.createElement("div");modal.className="dep-preview-modal";modal.hidden=true;modal.innerHTML='<div class="dep-preview-panel" role="dialog" aria-modal="true" aria-labelledby="depPreviewTitle"><div class="dep-preview-head"><strong id="depPreviewTitle"></strong><button type="button" class="ghost dep-preview-close" aria-label="Închide harta">✕</button></div><img alt="Hartă deployment"></div>';
+      document.body.appendChild(modal);
+      modal.addEventListener("click",function(e){if(e.target===modal||e.target.closest(".dep-preview-close"))close()});
+    }
+    modal.querySelector("#depPreviewTitle").textContent=title||"Deployment";
+    modal.querySelector("img").src=src;modal.hidden=false;document.body.classList.add("modal-open");
+    modal.querySelector(".dep-preview-close").focus();
+  }
+  document.addEventListener("click",function(e){var b=e.target.closest("[data-dep-preview]");if(b){e.preventDefault();open(b.getAttribute("data-dep-preview"),b.getAttribute("data-dep-title"));}});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"&&modal&&!modal.hidden)close()});
+})();

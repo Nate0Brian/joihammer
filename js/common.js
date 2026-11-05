@@ -13,7 +13,7 @@ App.start=function(cb,onOut){
   firebase.initializeApp(CFG);App.auth=firebase.auth();App.db=firebase.firestore();
   Data.load().then(function(){App.auth.onAuthStateChanged(function(u){
     if(!u){if(onOut)onOut();else location.href="index.html";return}
-    App.me=u.email.split(".")[0];App.isAdmin=u.email===ADMIN_EMAIL;
+    App.me=(u.email||"").split("@")[0].toLowerCase();App.isAdmin=(u.email||"").toLowerCase()===ADMIN_EMAIL;
     if($("nav")){App.nav();App.watchInvites()}
     App.db.collection("players").onSnapshot(function(s){
       App.players=s.docs.map(function(d){var x=d.data();return {name:d.id,army:x.army||"",det:x.det||"",dets:x.dets||[],fd:x.fd||FDS[0]}}).sort(function(a,b){return a.name<b.name?-1:1});
@@ -59,11 +59,15 @@ App.nav=function(){
   $("out").onclick=signOut;
   $("outMobile").onclick=signOut;
   var more=$("moreNav"),panel=$("moreNavPanel");
+  if(secondary.some(isActive))more.classList.add("on");
   function closeMore(){panel.hidden=true;more.setAttribute("aria-expanded","false");more.classList.remove("on")}
   more.onclick=function(e){e.preventDefault();e.stopPropagation();var opening=panel.hidden;panel.hidden=!opening;more.setAttribute("aria-expanded",String(opening));more.classList.toggle("on",opening)};
   panel.addEventListener("click",function(e){e.stopPropagation()});
-  document.addEventListener("click",function(e){if(!panel.hidden&&!panel.contains(e.target)&&e.target!==more)closeMore()});
-  document.addEventListener("keydown",function(e){if(e.key==="Escape")closeMore()});
+  if(!App._navEventsBound){
+    document.addEventListener("click",function(e){var p=$("moreNavPanel"),m=$("moreNav");if(p&&!p.hidden&&!p.contains(e.target)&&e.target!==m&&!m.contains(e.target)){p.hidden=true;m.setAttribute("aria-expanded","false");m.classList.remove("on")}});
+    document.addEventListener("keydown",function(e){if(e.key==="Escape"){var p=$("moreNavPanel"),m=$("moreNav");if(p&&m){p.hidden=true;m.setAttribute("aria-expanded","false");m.classList.remove("on")}}});
+    App._navEventsBound=true;
+  }
 };
 App.snap=function(n){
   var p=App.players.filter(function(x){return x.name===n})[0]||{name:n,army:"",det:"",dets:[],fd:FDS[0]};
@@ -91,7 +95,15 @@ App.matchRow=function(m){
 };
 
 /* notificare: număr de invitații pe meniu + notificare de browser (cât timp aplicația e deschisă) */
-App.badge=function(n){var a=document.querySelector('#nav a[href="friendly.html"]');if(a)a.textContent="Meci amical"+(n?" ("+n+")":"")};
+App.badge=function(n){
+  var links=document.querySelectorAll('#nav a[href="friendly.html"]');
+  links.forEach(function(a){
+    var label=a.querySelector('.nav-label');
+    if(label)label.textContent="Friendly"+(n?" ("+n+")":"");
+    a.setAttribute('aria-label',"Friendly"+(n?", "+n+" invitații":""));
+    a.dataset.invites=String(n||0);
+  });
+};
 App.notify=function(t,b){
   try{new Notification(t,{body:b})}catch(e){
     if(navigator.serviceWorker)navigator.serviceWorker.ready.then(function(r){r.showNotification(t,{body:b})}).catch(function(){});

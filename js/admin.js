@@ -16,16 +16,21 @@ async function removeUser(p){
     var open=Object.keys(docs).filter(function(id){return ["invited","active","confirm"].indexOf(docs[id].data().status)>=0});
     var tw=open.filter(function(id){return docs[id].data().type==="tournament"&&docs[id].data().status!=="invited"}).length;
     if(!confirm("Ștergi jucătorul "+p+"? Nu se va mai putea loga.\n\nSe închid automat "+open.length+" meciuri deschise: meciurile de turneu ("+tw+") se dau câștigate adversarului (neprezentare), restul se anulează. Scorurile deja încheiate rămân."))return;
-    var b=db.batch(),tids={};
+    var tids={},ops=[];
     open.forEach(function(id){
       var m=docs[id].data(),ref=mq.doc(id);
-      if(m.status!=="invited"&&m.type==="tournament"){b.update(ref,{status:"done",winner:m.a===p?"b":"a",wo:true,pw:null,pBy:null});if(m.tid)tids[m.tid]=1}
-      else b.update(ref,{status:"cancelled"});
+      if(m.status!=="invited"&&m.type==="tournament"){ops.push({type:"update",ref:ref,data:{status:"done",winner:m.a===p?"b":"a",wo:true,pw:null,pBy:null}});if(m.tid)tids[m.tid]=1}
+      else ops.push({type:"update",ref:ref,data:{status:"cancelled"}});
     });
     var ts=await db.collection("tournaments").get();
-    ts.docs.forEach(function(d){var t=d.data();if(t.status!=="done"&&t.players.indexOf(p)>=0){b.update(d.ref,{out:firebase.firestore.FieldValue.arrayUnion(p)});tids[d.id]=1}});
-    b.delete(db.collection("logins").doc(p));b.delete(db.collection("players").doc(p));
-    await b.commit();
+    ts.docs.forEach(function(d){var t=d.data();if(t.status!=="done"&&t.players.indexOf(p)>=0){ops.push({type:"update",ref:d.ref,data:{out:firebase.firestore.FieldValue.arrayUnion(p)}});tids[d.id]=1}});
+    ops.push({type:"delete",ref:db.collection("logins").doc(p)});
+    ops.push({type:"delete",ref:db.collection("players").doc(p)});
+    while(ops.length){
+      var batch=db.batch(),part=ops.splice(0,400);
+      part.forEach(function(op){if(op.type==="delete")batch.delete(op.ref);else batch.update(op.ref,op.data)});
+      await batch.commit();
+    }
     for(var tid in tids){try{await Tourney.tryAdvance(tid)}catch(e){fail(e)}}
     $("amsg").textContent="Jucătorul "+p+" a fost șters; "+open.length+" meciuri închise.";
   }catch(e){alert(nice(e))}

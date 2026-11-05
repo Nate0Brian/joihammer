@@ -73,9 +73,15 @@ App.start(function(){
   $("tb").onclick=create;
   $("tlist").addEventListener("click",async function(e){
     var el=e.target.closest("button[data-act='deltour']");if(!el||!confirm("Ștergi turneul și toate meciurile lui?"))return;
-    var id=el.getAttribute("data-id"),b=App.db.batch();
-    Object.keys(MS).forEach(function(k){if(MS[k].tid===id)b.delete(App.db.collection("matches").doc(k))});
-    b.delete(App.db.collection("tournaments").doc(id));
-    try{await b.commit()}catch(x){alert(nice(x))}
+    var id=el.getAttribute("data-id");
+    var refs=Object.keys(MS).filter(function(k){return MS[k].tid===id}).map(function(k){return App.db.collection("matches").doc(k)});
+    refs.push(App.db.collection("tournaments").doc(id));
+    try{
+      while(refs.length){
+        var b=App.db.batch(),chunk=refs.splice(0,400);
+        chunk.forEach(function(ref){b.delete(ref)});
+        await b.commit();
+      }
+    }catch(x){alert(nice(x))}
   });
 });

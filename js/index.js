@@ -1,18 +1,16 @@
 function showLogin(){$("login").classList.remove("hidden");$("dash").classList.add("hidden")}
 var MS=[];
 function draw(ms){
-  MS=ms||[];
-  var inv=MS.filter(function(m){return m.status==="invited"&&(m.a===App.me||m.b===App.me)});
-  var active=MS.filter(function(m){return m.status==="active"||m.status==="confirm"});
-  var done=MS.filter(function(m){return m.status==="done"}).slice(0,8);
-  var other=MS.filter(function(m){return ["declined","cancelled"].indexOf(m.status)<0&&["invited","active","confirm","done"].indexOf(m.status)<0});
-  var invitationHtml=inv.length?inv.map(function(m){
-    var incoming=m.b===App.me;
-    return '<div class="card"><b>'+esc(m.a)+' vs '+esc(m.b)+'</b><p class="sub">'+(incoming?'Ai primit o invitație.':'Invitație trimisă · în așteptare.')+'</p>'+(incoming?'<div class="vpb"><button class="sm" data-act="acc" data-id="'+m.id+'">Acceptă</button><button class="sm ghost" data-act="dec" data-id="'+m.id+'">Refuză</button></div>':'')+'</div>';
-  }).join(""):'<p class="empty">Nicio invitație.</p>';
-  $("inv").innerHTML=invitationHtml;
-  var allVisible=active.concat(other);
-  $("act").innerHTML=allVisible.length?allVisible.map(App.matchRow).join(""):'<p class="empty">Nu ai meciuri active momentan.</p>';
+  MS=ms;
+  var inv=ms.filter(function(m){return m.status==="invited"});
+  var act=ms.filter(function(m){return m.status==="active"||m.status==="confirm"});
+  var done=ms.filter(function(m){return m.status==="done"}).slice(0,8);
+  $("inv").innerHTML=inv.length?inv.map(function(m){
+    if(m.b===App.me)return '<div class="card"><b>'+esc(m.a)+'</b> te invită la un meci amical.<div class="vpb"><button class="sm" data-act="acc" data-id="'+m.id+'">Acceptă</button><button class="sm ghost" data-act="dec" data-id="'+m.id+'">Refuză</button></div></div>';
+    if(m.a===App.me)return '<div class="card">Invitație trimisă lui <b>'+esc(m.b)+'</b> · în așteptare.<div class="vpb"><button class="sm ghost" data-act="cancel" data-id="'+m.id+'">Anulează invitația</button></div></div>';
+    return '';
+  }).join(""):'<p class="empty">Nicio invitație în așteptare.</p>';
+  $("act").innerHTML=act.length?act.map(App.matchRow).join(""):'<p class="empty">Niciun meci în desfășurare.</p>';
   $("done").innerHTML=done.length?done.map(App.matchRow).join(""):'<p class="empty">Încă niciun meci încheiat.</p>';
 }
 async function login(){
@@ -31,8 +29,10 @@ App.start(function(){
     var el=e.target.closest("button[data-act]");if(!el)return;
     var m=MS.filter(function(x){return x.id===el.getAttribute("data-id")})[0];if(!m)return;
     var ref=App.db.collection("matches").doc(m.id);
-    if(el.getAttribute("data-act")==="acc")ref.update({status:"active",pa:App.snapOr(m.a,m.pa),pb:App.snapOr(m.b,m.pb)}).then(function(){location.href="match.html?id="+m.id}).catch(fail);
-    else ref.update({status:"declined"}).catch(fail);
+    var action=el.getAttribute("data-act");
+    if(action==="acc")ref.update({status:"active",pa:App.snapOr(m.a,m.pa),pb:App.snapOr(m.b,m.pb)}).then(function(){location.href="match.html?id="+m.id}).catch(fail);
+    else if(action==="cancel"&&m.a===App.me)ref.update({status:"cancelled"}).catch(fail);
+    else if(action==="dec"&&m.b===App.me)ref.update({status:"declined"}).catch(fail);
   });
 },showLogin);
 if(App.auth){$("lb").onclick=login;$("lp").onkeydown=function(e){if(e.key==="Enter")login()}}

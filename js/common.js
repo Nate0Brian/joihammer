@@ -11,9 +11,23 @@ var App={me:"",isAdmin:false,players:[],auth:null,db:null,onPlayers:function(){}
 App.start=function(cb,onOut){
   if(CFG.apiKey==="PUNE_AICI"){document.body.insertAdjacentHTML("afterbegin",'<p class="err" style="padding:16px">Completează datele Firebase în js/config.js</p>');return}
   firebase.initializeApp(CFG);App.auth=firebase.auth();App.db=firebase.firestore();
-  Data.load().then(function(){App.auth.onAuthStateChanged(function(u){
+  Data.load().then(function(){App.auth.onAuthStateChanged(async function(u){
     if(!u){if(onOut)onOut();else location.href="index.html";return}
-    App.me=(u.email||"").split("@")[0].toLowerCase();App.isAdmin=(u.email||"").toLowerCase()===ADMIN_EMAIL;
+    App.isAdmin=u.email===ADMIN_EMAIL;
+    if(App.isAdmin){App.me="admin";}
+    else {
+      // Username-ul canonic este ID-ul documentului logins/{username}, nu numele
+      // complet din email (care poate conține sufixe precum .1).
+      var email=String(u.email||"").toLowerCase();
+      var candidate=email.split("@")[0].split(".")[0];
+      try {
+        var loginDoc=await App.db.collection("logins").doc(candidate).get();
+        if(!loginDoc.exists || String((loginDoc.data()||{}).email||"").toLowerCase()!==email){
+          throw new Error("Contul autentificat nu corespunde documentului logins/"+candidate+". Verifică emailul din Firebase Authentication și câmpul email din Firestore.");
+        }
+        App.me=loginDoc.id;
+      } catch(e) { fail(e); if(onOut)onOut(); return; }
+    }
     if($("nav")){App.nav();App.watchInvites()}
     App.db.collection("players").onSnapshot(function(s){
       App.players=s.docs.map(function(d){var x=d.data();return {name:d.id,army:x.army||"",det:x.det||"",dets:x.dets||[],fd:x.fd||FDS[0]}}).sort(function(a,b){return a.name<b.name?-1:1});
@@ -26,9 +40,9 @@ App.nav=function(){
   var cur=location.pathname.split("/").pop()||"index.html";
   var items=[
     ["index.html","Home","⌂","primary"],
-    ["match.html","Match","⚔","primary"],
+    ["index.html#act","Matches","⚔","primary"],
     ["rules.html","Rules","▤","primary"],
-    ["stratagems.html","Strats","✦","primary"],
+    ["rules.html#core-strat-section","Strats","✦","primary"],
     ["friendly.html","Friendly","⚔","more"],
     ["tournaments.html","Tournaments","♜","more"],
     ["watch.html","Live","◉","more"],
@@ -61,17 +75,8 @@ App.nav=function(){
   var more=$("moreNav"),panel=$("moreNavPanel");
   if(secondary.some(isActive))more.classList.add("on");
   function closeMore(){panel.hidden=true;more.setAttribute("aria-expanded","false");more.classList.remove("on")}
-  more.addEventListener("click",function(e){
-    e.preventDefault();e.stopPropagation();
-    var opening=panel.hidden;
-    panel.hidden=!opening;
-    more.setAttribute("aria-expanded",opening?"true":"false");
-    more.classList.toggle("on",opening||secondary.some(isActive));
-  });
-  panel.addEventListener("click",function(e){
-    e.stopPropagation();
-    if(e.target.closest("a")) closeMore();
-  });
+  more.onclick=function(e){e.preventDefault();e.stopPropagation();var opening=panel.hidden;panel.hidden=!opening;more.setAttribute("aria-expanded",String(opening));more.classList.toggle("on",opening)};
+  panel.addEventListener("click",function(e){e.stopPropagation()});
   if(!App._navEventsBound){
     document.addEventListener("click",function(e){var p=$("moreNavPanel"),m=$("moreNav");if(p&&!p.hidden&&!p.contains(e.target)&&e.target!==m&&!m.contains(e.target)){p.hidden=true;m.setAttribute("aria-expanded","false");m.classList.remove("on")}});
     document.addEventListener("keydown",function(e){if(e.key==="Escape"){var p=$("moreNavPanel"),m=$("moreNav");if(p&&m){p.hidden=true;m.setAttribute("aria-expanded","false");m.classList.remove("on")}}});
@@ -93,8 +98,8 @@ App.watchMatches=function(cb){
   var A=[],B=[],q=App.db.collection("matches");
   function out(){var m={};A.concat(B).forEach(function(x){m[x.id]=x});cb(Object.keys(m).map(function(k){return m[k]}).sort(function(x,y){return y.n-x.n}))}
   function map(s){return s.docs.map(function(d){return Object.assign({id:d.id},d.data())})}
-  q.where("a","==",App.me).onSnapshot(function(s){A=map(s);out()},function(e){fail(e);});
-  q.where("b","==",App.me).onSnapshot(function(s){B=map(s);out()},function(e){fail(e);});
+  q.where("a","==",App.me).onSnapshot(function(s){A=map(s);out()},fail);
+  q.where("b","==",App.me).onSnapshot(function(s){B=map(s);out()},fail);
 };
 App.score=function(m){return totalPS(Object.assign(newPS(),m.sa))+" – "+totalPS(Object.assign(newPS(),m.sb))};
 App.matchRow=function(m){

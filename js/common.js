@@ -24,10 +24,20 @@ App.start=function(cb,onOut){
 };
 App.nav=function(){
   var cur=location.pathname.split("/").pop()||"index.html";
-  var L=[["index.html","Acasă"],["friendly.html","Meci amical"],["tournaments.html","Turnee"],["watch.html","Live"],["missions.html","Misiuni"],["stats.html","Clasament"],["rules.html","Reguli"],["army-stats.html","Armate"],["profile.html","Profil"]];
-  if(App.isAdmin)L.push(["admin.html","Admin"]);
-  $("nav").innerHTML=L.map(function(l){return '<a href="'+l[0]+'"'+(cur===l[0]?' class="on"':'')+'>'+l[1]+'</a>'}).join("")+'<a href="#" id="out">Ieși ('+esc(App.me)+')</a>';
-  $("out").onclick=function(e){e.preventDefault();App.auth.signOut().then(function(){location.href="index.html"})};
+  var items=[
+    ["index.html","Home","⌂","primary"],["friendly.html","Match","⚔","primary"],["rules.html","Rules","▤","primary"],["rules.html#core-strat-section","Strats","✦","primary"],
+    ["tournaments.html","Tournaments","♜","more"],["watch.html","Live","◉","more"],["missions.html","Missions","◇","more"],["stats.html","Leaderboard","▥","more"],["army-stats.html","Army Stats","♙","more"],["profile.html","Profile","◉","more"]
+  ];
+  if(App.isAdmin)items.push(["admin.html","Admin","⚙","more"]);
+  var primary=items.filter(function(x){return x[3]==="primary"}),secondary=items.filter(function(x){return x[3]==="more"});
+  function link(x,cls){var active=x[0].indexOf("#")>=0?(cur===x[0].split("#")[0]&&location.hash===x[0].substring(x[0].indexOf("#"))):(cur===x[0]||(x[0]==="friendly.html"&&cur==="match.html"));return '<a class="'+(active?'on ' :'')+(cls||'')+'" href="'+x[0]+'">'+'<span class="nav-glyph" aria-hidden="true">'+x[2]+'</span><span class="nav-label">'+x[1]+'</span></a>'}
+  $("nav").innerHTML='<div class="nav-brand"><span class="brand-seal">✠</span><span class="brand-copy"><b>JOIHAMMER</b><small>IMPERIAL COMMAND SYSTEM</small></span></div>'+
+    '<div class="nav-desktop-links">'+primary.map(function(x){return link(x,'nav-primary')}).join('')+'<div class="nav-group-label">COMMAND ARCHIVE</div>'+secondary.map(function(x){return link(x,'nav-secondary')}).join('')+'<button class="nav-logout" id="out" type="button"><span class="nav-glyph">⇥</span><span>Sign out · '+esc(App.me)+'</span></button></div>'+ 
+    '<div class="nav-mobile-links">'+primary.map(function(x){return link(x,'nav-mobile-primary')}).join('')+'<button type="button" id="moreNav" class="nav-more '+(secondary.some(function(x){return cur===x[0]})?'on':'')+'" aria-expanded="false"><span class="nav-glyph">☷</span><span class="nav-label">More</span></button></div>'+ 
+    '<div class="nav-more-panel" id="moreNavPanel" hidden>'+secondary.map(function(x){return link(x,'nav-more-link')}).join('')+'<button class="nav-logout" id="outMobile" type="button">⇥ Sign out · '+esc(App.me)+'</button></div>';
+  function signOut(e){if(e)e.preventDefault();App.auth.signOut().then(function(){location.href="index.html"})}
+  $("out").onclick=signOut;$("outMobile").onclick=signOut;
+  $("moreNav").onclick=function(){var panel=$("moreNavPanel");panel.hidden=!panel.hidden;$("moreNav").setAttribute("aria-expanded",String(!panel.hidden))};
 };
 App.snap=function(n){
   var p=App.players.filter(function(x){return x.name===n})[0]||{name:n,army:"",det:"",dets:[],fd:FDS[0]};

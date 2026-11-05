@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 440" font-family="Arial,sans-serif">
+<rect width="500" height="440" fill="#f6f2e8"/>
+<text x="10" y="22" font-size="16" font-weight="bold" fill="#1d1b18">Search and Destroy</text>
+<text x="490" y="22" font-size="11" text-anchor="end" fill="#6b645a">schemă orientativă · 60" × 44"</text>
+<rect x="10" y="34" width="480" height="352" fill="#ece5d2" stroke="#1d1b18" stroke-width="2"/>
+<polygon points="10,34 250,34 250,210 10,210" fill="#d2aa4f" fill-opacity="0.7" stroke="#8a6a1f" stroke-width="2"/>
+<polygon points="250,210 490,210 490,386 250,386" fill="#d4554f" fill-opacity="0.6" stroke="#8f1d1d" stroke-width="2"/>
+<circle cx="250" cy="210" r="72" fill="#ece5d2" stroke="#6b645a" stroke-width="1.5" stroke-dasharray="5 4"/>
+<circle cx="250" cy="210" r="5" fill="#1d1b18"/>
+<text x="106" y="110" font-size="13" font-weight="bold" text-anchor="middle" fill="#1d1b18">Atacator</text>
+<text x="394" y="318" font-size="13" font-weight="bold" text-anchor="middle" fill="#1d1b18">Defender</text>
+<rect x="10" y="408" width="14" height="14" fill="#d2aa4f" fill-opacity="0.7" stroke="#8a6a1f"/><text x="30" y="420" font-size="12" fill="#1d1b18">Zona Atacatorului</text>
+<rect x="160" y="408" width="14" height="14" fill="#d4554f" fill-opacity="0.6" stroke="#8f1d1d"/><text x="180" y="420" font-size="12" fill="#1d1b18">Zona Defender-ului</text>
+<rect x="330" y="408" width="14" height="14" fill="#ece5d2" stroke="#1d1b18"/><text x="350" y="420" font-size="12" fill="#1d1b18">No Man’s Land</text>
+</svg>

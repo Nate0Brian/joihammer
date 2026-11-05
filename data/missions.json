@@ -512,12 +512,12 @@
     "Night Fighting": "Unitățile sunt vizibile doar la 18\"; fără INDIRECT FIRE dincolo de 18\"."
   },
   "deployment_images": {
-    "Tipping Point": "https://wahapedia.ru/wh40k11ed/img/maps/cards/CA7_TippingPoint.png",
-    "Sweeping Engagement": "https://wahapedia.ru/wh40k11ed/img/maps/cards/CA7_SweepingEngagement.png",
-    "Search and Destroy": "https://wahapedia.ru/wh40k11ed/img/maps/cards/CA7_SearchAndDestroy.png",
-    "Hammer and Anvil": "https://wahapedia.ru/wh40k11ed/img/maps/cards/CA7_HammerAndAnvil.png",
-    "Dawn of War": "https://wahapedia.ru/wh40k11ed/img/maps/cards/CA7_DawnOfWar.png",
-    "Crucible of Battle": "https://wahapedia.ru/wh40k11ed/img/maps/cards/CA7_CrucibleOfBattle.png"
+    "Tipping Point": "images/deploy/tipping-point.svg",
+    "Sweeping Engagement": "images/deploy/sweeping-engagement.svg",
+    "Search and Destroy": "images/deploy/search-and-destroy.svg",
+    "Hammer and Anvil": "images/deploy/hammer-and-anvil.svg",
+    "Dawn of War": "images/deploy/dawn-of-war.svg",
+    "Crucible of Battle": "images/deploy/crucible-of-battle.svg"
   },
   "deployment_notes": {
     "Tipping Point": "Zonele sunt pe laturile scurte; flancul drept al fiecărui jucător e împins înainte în trepte.",

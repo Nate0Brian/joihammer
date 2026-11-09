@@ -1,0 +1,303 @@
+{
+  "sources": {
+    "11OfficialApp": "https://www.warhammer-community.com/en-gb/articles/2akzkx92/combat-patrol-is-now-live-in-your-app/",
+    "11Reference": "https://wahapedia.ru/wh40k11ed_cp/",
+    "11OfficialHub": "https://warhammer40000.com/combat-patrol/",
+    "10ArchivePage": "https://tcrepo.com/downloads/wh40k-10e-combat-patrol-rules/",
+    "10Archive": "https://tcrepo.com/wp-content/uploads/edd/2023/06/WH40k-10e-Combat-Patrol-Box-Rules.zip",
+    "10OfficialAnnouncement": "https://www.warhammer-community.com/en-gb/articles/TDeIzUX3/combat-patrol-rules-and-missions-everything-you-need-to-play-this-fresh-new-mode/",
+    "10CoreRules": "https://assets.warhammer-community.com/warhammer40000_core&key_corerules_eng_24.09-5xfayxjekm.pdf",
+    "10OfficialMissions": "https://warcomprod2024productionstorage.s3.eu-west-2.amazonaws.com/warhammer40000_combatpatrol_rules_eng.24.09-rbtns7zwbh.pdf",
+    "11MissionRules": "https://wahapedia.ru/wh40k11ed_cp/the-rules/combat-patrol-mission/",
+    "11CoreRules": "https://wahapedia.ru/wh40k11ed_cp/the-rules/core-rules/",
+    "11Nav": "https://wahapedia.ru/wh40k11ed_cp/nav.html",
+    "11OfficialAppStore": "https://www.warhammer-community.com/en-gb/articles/2akzkx92/combat-patrol-is-now-live-in-your-app/"
+  },
+  "factions": [
+    {
+      "id": "space-marines",
+      "name": "Space Marines",
+      "group": "Imperium",
+      "pdf10": "https://warhammer40000.com/wp-content/uploads/2023/06/xw27iUOHPKXBNDnG.pdf",
+      "legacy10Available": true,
+      "edition11Access": "official-app",
+      "patrol11Name": "Assault Force",
+      "url11": "https://wahapedia.ru/wh40k11ed_cp/factions/assault-force/",
+      "edition10Available": true
+    },
+    {
+      "id": "black-templars",
+      "name": "Black Templars",
+      "group": "Imperium",
+      "pdf10": "https://warhammer40000.com/wp-content/uploads/2023/06/OuIi2eABoWrcNQmz.pdf",
+      "legacy10Available": true,
+      "edition11Access": "official-app",
+      "patrol11Name": "Vow-Sworn of Vedrenn",
+      "url11": "https://wahapedia.ru/wh40k11ed_cp/factions/vow-sworn-of-vedrenn/",
+      "edition10Available": true
+    },
+    {
+      "id": "blood-angels",
+      "name": "Blood Angels",
+      "group": "Imperium",
+      "pdf10": "https://warhammer40000.com/wp-content/uploads/2023/06/jpxkgKmUokR47P0p.pdf",
+      "legacy10Available": true,
+      "edition11Access": "official-app",
+      "patrol11Name": "Sanguinary Spearhead",
+      "url11": "https://wahapedia.ru/wh40k11ed_cp/factions/sanguinary-spearhead/",
+      "edition10Available": true
+    },
+    {
+      "id": "dark-angels",
+      "name": "Dark Angels",
+      "group": "Imperium",
+      "pdf10": "https://warhammer40000.com/wp-content/uploads/2023/06/cyKaIQv3utL1s0U7.pdf",
+      "legacy10Available": true,
+      "edition11Access": "official-app",
+      "patrol11Name": "The Vengeful Brethren",
+      "url11": "https://wahapedia.ru/wh40k11ed_cp/factions/the-vengeful-brethren/",
+      "edition10Available": true
+    },
+    {
+      "id": "deathwatch",
+      "name": "Deathwatch",
+      "group": "Imperium",
+      "pdf10": "https://warhammer40000.com/wp-content/uploads/2023/06/gEwkam3HZPI2YXoG.pdf",
+      "legacy10Available": true,
+      "edition11Access": "official-app",
+      "patrol11Name": "",
+      "url11": null,
+      "edition10Available": true
+    },
+    {
+      "id": "space-wolves",
+      "name": "Space Wolves",
+      "group": "Imperium",
+      "pdf10": "https://warhammer40000.com/wp-content/uploads/2023/06/d4AeCluWXbLKuXd9.pdf",
+      "legacy10Available": true,
+      "edition11Access": "official-app",
+      "patrol11Name": "Askar's Wolfpack",
+      "url11": "https://wahapedia.ru/wh40k11ed_cp/factions/askar-s-wolfpack/",
+      "edition10Available": true
+    },
+    {
+      "id": "grey-knights",
+      "name": "Grey Knights",
+      "group": "Imperium",
+      "pdf10": "https://warhammer40000.com/wp-content/uploads/2023/06/zm3JTlDQc9fKjFZG.pdf",
+      "legacy10Available": true,
+      "edition11Access": "official-app",
+      "patrol11Name": "Crowe's Sanctifiers",
+      "url11": "https://wahapedia.ru/wh40k11ed_cp/factions/crowe-s-sanctifiers/",
+      "edition10Available": true
+    },
+    {
+      "id": "adepta-sororitas",
+      "name": "Adepta Sororitas",
+      "group": "Imperium",
+      "pdf10": "https://warhammer40000.com/wp-content/uploads/2023/06/JYiUVw4ZWuUxVbgx.pdf",
+      "legacy10Available": true,
+      "edition11Access": "official-app",
+      "patrol11Name": "Sanctuary Guardians",
+      "url11": "https://wahapedia.ru/wh40k11ed_cp/factions/sanctuary-guardians/",
+      "edition10Available": true
+    },
+    {
+      "id": "adeptus-custodes",
+      "name": "Adeptus Custodes",
+      "group": "Imperium",
+      "pdf10": "https://warhammer40000.com/wp-content/uploads/2023/06/jv02G8XTE7LWF2d6.pdf",
+      "legacy10Available": true,
+      "edition11Access": "official-app",
+      "patrol11Name": "Tristraen's Gilded Blades",
+      "url11": "https://wahapedia.ru/wh40k11ed_cp/factions/tristraen-s-gilded-blades/",
+      "edition10Available": true
+    },
+    {
+      "id": "adeptus-mechanicus",
+      "name": "Adeptus Mechanicus",
+      "group": "Imperium",
+      "pdf10": "https://warhammer40000.com/wp-content/uploads/2023/06/kR4Wm60N59Imb5Rz.pdf",
+      "legacy10Available": true,
+      "edition11Access": "official-app",
+      "patrol11Name": "Purge Corps Deltic-9",
+      "url11": "https://wahapedia.ru/wh40k11ed_cp/factions/purge-corps-deltic-9/",
+      "edition10Available": true
+    },
+    {
+      "id": "astra-militarum",
+      "name": "Astra Militarum",
+      "group": "Imperium",
+      "pdf10": "https://warhammer40000.com/wp-content/uploads/2023/06/AN72ObkWf1oehf6B.pdf",
+      "legacy10Available": true,
+      "edition11Access": "official-app",
+      "patrol11Name": "Drayden's Lance",
+      "url11": "https://wahapedia.ru/wh40k11ed_cp/factions/drayden-s-lance/",
+      "edition10Available": true
+    },
+    {
+      "id": "chaos-space-marines",
+      "name": "Chaos Space Marines",
+      "group": "Chaos",
+      "pdf10": "https://warhammer40000.com/wp-content/uploads/2023/06/enZkKnWNM3zHqzhu.pdf",
+      "legacy10Available": true,
+      "edition11Access": "official-app",
+      "patrol11Name": "Zarkan's Daemonkin",
+      "url11": "https://wahapedia.ru/wh40k11ed_cp/factions/zarkan-s-daemonkin/",
+      "edition10Available": true
+    },
+    {
+      "id": "death-guard",
+      "name": "Death Guard",
+      "group": "Chaos",
+      "pdf10": "https://warhammer40000.com/wp-content/uploads/2023/06/IvffPVTSdysojD7L.pdf",
+      "legacy10Available": true,
+      "edition11Access": "official-app",
+      "patrol11Name": "Maggot Lords",
+      "url11": "https://wahapedia.ru/wh40k11ed_cp/factions/maggot-lords/",
+      "edition10Available": true
+    },
+    {
+      "id": "thousand-sons",
+      "name": "Thousand Sons",
+      "group": "Chaos",
+      "pdf10": "https://warhammer40000.com/wp-content/uploads/2023/06/PJ7RabvBBLrN482S.pdf",
+      "legacy10Available": true,
+      "edition11Access": "official-app",
+      "patrol11Name": "Prism of Zadophon",
+      "url11": "https://wahapedia.ru/wh40k11ed_cp/factions/prism-of-zadophon/",
+      "edition10Available": true
+    },
+    {
+      "id": "world-eaters",
+      "name": "World Eaters",
+      "group": "Chaos",
+      "pdf10": "https://warhammer40000.com/wp-content/uploads/2023/06/kaRdp4sLRdNOyIGd.pdf",
+      "legacy10Available": true,
+      "edition11Access": "official-app",
+      "patrol11Name": "Frenzied Reavers",
+      "url11": "https://wahapedia.ru/wh40k11ed_cp/factions/frenzied-reavers/",
+      "edition10Available": true
+    },
+    {
+      "id": "chaos-daemons",
+      "name": "Chaos Daemons",
+      "group": "Chaos",
+      "pdf10": "https://warhammer40000.com/wp-content/uploads/2023/06/ylTowNxNq36o3l47.pdf",
+      "legacy10Available": true,
+      "edition11Access": "official-app",
+      "patrol11Name": "",
+      "url11": null,
+      "edition10Available": true
+    },
+    {
+      "id": "aeldari",
+      "name": "Aeldari",
+      "group": "Xenos",
+      "pdf10": "https://warhammer40000.com/wp-content/uploads/2023/06/TEoMuTZ8KXNKhDBU.pdf",
+      "legacy10Available": true,
+      "edition11Access": "official-app",
+      "patrol11Name": "Kygharil's Protectors",
+      "url11": "https://wahapedia.ru/wh40k11ed_cp/factions/kygharil-s-protectors/",
+      "edition10Available": true
+    },
+    {
+      "id": "drukhari",
+      "name": "Drukhari",
+      "group": "Xenos",
+      "pdf10": "https://warhammer40000.com/wp-content/uploads/2023/06/U04b15adJZoZKj25.pdf",
+      "legacy10Available": true,
+      "edition11Access": "official-app",
+      "patrol11Name": "Coven of Agonies",
+      "url11": "https://wahapedia.ru/wh40k11ed_cp/factions/coven-of-agonies/",
+      "edition10Available": true
+    },
+    {
+      "id": "tyranids",
+      "name": "Tyranids",
+      "group": "Xenos",
+      "pdf10": "https://warhammer40000.com/wp-content/uploads/2023/06/lbmtxXmWRsCoIL5m.pdf",
+      "legacy10Available": true,
+      "edition11Access": "official-app",
+      "patrol11Name": "The Vardenghast Swarm",
+      "url11": "https://wahapedia.ru/wh40k11ed_cp/factions/the-vardenghast-swarm/",
+      "edition10Available": true
+    },
+    {
+      "id": "genestealer-cults",
+      "name": "Genestealer Cults",
+      "group": "Xenos",
+      "pdf10": "https://warhammer40000.com/wp-content/uploads/2023/06/ZBN8soRPR0YqAuki.pdf",
+      "legacy10Available": true,
+      "edition11Access": "official-app",
+      "patrol11Name": "Claw of Ascension",
+      "url11": "https://wahapedia.ru/wh40k11ed_cp/factions/claw-of-ascension/",
+      "edition10Available": true
+    },
+    {
+      "id": "leagues-of-votann",
+      "name": "Leagues of Votann",
+      "group": "Xenos",
+      "pdf10": "https://warhammer40000.com/wp-content/uploads/2023/06/K4AtwlXc5wLYxSHc.pdf",
+      "legacy10Available": true,
+      "edition11Access": "official-app",
+      "patrol11Name": "Bane-slayer's Bulwark",
+      "url11": "https://wahapedia.ru/wh40k11ed_cp/factions/bane-slayer-s-bulwark/",
+      "edition10Available": true
+    },
+    {
+      "id": "necrons",
+      "name": "Necrons",
+      "group": "Xenos",
+      "pdf10": "https://warhammer40000.com/wp-content/uploads/2023/06/iFOFJBKONEhD2ra3.pdf",
+      "legacy10Available": true,
+      "edition11Access": "official-app",
+      "patrol11Name": "Amonhotekh's Guard",
+      "url11": "https://wahapedia.ru/wh40k11ed_cp/factions/amonhotekh-s-guard/",
+      "edition10Available": true
+    },
+    {
+      "id": "orks",
+      "name": "Orks",
+      "group": "Xenos",
+      "pdf10": "https://warhammer40000.com/wp-content/uploads/2023/06/rbBqzfGoGuuDc5fa.pdf",
+      "legacy10Available": true,
+      "edition11Access": "official-app",
+      "patrol11Name": "'Ardmob",
+      "url11": "https://wahapedia.ru/wh40k11ed_cp/factions/ardmob/",
+      "edition10Available": true
+    },
+    {
+      "id": "tau-empire",
+      "name": "T'au Empire",
+      "group": "Xenos",
+      "pdf10": "https://warhammer40000.com/wp-content/uploads/2023/06/F9ZmBUY2Dus0yLea.pdf",
+      "legacy10Available": true,
+      "edition11Access": "official-app",
+      "patrol11Name": "Sudden Dawn Cadre",
+      "url11": "https://wahapedia.ru/wh40k11ed_cp/factions/sudden-dawn-cadre/",
+      "edition10Available": true
+    }
+  ],
+  "notes": {
+    "edition11": "Games Workshop anunță suportul Combat Patrol în aplicația oficială: datasheets, Army Rules, Enhancements și misiuni proprii. Portalul Wahapedia este neoficial și este oferit numai ca referință externă.",
+    "edition10": "Cele 24 de PDF-uri individuale sunt documente oficiale Combat Patrol din ediția 10, accesate prin linkurile originale Games Workshop. Include link separat către regulile generale și misiunile oficiale.",
+    "copyright": "JoiHammer links to the source documents and does not redistribute Games Workshop rulebook text."
+  },
+  "patrols11_extra": [
+    {
+      "id": "imperial-agents",
+      "name": "Inquisitor's Hand",
+      "group": "Imperium",
+      "url11": "https://wahapedia.ru/wh40k11ed_cp/factions/inquisitor-s-hand/",
+      "edition11Available": true
+    },
+    {
+      "id": "emperors-children",
+      "name": "Callous Blades",
+      "group": "Chaos",
+      "url11": "https://wahapedia.ru/wh40k11ed_cp/factions/callous-blades/",
+      "edition11Available": true
+    }
+  ]
+}

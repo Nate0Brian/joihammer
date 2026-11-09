@@ -1,0 +1,361 @@
+{
+  "schemaVersion": 1,
+  "notice": "Conținut nativ JoiHammer. Datele sunt rezumate/structurate din referințe consultate; verifică mereu actualizările oficiale înainte de joc.",
+  "patrols": {
+    "11:space-marines": {
+      "edition": 11,
+      "id": "space-marines",
+      "name": "Assault Force",
+      "sourceFaction": "Space Marines",
+      "status": "verified-reference",
+      "armyRules": [
+        {
+          "name": "Combat Doctrines",
+          "text": "La începutul Command phase, alege o doctrină pentru unitățile ADEPTUS ASTARTES prietene până la următoarea Command phase. Assault: unitățile pot declara Charge după Advance. Devastator: pot trage după Advance. Tactical: pot trage și declara Charge după Fall Back. Fiecare doctrină poate fi aleasă o singură dată pe bătălie."
+        }
+      ],
+      "detachmentRules": [
+        {
+          "name": "Indomitable Resolve",
+          "text": "Unitățile prietene ASSAULT FORCE primesc +1 Objective Control."
+        }
+      ],
+      "enhancements": [
+        {
+          "name": "Blade Masters",
+          "unit": "Vanguard Veteran Squad with Jump Packs",
+          "text": "Când o unitate inamică termină un Charge move engaged cu această unitate, atacurile melee ale acelei unități inamice au -1 la wound până la sfârșitul turei."
+        },
+        {
+          "name": "Battle-line Veterans",
+          "unit": "Intercessor Squad",
+          "text": "Bolt rifles ale unității primesc Rapid Fire 1."
+        }
+      ],
+      "mission": {
+        "name": "Honour the Chapter",
+        "summary": "Misiune primară Assault Force.",
+        "scoring": [
+          "Din Battle Round 2: la sfârșitul Command phase (sau la sfârșitul turei în BR5), dacă controlezi cel puțin un obiectiv și controlezi cel puțin la fel de multe obiective ca adversarul: 5 VP.",
+          "Controlezi cel puțin două obiective care nu sunt obiectivul tău de acasă: 10 VP."
+        ]
+      },
+      "stratagems": [
+        {
+          "name": "Relentless Aggression",
+          "cp": 1,
+          "phase": "Fight phase",
+          "when": "Când o unitate ASSAULT FORCE prietenoasă este selectată să facă Consolidation move.",
+          "target": "Acea unitate ASSAULT FORCE.",
+          "effect": "La efectuarea Consolidation move, unitatea poate avansa până la 6 inch."
+        },
+        {
+          "name": "Decapitating Strike",
+          "cp": 1,
+          "phase": "Fight phase",
+          "when": "Când o unitate ASSAULT FORCE prietenoasă este selectată să lupte.",
+          "target": "Acea unitate ASSAULT FORCE.",
+          "effect": "Atacurile melee ale unității primesc Precision."
+        },
+        {
+          "name": "Terrifying Charge",
+          "cp": 1,
+          "phase": "Charge phase",
+          "when": "Când o unitate ASSAULT FORCE prietenoasă termină un Charge move în propria Charge phase.",
+          "target": "Acea unitate; selectează apoi o unitate inamică engaged cu ea.",
+          "effect": "Unitatea inamică selectată face un Battle-shock test cu -1 la rezultat."
+        }
+      ],
+      "units": [
+        {
+          "name": "Assault Force Captain",
+          "models": "1",
+          "profile": "M 6\" · T4 · Sv 3+ · W6 · Ld 6+ · OC1 · Inv 4+",
+          "weapons": [
+            "Heavy Bolt Pistol — 18\", A1, BS2+, S4, AP-1, D1",
+            "Master-crafted Power Weapon — Melee, A6, WS2+, S5, AP-2, D2"
+          ],
+          "abilities": [
+            "Relic Shield: +1 Wound (inclus în profil).",
+            "Master of War: la sfârșitul Charge phase a adversarului, dacă unitatea este neangajată și în 6\" de un inamic, poate face un Charge; rezultatul charge mai mare de 6 devine 6."
+          ]
+        },
+        {
+          "name": "Assault Force Librarian",
+          "models": "1",
+          "profile": "M 6\" · T4 · Sv 3+ · W4 · Ld 6+ · OC1 · Inv 4+",
+          "weapons": [
+            "Fulmination – Electropulse: 24\", A2, BS3+, S8, AP-2, D3",
+            "Fulmination – Electrosurge: 24\", A3, BS3+, S4, AP-1, D1",
+            "Bolt Pistol: 12\", A1, BS3+, S4, AP0, D1",
+            "Force Weapon: Melee, A4, WS3+, S6, AP-1, D2"
+          ],
+          "abilities": [
+            "Empyric Insight: atacurile ranged ale unității ignoră modificatorii la BS, Hit rolls și Wound rolls.",
+            "Leader: se poate atașa la Assault Force Intercessor Squad."
+          ]
+        },
+        {
+          "name": "Assault Force Intercessor Squad",
+          "models": "5",
+          "profile": "M 6\" · T4 · Sv 3+ · W2 · Ld 6+ · OC3",
+          "weapons": [
+            "Bolt Pistol: 12\", A1, BS3+, S4, AP0, D1",
+            "Bolt Rifle: 24\", A2, BS3+, S4, AP-1, D1",
+            "Grenade Launcher Frag: 24\", A2, BS3+, S4, AP-1, D1",
+            "Grenade Launcher Krak: 24\", A2, BS3+, S5, AP-2, D3",
+            "Chainsword: Melee, A5, WS3+, S4, AP-1, D1"
+          ],
+          "abilities": [
+            "Stalwart Defenders: când este țintită de un inamic, dacă toate modelele sunt în range-ul unui obiectiv, atacurile împotriva unității au -1 AP."
+          ]
+        },
+        {
+          "name": "Assault Force Land Speeder",
+          "models": "1",
+          "profile": "M 14\" · T8 · Sv 3+ · W9 · Ld 6+ · OC2",
+          "weapons": [
+            "Multi-melta: 18\", A2, BS3+, S10, AP-4, D6",
+            "Heavy Flamer: 12\", AD6, Torrent, S5, AP-1, D1",
+            "Stormfury Missile Launcher: 48\", A1, BS3+, S10, AP-3, D4",
+            "Armoured Impact: Melee, A4, WS3+, S4, AP0, D1"
+          ],
+          "abilities": [
+            "Fly; Vehicle."
+          ]
+        },
+        {
+          "name": "Assault Force Vanguard Veteran Squad with Jump Packs",
+          "models": "5",
+          "profile": "M 12\" · T4 · Sv 3+ · W2 · Ld 6+ · OC1",
+          "weapons": [],
+          "abilities": [
+            "Jump Pack infantry; consult loadout chosen for the patrol roster."
+          ]
+        }
+      ]
+    },
+    "11:black-templars": {
+      "edition": 11,
+      "id": "black-templars",
+      "name": "Vow-Sworn of Vedrenn",
+      "sourceFaction": "Black Templars",
+      "status": "verified-reference",
+      "armyRules": [
+        {
+          "name": "Templar Vows",
+          "text": "La începutul primei Battle Round, alege un Vow activ pentru unitățile ADEPTUS ASTARTES. Abhor the Witch: melee attacks against PSYKER gain Precision; dacă un PSYKER inamic este în 12\" la declararea charge-ului, poți re-rula charge-ul și trebuie să termini engaged cu acel PSYKER. Accept Any Challenge: dacă Strength-ul atacului este ≤ Toughness-ul țintei, +1 la Wound roll. Suffer Not the Unclean: unitatea poate declara Charge după Fall Back; Pile-in/Consolidation nu trebuie să se apropie de modelul inamic cel mai apropiat, dar trebuie să se apropie cât mai mult de unitatea inamică cea mai apropiată. Uphold the Honour: Infantry păstrează controlul obiectivului până când adversarul depășește Level of Control; poate începe Actions după Advance."
+        },
+        {
+          "name": "Heirs of Sigismund",
+          "text": "Unitățile ADEPTUS ASTARTES cu al doilea Faction keyword folosesc Chapter-ul respectiv. Nu poți include mai multe Chapters. Dacă armata include Black Templars, Oath of Moment este înlocuit cu Templar Vows; nu poți include modele ADEPTUS ASTARTES PSYKER și anumite datasheets Space Marines sunt excluse."
+        }
+      ],
+      "detachmentRules": [
+        {
+          "name": "Close-range Destruction",
+          "text": "Atacurile unităților VOW-SWORN OF VEDRENN împotriva unei unități aflate în 12\" ignoră modificatorii la BS, WS și Hit rolls. Emperor’s Champion începe în Strategic Reserves și nu poate fi plasat înainte de Battle Round 2."
+        }
+      ],
+      "enhancements": [
+        {
+          "name": "Divine Protection",
+          "unit": "Vow-Sworn Sword Brethren",
+          "text": "O dată pe bătălie per unitate, când este țintită de o unitate inamică, poate primi 4+ Invulnerable Save."
+        },
+        {
+          "name": "Divine Endurance",
+          "unit": "Emperor’s Champion Vedrenn",
+          "text": "La începutul Movement phase, selectează o unitate VOW-SWORN vizibilă și în 12\"; când face Advance/Fall Back în acea tură, trece automat Hazard rolls pentru Desperate Escape și nu pierde eligibilitatea de Action."
+        }
+      ],
+      "mission": {
+        "name": "Uphold Your Vows",
+        "summary": "Misiunea primară Vow-Sworn of Vedrenn.",
+        "scoring": [
+          "La sfârșitul bătăliei: 10 VP pentru fiecare obiectiv binecuvântat de armata ta.",
+          "La sfârșitul turei: 5 VP pentru fiecare model CHARACTER inamic distrus în această tură sau în cea precedentă.",
+          "La sfârșitul bătăliei: 5 VP dacă toate modelele CHARACTER inamice sunt distruse."
+        ],
+        "actions": [
+          {
+            "name": "Hallowed Ground",
+            "starts": "Începutul Shooting phase",
+            "unit": "O unitate VOW-SWORN OF VEDRENN prietenoasă, non-CHARACTER, în range-ul unui obiectiv nebendecat.",
+            "limit": "O dată pe tură",
+            "completes": "Sfârșitul turei",
+            "effect": "Obiectivul devine binecuvântat de armata ta."
+          }
+        ]
+      },
+      "stratagems": [
+        {
+          "name": "Come to Their Aid",
+          "cp": 1,
+          "phase": "Charge phase",
+          "when": "În propria Charge phase, după ce o unitate VOW-SWORN OF VEDRENN prietenoasă a făcut Charge roll.",
+          "target": "Acea unitate.",
+          "effect": "Adaugă 2 la Charge roll. La selectarea țintelor, unitatea poate selecta doar unități inamice engaged cu unități VOW-SWORN OF VEDRENN prietenoase."
+        },
+        {
+          "name": "Heavy Strikes",
+          "cp": 1,
+          "phase": "Fight phase",
+          "when": "Când o unitate Sword Brethren sau Bladeguard Veteran este selectată să lupte.",
+          "target": "Acea unitate.",
+          "effect": "Atacurile melee împotriva unităților MONSTER/VEHICLE primesc +1 Damage."
+        },
+        {
+          "name": "Blessed Aura",
+          "cp": 1,
+          "phase": "Command phase",
+          "when": "În propria Command phase, când o unitate VOW-SWORN OF VEDRENN prietenoasă trece un Battle-shock test.",
+          "target": "Acea unitate.",
+          "effect": "Atacurile melee care țintesc unitatea au -1 la Hit rolls până la începutul următoarei tale ture."
+        }
+      ],
+      "units": [
+        {
+          "name": "Emperor’s Champion Vedrenn",
+          "models": "1",
+          "profile": "M 8\" · T4 · Sv 2+ · W5 · Ld 6+ · OC1 · Inv 4+",
+          "weapons": [
+            "Bolt Pistol: 12\", A1, BS2+, S4, AP0, D1",
+            "Black Sword – Sweep: Melee, A10, WS2+, S6, AP-2, D1",
+            "Black Sword – Strike: Melee, A6, WS2+, S8, AP-3, D3; Anti-Character 5+, Precision"
+          ],
+          "abilities": [
+            "Deft Riposte: atacurile melee care țintesc unitatea au Hazardous."
+          ]
+        },
+        {
+          "name": "Vow-Sworn Bladeguard Veteran Squad",
+          "models": "3",
+          "profile": "Infantry · Tacticus",
+          "weapons": [],
+          "abilities": [
+            "Vezi loadout-ul Combat Patrol și abilitatea detaliată în fișa de unitate."
+          ]
+        },
+        {
+          "name": "Vow-Sworn Crusader Squad",
+          "models": "10",
+          "profile": "Infantry · Battleline",
+          "weapons": [],
+          "abilities": []
+        },
+        {
+          "name": "Vow-Sworn Sword Brethren Squad",
+          "models": "5",
+          "profile": "Infantry · Tacticus",
+          "weapons": [],
+          "abilities": []
+        }
+      ]
+    },
+    "10:space-marines": {
+      "edition": 10,
+      "id": "space-marines",
+      "name": "Strike Force Octavius",
+      "sourceFaction": "Space Marines",
+      "status": "verified-official-pdf-summary",
+      "armyRules": [
+        {
+          "name": "Oath of Moment",
+          "text": "La începutul Command phase, selectează o unitate din armata adversarului. Până la începutul următoarei Command phase, aceasta este ținta Oath of Moment; modelele cu această abilitate pot re-arunca Hit rolls împotriva țintei."
+        }
+      ],
+      "enhancements": [
+        {
+          "name": "Champion Duellist",
+          "unit": "Captain Octavius",
+          "text": "Armele melee ale purtătorului primesc Precision și Lethal Hits."
+        },
+        {
+          "name": "Oathsworn Determination",
+          "unit": "Captain Octavius",
+          "text": "Modelele din unitatea purtătorului primesc +1 Objective Control."
+        }
+      ],
+      "mission": {
+        "name": "Wrath of the Emperor / Shock Tactics",
+        "scoring": [
+          "Wrath of the Emperor (implicit): la sfârșitul fiecărei faze, 2 VP dacă Captain Octavius a distrus cel puțin un model inamic în acea fază.",
+          "Shock Tactics (alternativ): la sfârșitul turei fiecărui jucător, 5 VP dacă controlezi cel puțin un obiectiv controlat de adversar la începutul turei."
+        ]
+      },
+      "stratagems": [
+        {
+          "name": "Gene-wrought Resilience",
+          "cp": 1,
+          "phase": "Shooting / Fight phase",
+          "when": "În Shooting phase a adversarului sau Fight phase, după selectarea țintelor de către o unitate inamică.",
+          "target": "O unitate Adeptus Astartes proprie țintită de unul sau mai multe atacuri.",
+          "effect": "Până la sfârșitul fazei, atacurile cu Strength mai mare decât Toughness-ul unității au -1 la Wound roll."
+        },
+        {
+          "name": "Veteran Instincts",
+          "cp": 1,
+          "phase": "Fight phase",
+          "when": "În Fight phase.",
+          "target": "O unitate Terminator proprie care nu a fost selectată să lupte în această fază.",
+          "effect": "Până la sfârșitul fazei, re-roll Wound rolls de 1; împotriva Monster/Vehicle poți re-rula Wound roll-ul."
+        },
+        {
+          "name": "Duty and Honour",
+          "cp": 1,
+          "phase": "Command phase",
+          "when": "La sfârșitul propriei Command phase.",
+          "target": "O unitate Adeptus Astartes proprie aflată în range-ul unui obiectiv controlat de tine.",
+          "effect": "Obiectivul rămâne sub controlul tău chiar dacă nu mai ai modele în range, până când adversarul îl controlează la începutul sau sfârșitul unei ture."
+        }
+      ],
+      "units": [
+        {
+          "name": "Captain Octavius",
+          "models": "1",
+          "profile": "M 5\" · T5 · Sv 2+ · W6 · Ld 6+ · OC1",
+          "weapons": [
+            "Storm Bolter: 24\", A2, BS2+, S4, AP0, D1",
+            "Relic Weapon: Melee, A6, WS2+, S5, AP-2, D2"
+          ],
+          "abilities": [
+            "Champion Duellist enhancement; Warlord."
+          ]
+        },
+        {
+          "name": "Librarian Tantus",
+          "models": "1",
+          "profile": "M 5\" · T5 · Sv 2+ · W5 · Ld 6+ · OC1 · Inv 4+",
+          "weapons": [
+            "Smite Electropulse: 24\", AD6, BS3+, S5, AP-1, DD3",
+            "Force Weapon: Melee, A4, WS3+, S6, AP-1, DD3"
+          ],
+          "abilities": [
+            "Deep Strike; Leader; Veil of Time: unit weapons gain Sustained Hits 1 while leading."
+          ]
+        },
+        {
+          "name": "Terminator Squad",
+          "models": "5",
+          "profile": "M 5\" · T5 · Sv 2+ · W3 · Ld 6+ · OC1",
+          "weapons": [
+            "Storm Bolter; Assault Cannon; Power Fist; Power Weapon"
+          ],
+          "abilities": [
+            "Deep Strike; Fury of the First: +1 Hit against Oath of Moment target."
+          ]
+        },
+        {
+          "name": "Infernus Squad",
+          "models": "5",
+          "profile": "M 6\" · T4 · Sv 3+ · W2 · Ld 6+ · OC1",
+          "weapons": [
+            "Bolt Pistol; Pyreblaster; Close Combat Weapon"
+          ],
+          "abilities": []
+        }
+      ]
+    }
+  }
+}

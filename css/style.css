@@ -307,3 +307,6 @@ html.jh-auth-pending body #nav,html.jh-auth-pending body main{visibility:hidden}
 @keyframes jh-loader-pulse{0%,100%{text-shadow:0 0 5px rgba(190,151,83,.18);border-color:rgba(173,137,75,.35)}50%{text-shadow:0 0 14px rgba(190,151,83,.65);border-color:rgba(205,169,104,.8)}}
 @media(prefers-reduced-motion:reduce){html.jh-auth-pending body::after{animation:none}}
 
+
+/* Native Combat Patrol reference panels */
+.cp-native-content{display:grid;gap:10px;padding:4px 0 18px}.cp-content-card{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--brass);border-radius:8px;padding:12px 14px;overflow-wrap:anywhere}.cp-content-card h3,.cp-content-card h4{font-family:Cinzel,Georgia,serif;color:var(--ink);margin:0 0 8px}.cp-content-card h3 span,.cp-content-card h4 span{float:right;color:var(--brass);font:700 12px sans-serif}.cp-content-card p{line-height:1.5;margin:7px 0;color:var(--ink)}.cp-content-card small{color:var(--muted)}.cp-status{display:inline-block;color:var(--muted);font-size:12px;border:1px solid var(--line);padding:5px 8px;border-radius:5px}.cp-rules-frame{display:none!important}

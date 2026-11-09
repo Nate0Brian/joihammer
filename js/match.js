@@ -6,7 +6,12 @@ function own(s){return App.isAdmin||App.me===M[s]}
 function P(s){return M[s==="a"?"pa":"pb"]}
 function PS(s){return M[s==="a"?"sa":"sb"]}
 function upd(o){return App.db.collection("matches").doc(mid).update(o).catch(fail)}
-function saveS(s){var o={};o[s==="a"?"sa":"sb"]=PS(s);upd(o)}
+function cpBalance(ps,s,events){var base=(ps.log||[]).reduce(function(a,e){return a+(e.k==="cp"?e.v:0)},0);return base+(events||M.cpAuto||[]).reduce(function(a,e){return a+(e.s===s?e.v:0)},0)}
+function cpEvent(events,s,v,k,label,ps,targetRound,targetTurn){var current=cpBalance(ps,s,events),amount=v>0?Math.min(v,Math.max(0,25-current)):v;if(!amount)return;events.push({s:s,v:amount,k:k,l:label,r:targetRound,t:targetTurn,at:Date.now()})}
+function awardCommandCP(events,players,roundStart,targetRound,targetTurn){["a","b"].forEach(function(s){cpEvent(events,s,1,"cp_base","CP de bază – Command Phase",players[s],targetRound,targetTurn);if(roundStart&&players[s]&&players[s].warlordExtraCP)cpEvent(events,s,1,"cp_warlord","CP Warlord – Battle Round",players[s],targetRound,targetTurn)})}
+function saveTurnEnd(){var ref=App.db.collection("matches").doc(mid);return App.db.runTransaction(function(tx){return tx.get(ref).then(function(doc){if(!doc.exists)throw new Error("Meciul nu există.");var d=doc.data();if(d.status!=="active"||d.first==null||d.turn>=10)throw new Error("Meciul nu mai este într-o tură activă.");var oldTurn=d.turn||0,oldTs=d.ts||0,tt=Object.assign({},d.tt||{}),cur=oldTurn%2===0?d.first:(d.first==="a"?"b":"a");if(oldTs)tt[cur]=(tt[cur]||0)+Math.max(0,Date.now()-oldTs);var events=(d.cpAuto||[]).slice(),players={a:d.pa||{},b:d.pb||{}},next=oldTurn+1;M=Object.assign({},M,d);awardCommandCP(events,players,next%2===0,Math.floor(next/2)+1,next);tx.update(ref,{turn:next,ts:Date.now(),tt:tt,cpAuto:events,turnUndo:{turn:oldTurn,ts:oldTs,tt:d.tt||{},cpAuto:d.cpAuto||[],savedAt:Date.now()}})})}) .catch(fail)}
+function undoTurn(){var ref=App.db.collection("matches").doc(mid);return App.db.runTransaction(function(tx){return tx.get(ref).then(function(doc){if(!doc.exists)throw new Error("Meciul nu există.");var d=doc.data(),u=d.turnUndo;if(!u)throw new Error("Nu există o tură de anulat.");tx.update(ref,{turn:u.turn,ts:Date.now(),tt:u.tt||{},cpAuto:u.cpAuto||[],turnUndo:firebase.firestore.FieldValue.delete()})})}).catch(fail)}
+function saveS(s){var o={};o[s==="a"?"sa":"sb"]=PS(s);if(M&&M.turnUndo)o.turnUndo=firebase.firestore.FieldValue.delete();upd(o)}
 function logAdd(ps,k,v,l,f){ps.log.push({k:k,v:v,l:String(l).slice(0,60),r:rd(),f:!!f,t:M.turn})}
 function mut(s,fn){var ps=PS(s);fn(ps);saveS(s);render()}
 function deckOf(ps){return SEC.map(function(c){return c.n}).filter(function(n){return ps.hand.indexOf(n)<0&&ps.used.indexOf(n)<0})}
@@ -52,7 +57,7 @@ function setupHtml(s){
 }
 
 function sideHtml(s){
-  var ps=PS(s),pl=P(s),started=M.first!=null,ended=M.turn>=10,a=actS(),mine=own(s),live=M.status==="active",r=rd(),cp=cpOf(ps),capP={t:sums(ps,"pri")>=45,r:roundVP(ps,"pri",r)>=15},capS={t:sums(ps,"sec")>=45,r:roundVP(ps,"sec",r)>=15};
+  var ps=PS(s),pl=P(s),started=M.first!=null,ended=M.turn>=10,a=actS(),mine=own(s),live=M.status==="active",r=rd(),cp=cpOf(ps,s),capP={t:sums(ps,"pri")>=45,r:roundVP(ps,"pri",r)>=15},capS={t:sums(ps,"sec")>=45,r:roundVP(ps,"sec",r)>=15};
   var h='<section class="side"><h2>'+esc(pl.name)+(App.me===M[s]?' <small>(tu)</small>':'')+(M.atk?' <span class="role">'+(M.atk===s?'Atacator':'Defender')+'</span>':'')+'</h2><div class="info">'+esc([pl.army,pl.det].filter(Boolean).join(" · "))+'</div>';
   var fo=Data.fdsFor(pl.army,pl.dets),fdOk=fo.indexOf(pl.fd)>=0;
   if(!started&&mine&&live){
@@ -106,8 +111,8 @@ function sideHtml(s){
     }).join("")||'<div class="legend">Nicio carte activă.</div>';
   }
 
-  h+='<details data-k="log'+s+'"'+(openS["log"+s]?' open':'')+'><summary>Istoric ('+ps.log.length+')</summary>'+ps.log.map(function(e,i){
-    return '<div class="lg">R'+e.r+' · '+(e.k==="cp"?"CP":e.k==="pri"?"Primar":"Secundar")+' '+(e.v>0?"+":"")+e.v+' · '+esc(e.l)+(App.isAdmin&&live?' '+B("rm",s,"×",' data-i="'+i+'"',false,"ghost"):'')+'</div>';
+  h+='<details data-k="log'+s+'"'+(openS["log"+s]?' open':'')+'><summary>Istoric ('+(ps.log.length+(M.cpAuto||[]).filter(function(e){return e.s===s}).length)+')</summary>'+(ps.log.concat((M.cpAuto||[]).filter(function(e){return e.s===s}).map(function(e){return {k:"cp",v:e.v,l:e.l,r:e.r,auto:true}}))).map(function(e,i){
+    return '<div class="lg">R'+e.r+' · '+(e.k==="cp"?"CP":e.k==="pri"?"Primar":"Secundar")+' '+(e.v>0?"+":"")+e.v+' · '+esc(e.l)+(App.isAdmin&&live&&!e.auto?' '+B("rm",s,"×",' data-i="'+i+'"',false,"ghost"):e.auto?' <small>(automat)</small>':'')+'</div>';
   }).reverse().join("")+'</details></section>';
   return h;
 }
@@ -142,7 +147,7 @@ function summaryHtml(){
   h+='</table></div>';
   ["a","b"].forEach(function(s){
     var ps=m["s"+s],gain=0,spent=0;
-    ps.log.forEach(function(e){if(e.k==="cp"){if(e.v>0)gain+=e.v;else spent-=e.v}});
+    ps.log.forEach(function(e){if(e.k==="cp"){if(e.v>0)gain+=e.v;else spent-=e.v}});(m.cpAuto||[]).forEach(function(e){if(e.s===s){if(e.v>0)gain+=e.v;else spent-=e.v}});
     var top=ps.log.filter(function(e){return e.k!=="cp"&&e.v>0}).sort(function(x,y){return y.v-x.v}).slice(0,3);
     h+='<div class="info"><b>'+esc(m["p"+s].name)+'</b> · Primar '+sums(ps,"pri")+' · Secundar '+sums(ps,"sec")+' · CP câștigat '+gain+', folosit '+spent+(m.tt&&m.tt[s]?' · timp jucat '+fmtT(m.tt[s]):'')
       +(top.length?'<div class="wev">Cele mai mari punctaje: '+top.map(function(e){return '+'+e.v+' '+(e.k==="pri"?"Primar":"Secundar")+' (R'+e.r+')'}).join(", ")+'</div>':'')+'</div>';
@@ -181,9 +186,9 @@ function render(){
       +'<div><b>3. Cine joacă prima tură</b> (zar, câștigătorul decide)<div class="vpb">'+B("first","",na,' data-v="a"',!(rdy&&roleOk))+B("first","",nb,' data-v="b"',!(rdy&&roleOk))+B("first","","Zar random",' data-v="rand"',!(rdy&&roleOk),"ghost")+'</div></div></div>';
   }else if(!ended){
     var an=m[a];
-    h+='Runda <b>'+rd()+'</b> din 5 · Tura lui <b>'+esc(P(a).name)+'</b> · <span class="timer" id="tmr" data-ts="'+(m.ts||0)+'"></span><div class="vpb" style="justify-content:center">'+B("end","","Termină tura",'',!(App.isAdmin||App.me===an))+B("back","","Tura anterioară","",false,"ghost")+'</div>';
+    h+='Runda <b>'+rd()+'</b> din 5 · Tura lui <b>'+esc(P(a).name)+'</b> · <span class="timer" id="tmr" data-ts="'+(m.ts||0)+'"></span><div class="vpb" style="justify-content:center">'+B("end","","Termină tura",'',!(App.isAdmin||App.me===an))+B("back","","Undo End Turn","",!m.turnUndo,"ghost")+'</div>';
   }else{
-    h+='Bătălia s-a încheiat. Adaugă punctele „Final bătălie” (F), apoi propune scorul final.<div class="vpb" style="justify-content:center">'+((App.me===m.a||App.me===m.b)?B("propose","","Propune scorul final",""):'')+(App.isAdmin?B("finish","","Încheie direct (admin)","",false,"ghost"):'')+B("back","","Tura anterioară","",false,"ghost")+'</div>';
+    h+='Bătălia s-a încheiat. Adaugă punctele „Final bătălie” (F), apoi propune scorul final.<div class="vpb" style="justify-content:center">'+((App.me===m.a||App.me===m.b)?B("propose","","Propune scorul final",""):'')+(App.isAdmin?B("finish","","Încheie direct (admin)","",false,"ghost"):'')+B("back","","Undo End Turn","",!m.turnUndo,"ghost")+'</div>';
   }
   var fr=m.type==="friendly"&&m.status==="active"&&(App.isAdmin||App.me===m.a||App.me===m.b);
   if(fr)h+='<div class="vpb" style="justify-content:center">'+B("early","","Încheie cu scorul de acum",'',!started,"ghost")+B("cancel","","Anulează meciul",'',false,"ghost")+'</div><div class="legend">Doar la meciurile amicale. „Anulează” nu se numără în statistici; încheierea anticipată se numără și cere confirmarea adversarului.</div>';
@@ -204,8 +209,8 @@ function syncProfile(){
     if(App.me!==M[s]||PS(s).ready)return;
     var cur=App.players.filter(function(x){return x.name===M[s]})[0];if(!cur)return;
     var old=P(s),opts=Data.fdsFor(cur.army,cur.dets),fd=opts.indexOf(old.fd)>=0?old.fd:(opts.indexOf(cur.fd)>=0?cur.fd:old.fd);
-    if(old.army===cur.army&&JSON.stringify(old.dets||[])===JSON.stringify(cur.dets||[])&&old.fd===fd)return;
-    var o={};o[s==="a"?"pa":"pb"]=Object.assign({},old,{army:cur.army,det:cur.det,dets:cur.dets,fd:fd});upd(o);
+    if(old.army===cur.army&&JSON.stringify(old.dets||[])===JSON.stringify(cur.dets||[])&&old.fd===fd&&old.warlordName===(cur.warlordName||"")&&!!old.warlordExtraCP===!!cur.warlordExtraCP)return;
+    var o={};o[s==="a"?"pa":"pb"]=Object.assign({},old,{army:cur.army,det:cur.det,dets:cur.dets,fd:fd,warlordName:cur.warlordName||"",warlordExtraCP:!!cur.warlordExtraCP});upd(o);
   });
 }
 function afterDone(){if(M.type==="tournament"&&M.tid)Tourney.tryAdvance(M.tid).catch(fail)}
@@ -222,9 +227,9 @@ function go(a,el){
   if(a==="ready"){mut(s,function(ps){ps.ready=true});return}
   if(a==="unready"){mut(s,function(ps){ps.ready=false});return}
   if(a==="atk"){upd({atk:el.getAttribute("data-v")});return}
-  if(a==="first"){if(!(M.sa.ready&&M.sb.ready&&M.atk))return;upd({first:el.getAttribute("data-v")==="rand"?pick(["a","b"]):el.getAttribute("data-v"),ts:Date.now()});return}
-  if(a==="end"){var cur=actS(),o={turn:M.turn+1,ts:Date.now()};if(cur&&M.ts)o["tt."+cur]=firebase.firestore.FieldValue.increment(Date.now()-M.ts);upd(o);return}
-  if(a==="back"){upd({turn:Math.max(0,M.turn-1),ts:Date.now()});return}
+  if(a==="first"){if(!(M.sa.ready&&M.sb.ready&&M.atk))return;var chosen=el.getAttribute("data-v")==="rand"?pick(["a","b"]):el.getAttribute("data-v");var ref=App.db.collection("matches").doc(mid);App.db.runTransaction(function(tx){return tx.get(ref).then(function(doc){var d=doc.data();if(!doc.exists||d.first!=null||d.status!=="active")return;var events=(d.cpAuto||[]).slice();M=Object.assign({},M,d);awardCommandCP(events,{a:d.pa||{},b:d.pb||{}},true,1,0);tx.update(ref,{first:chosen,ts:Date.now(),cpAuto:events,turnUndo:null})})}).catch(fail);return}
+  if(a==="end"){saveTurnEnd();return}
+  if(a==="back"){undoTurn();return}
   if(a==="reopen"){upd({status:"active",winner:null,pw:null,pBy:null});return}
   if(a==="del"){if(confirm("Ștergi meciul definitiv?"))App.db.collection("matches").doc(mid).delete().then(function(){location.href="index.html"}).catch(fail);return}
   if(a==="finish"){var f=verdict();upd({status:"done",winner:f.w,fta:f.ta,ftb:f.tb}).then(afterDone);return}
@@ -235,7 +240,7 @@ function go(a,el){
   if(a==="early"){var e=verdict();if(confirm("Încheii meciul cu scorul de acum ("+e.ta+" – "+e.tb+")? Adversarul trebuie să confirme."))upd({status:"confirm",pw:e.w,pBy:App.me===M.b?"b":"a",pta:e.ta,ptb:e.tb,early:true});return}
   if(a==="pv"){var pn=primOf(s),L=parseLine(PRI[pn].r[i]);mut(s,function(ps){logAdd(ps,"pri",v,pn+" – "+L.text.slice(0,45),L.w==="F")});return}
   if(a==="sv"){mut(s,function(ps){logAdd(ps,"sec",v,n);if(ps.mode==="T"){rm(ps.hand,n);rm(ps.fresh,n);ps.used.push(n)}});return}
-  if(a==="toss"){mut(s,function(ps){logAdd(ps,"cp",1,"Aruncat: "+n);rm(ps.hand,n);rm(ps.fresh,n);ps.used.push(n)});return}
+  if(a==="toss"){mut(s,function(ps){var amount=Math.min(1,Math.max(0,25-cpBalance(ps,s)));if(amount)logAdd(ps,"cp",amount,"CP Tactical discard: "+n);rm(ps.hand,n);rm(ps.fresh,n);ps.used.push(n)});return}
   if(a==="mull"){mut(s,function(ps){
     logAdd(ps,"cp",-1,"Re-trage: "+n);rm(ps.hand,n);rm(ps.fresh,n);ps.used.push(n);ps.rd=true;
     var d=shuffle(deckOf(ps));if(d.length){ps.hand.push(d[0]);ps.fresh.push(d[0])}
@@ -252,11 +257,11 @@ function go(a,el){
   if(a==="rm"){
     if(!App.isAdmin)return;
     var t=JSON.parse(JSON.stringify(PS(s)));t.log.splice(i,1);
-    var neg=cpOf(t)<0;["pri","sec"].forEach(function(k){for(var q=1;q<=5;q++)if(roundVP(t,k,q)<0)neg=true});
+    var neg=cpOf(t,s)<0;["pri","sec"].forEach(function(k){for(var q=1;q<=5;q++)if(roundVP(t,k,q)<0)neg=true});
     if(neg){alert("Nu se poate șterge: CP-ul sau VP-ul unei runde ar deveni negativ. Șterge mai întâi scăderile de după.");return}
     mut(s,function(ps){ps.log.splice(i,1)});return;
   }
-  if(a==="cp"){if(v<0&&cpOf(PS(s))+v<0)return;mut(s,function(ps){logAdd(ps,"cp",v,"manual")});return}
+  if(a==="cp"){var bal=cpOf(PS(s),s),amount=v>0?Math.min(v,Math.max(0,25-bal)):v;if(amount<0&&bal+amount<0)return;if(!amount)return;mut(s,function(ps){logAdd(ps,"cp",amount,amount>0?"CP manual":"CP cheltuit manual")});return}
   if(a==="man"){var k=el.getAttribute("data-k");if(v<0&&roundVP(PS(s),k,rd())+v<0)return;mut(s,function(ps){logAdd(ps,k,v,"manual")});return}
 }
 
@@ -285,7 +290,7 @@ App.start(function(){
   setInterval(function(){var e=$("tmr");if(e){var ts=+e.getAttribute("data-ts");e.textContent=ts?fmtT(Date.now()-ts):""}},1000);
   App.db.collection("matches").doc(mid).onSnapshot(function(d){
     if(!d.exists){$("box").innerHTML='<p class="err">Meciul nu există.</p>';return}
-    M=Object.assign({id:d.id},d.data());render();syncProfile();
+    M=Object.assign({id:d.id,cpAuto:[]},d.data());if(!Array.isArray(M.cpAuto))M.cpAuto=[];render();syncProfile();
   },fail);
   $("box").addEventListener("click",function(e){var el=e.target.closest("button[data-act]");if(el&&!el.disabled&&M)go(el.getAttribute("data-act"),el)});
   $("box").addEventListener("change",function(e){if(M&&e.target.getAttribute("data-act"))onChange(e.target)});

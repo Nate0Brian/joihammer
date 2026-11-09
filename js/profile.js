@@ -17,6 +17,7 @@ function paint(){
     if(!fdo.length)h+='<div class="legend">Bifează cel puțin un detașament. Force Disposition-ul se alege doar dintre cele ale detașamentelor tale.</div>';
     else h+='<label class="opt">Force Disposition al armatei <select id="fd">'+fdo.map(function(f){return '<option'+(f===cur.fd?' selected':'')+'>'+esc(f)+'</option>'}).join("")+'</select></label>'+'<div class="legend">'+(fdo.length===1?'Din detașamentul ales.':'Alege unul dintre Force Disposition-urile detașamentelor tale.')+'</div>';
   }
+  h+='<h3>Warlord</h3><label class="opt">Numele Warlord-ului <input id="warlordName" type="text" maxlength="80" value="'+esc(cur.warlordName||'')+'" placeholder="Numele modelului"></label><label class="opt"><input id="warlordExtraCP" type="checkbox"'+(cur.warlordExtraCP?' checked':'')+'> Warlord-ul meu acordă +1 CP la începutul Battle Round-ului</label>';
   h+='<p><button id="save">Salvează</button></p>';
   $("pf").innerHTML=h;
   if(!fdo.length){$("pm").innerHTML='<p class="empty">Alege un detașament ca să vezi misiunile tale.</p>';return}
@@ -30,7 +31,7 @@ function draw(){
     if($("addme"))$("addme").onclick=function(){App.db.collection("players").doc("admin").set({army:"",det:"",dets:[],fd:FDS[0]}).catch(fail)};
     return;
   }
-  if(!cur)cur={army:DET[p.army]?p.army:"",dets:(p.dets||[]).slice(),fd:p.fd};
+  if(!cur)cur={army:DET[p.army]?p.army:"",dets:(p.dets||[]).slice(),fd:p.fd,warlordName:p.warlordName||"",warlordExtraCP:!!p.warlordExtraCP};
   if(!FDM[cur.fd])cur.fd=FDS[0];
   paint();
 }
@@ -40,6 +41,8 @@ App.start(function(){
     var t=e.target;
     if(t.id==="army"){cur.army=t.value;cur.dets=[];paint();return}
     if(t.id==="fd"){cur.fd=t.value;paint();return}
+    if(t.id==="warlordName"){cur.warlordName=t.value;return}
+    if(t.id==="warlordExtraCP"){cur.warlordExtraCP=t.checked;return}
     var d=t.getAttribute&&t.getAttribute("data-d");
     if(d){var i=cur.dets.indexOf(d);if(t.checked&&i<0)cur.dets.push(d);else if(!t.checked&&i>=0)cur.dets.splice(i,1);paint()}
   });
@@ -47,7 +50,7 @@ App.start(function(){
     if(e.target.id!=="save")return;
     var allowed=Data.fdsFor(cur.army,cur.dets);
     if(!cur.army||!cur.dets.length||allowed.indexOf(cur.fd)<0){$("st").textContent="Alege armata, cel puțin un detașament și un Force Disposition permis de ele.";return}
-    App.db.collection("players").doc(App.me).update({army:cur.army,dets:cur.dets,det:cur.dets.join(", "),fd:cur.fd})
+    App.db.collection("players").doc(App.me).update({army:cur.army,dets:cur.dets,det:cur.dets.join(", "),fd:cur.fd,warlordName:cur.warlordName||"",warlordExtraCP:!!cur.warlordExtraCP})
       .then(function(){$("st").textContent="Salvat.";cur=null}).catch(fail);
   });
   $("chp").onclick=async function(){

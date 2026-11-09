@@ -28,6 +28,7 @@ function secInfo(ps,started){
 function events(m){
   var out=[];
   ["a","b"].forEach(function(s){m["s"+s].log.forEach(function(e,i){out.push({s:s,e:e,i:i})})});
+  (m.cpAuto||[]).forEach(function(e,i){out.push({s:e.s,e:{k:"cp",v:e.v,l:e.l,r:e.r,t:e.t},i:10000+i})});
   out.sort(function(x,y){return x.e.t-y.e.t||x.i-y.i});
   return out.slice(-4).reverse();
 }
@@ -35,7 +36,7 @@ function side(m,s,lead){
   var ps=m["s"+s],pl=m["p"+s],started=m.first!=null,a=actSide(m);
   return '<div class="ws'+(lead?' lead':'')+'"><div class="pn">'+(a===s?'▶ ':'')+esc(pl.name)+'</div><small>'+esc([m.atk?(m.atk===s?"Atacator":"Defender"):"",pl.army,pl.fd].filter(Boolean).join(" · "))+'</small>'
     +'<div class="num">'+totalPS(ps)+'</div>'
-    +'<div class="st">CP <b>'+cpOf(ps)+'</b> · Primar <b>'+sums(ps,"pri")+'</b> · Secundar <b>'+sums(ps,"sec")+'</b>'+(ps.br?' · Pictată +10':'')+'</div>'
+    +'<div class="st">CP <b>'+cpOf(ps,s,m.cpAuto)+'</b> · Primar <b>'+sums(ps,"pri")+'</b> · Secundar <b>'+sums(ps,"sec")+'</b>'+(ps.br?' · Pictată +10':'')+'</div>'
     +(started?'<div class="st">'+esc(primName(m,s))+'</div>':'')
     +'<div class="st">'+secInfo(ps,started)+'</div></div>';
 }

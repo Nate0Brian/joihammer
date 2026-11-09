@@ -31,7 +31,7 @@ App.start=function(cb,onOut){
     }
     if($("nav")){App.nav();App.watchInvites()}
     App.db.collection("players").onSnapshot(function(s){
-      App.players=s.docs.map(function(d){var x=d.data();return {name:d.id,army:x.army||"",det:x.det||"",dets:x.dets||[],fd:x.fd||FDS[0]}}).sort(function(a,b){return a.name<b.name?-1:1});
+      App.players=s.docs.map(function(d){var x=d.data();return {name:d.id,army:x.army||"",det:x.det||"",dets:x.dets||[],fd:x.fd||FDS[0],warlordName:x.warlordName||"",warlordExtraCP:!!x.warlordExtraCP}}).sort(function(a,b){return a.name<b.name?-1:1});
       App.onPlayers();
     },fail);
     try{cb();}finally{hideLoading()}
@@ -47,6 +47,7 @@ App.nav=function(){
     ["tournaments.html","Tournaments","♜","more"],
     ["watch.html","Live","◉","more"],
     ["missions.html","Missions","◇","more"],
+    ["combat-patrol.html","Combat Patrol","⬡","more"],
     ["stats.html","Leaderboard","▥","more"],
     ["army-stats.html","Army Stats","♙","more"],
     ["profile.html","Profile","◉","more"]
@@ -84,15 +85,15 @@ App.nav=function(){
   }
 };
 App.snap=function(n){
-  var p=App.players.filter(function(x){return x.name===n})[0]||{name:n,army:"",det:"",dets:[],fd:FDS[0]};
-  return {name:p.name,army:p.army,det:p.det,dets:p.dets||[],fd:p.fd};
+  var p=App.players.filter(function(x){return x.name===n})[0]||{name:n,army:"",det:"",dets:[],fd:FDS[0],warlordName:"",warlordExtraCP:false};
+  return {name:p.name,army:p.army,det:p.det,dets:p.dets||[],fd:p.fd,warlordName:p.warlordName||"",warlordExtraCP:!!p.warlordExtraCP};
 };
 App.snapOr=function(n,old){
   var p=App.players.filter(function(x){return x.name===n})[0];
-  return p?Object.assign({},old||{},{name:p.name,army:p.army,det:p.det,dets:p.dets||[],fd:p.fd}):old;
+  return p?Object.assign({},old||{},{name:p.name,army:p.army,det:p.det,dets:p.dets||[],fd:p.fd,warlordName:p.warlordName||"",warlordExtraCP:!!p.warlordExtraCP}):old;
 };
 App.newMatch=function(o){
-  return Object.assign({n:Date.now(),atk:null,first:null,turn:0,sa:newPS(),sb:newPS(),deploy:pick(DEPLOYS)},o);
+  return Object.assign({n:Date.now(),atk:null,first:null,turn:0,sa:newPS(),sb:newPS(),cpAuto:[],turnUndo:null,deploy:pick(DEPLOYS)},o);
 };
 App.watchMatches=function(cb){
   var A=[],B=[],q=App.db.collection("matches");

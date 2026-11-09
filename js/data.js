@@ -50,7 +50,7 @@ function sums(ps,k){
   return Math.min(45,Math.max(0,t));
 }
 function roundVP(ps,k,r){var t=0;(ps.log||[]).forEach(function(e){if(e.k===k&&!e.f&&e.r===r)t+=e.v});return t}
-function cpOf(ps){return (ps.log||[]).reduce(function(a,e){return a+(e.k==="cp"?e.v:0)},0)}
+function cpOf(ps,side,events){var n=(ps.log||[]).reduce(function(a,e){return a+(e.k==="cp"?e.v:0)},0),list=events||(side&&typeof M!=="undefined"&&M&&Array.isArray(M.cpAuto)?M.cpAuto:[]);if(side)n+=list.reduce(function(a,e){return a+(e.s===side?e.v:0)},0);return n}
 function totalPS(ps){return sums(ps,"pri")+sums(ps,"sec")+(ps.br?10:0)}
 
 /* „T R1–2 · 2VP: text” -> {w, min, max, text, v[]} */

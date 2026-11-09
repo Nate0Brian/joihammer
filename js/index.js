@@ -6,7 +6,7 @@ function draw(ms){
   var act=ms.filter(function(m){return m.status==="active"||m.status==="confirm"});
   var done=ms.filter(function(m){return m.status==="done"}).slice(0,8);
   $("inv").innerHTML=inv.length?inv.map(function(m){
-    if(m.b===App.me)return '<div class="card"><b>'+esc(m.a)+'</b> te invită la un meci amical.<div class="vpb"><button class="sm" data-act="acc" data-id="'+m.id+'">Acceptă</button><button class="sm ghost" data-act="dec" data-id="'+m.id+'">Refuză</button></div></div>';
+    if(m.b===App.me)return '<div class="card"><b>'+esc(m.a)+'</b> te invită la un meci '+(m.type==='combat-patrol'?'Combat Patrol ('+(m.cpEdition||'11')+'th Edition)':'amical')+'.<div class="vpb"><button class="sm" data-act="acc" data-id="'+m.id+'">Acceptă</button><button class="sm ghost" data-act="dec" data-id="'+m.id+'">Refuză</button></div></div>';
     if(m.a===App.me)return '<div class="card">Invitație trimisă lui <b>'+esc(m.b)+'</b> · în așteptare.<div class="vpb"><button class="sm ghost" data-act="cancel" data-id="'+m.id+'">Anulează invitația</button></div></div>';
     return '';
   }).join(""):'<p class="empty">Nicio invitație în așteptare.</p>';

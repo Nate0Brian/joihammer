@@ -1,4 +1,33 @@
-var mid=new URLSearchParams(location.search).get("id"),M=null,openS={};
+var mid=new URLSearchParams(location.search).get("id"),M=null,openS={},CPMATCH=null,cpModalTab="core";
+function cpPatrolList(ed){if(!CPMATCH)return[];if(ed==="11")return (CPMATCH.factions||[]).filter(function(f){return !!f.url11}).map(function(f){return{id:f.id,name:f.patrol11Name,group:f.group,url:f.url11,sourceFaction:f.name}}).concat(CPMATCH.patrols11_extra||[]);return (CPMATCH.factions||[]).filter(function(f){return f.edition10Available!==false}).map(function(f){return{id:f.id,name:f.name,group:f.group,url:f.pdf10,sourceFaction:f.name}})}
+function cpPatrolFor(s){var ps=PS(s),ed=M.cpEdition||"11";return cpPatrolList(ed).filter(function(x){return x.id===ps.cpPatrolId})[0]||null}
+function cpOwnSide(){if(!M)return null;if(App.me===M.a)return"a";if(App.me===M.b)return"b";return null}
+function cpSource(s){var p=cpPatrolFor(s);return p&&p.url?p.url:""}
+function matchScore(ps){return M&&M.type==="combat-patrol"?(ps.log||[]).filter(function(e){return e.k==="cpvp"}).reduce(function(a,e){return a+e.v},0):totalPS(ps)}
+function cpModalOpen(id){var x=$(id);if(x){x.hidden=false;document.body.classList.add("modal-open")}}
+function cpModalClose(id){var x=$(id);if(x)x.hidden=true;document.body.classList.remove("modal-open")}
+function cpSetTab(tab){cpModalTab=tab;var core=$("cpCoreStratPanel"),patrol=$("cpPatrolStratPanel");if(core)core.hidden=tab!=="core";if(patrol)patrol.hidden=tab!=="patrol";document.querySelectorAll("[data-cp-tab]").forEach(function(b){b.classList.toggle("on",b.getAttribute("data-cp-tab")===tab)})}
+function cpRecordFor(side){if(!window.CP_CONTENT||!M)return null;var ps=PS(side);return CP_CONTENT.patrols[(M.cpEdition||"11")+":"+ps.cpPatrolId]||null}
+function cpNativeStratHtml(items){return (items||[]).map(function(x){return '<details class="core-strat-card"><summary><span class="core-strat-summary-main"><strong>'+esc(x.name)+'</strong><small>'+esc(x.phase||'Combat Patrol')+'</small></span><span class="core-strat-cp">'+x.cp+' CP</span><span class="core-strat-chevron">＋</span></summary><div class="core-strat-details"><div class="core-strat-field"><b>WHEN</b><p>'+esc(x.when)+'</p></div><div class="core-strat-field"><b>TARGET</b><p>'+esc(x.target)+'</p></div><div class="core-strat-field"><b>EFFECT</b><p>'+esc(x.effect)+'</p></div></div></details>'}).join('')||'<p class="empty">Nu există stratageme locale verificate pentru această patrulă.</p>'}
+function cpOpenPatrolModal(kind){var side=cpOwnSide();if(!side){alert("Doar participanții la meci pot vedea regulile propriei patrule.");return}var patrol=cpPatrolFor(side),rec=cpRecordFor(side);if(!patrol){alert("Alege mai întâi Combat Patrol-ul tău.");return}var edition=M.cpEdition||"11",label=patrol.name+" · "+edition+"th Edition";if(kind==="strat"){$("stratModalTitle").textContent="Stratagems · "+label;$ ("stratModalDesc").textContent="Core Stratagems eligibile + stratagemele exclusiv ale patrulei tale.";$ ("cpPatrolStratLabel").textContent="Combat Patrol propriu: "+label;var core=edition==="11"?CORE_STRATAGEMS.filter(function(x){return ["Explosives","Crushing Impact","Rapid Ingress"].indexOf(x.name)<0}):[];if(edition==="11")renderCoreStratagems($("matchCoreStratagemList"),$("matchStratQ").value,core);else $("matchCoreStratagemList").innerHTML="<p class=\"cp-status\">Biblioteca Core Stratagems 10th Edition nu este încă integrată local. Nu afișăm stratageme din ediția greșită.</p>";$ ("cpPatrolStratPanel").innerHTML='<div id="cpPatrolNativeStrats" class="match-strat-list">'+cpNativeStratHtml(rec&&rec.stratagems)+'</div>';$("cpCoreRulesFrame")&&($("cpCoreRulesFrame").hidden=true);$("cpStratTabs").hidden=false;$("cpCoreStratPanel").hidden=false;cpSetTab("core");cpModalOpen("coreStratagemModal");return}
+ var modal=kind==="data"?"patrolDatasheetModal":"patrolMissionModal",title=kind==="data"?"patrolDatasheetTitle":"patrolMissionTitle",desc=kind==="data"?"patrolDatasheetDesc":"patrolMissionDesc",body=kind==="data"?"patrolDatasheetBody":"patrolMissionBody";$(title).textContent=(kind==="data"?"Datasheets & Army Rules · ":"Mission · ")+label;$(desc).textContent=kind==="data"?"Conținutul local al patrulei tale.":"Misiunea și scoring-ul propriu patrulei tale.";$(body).innerHTML=kind==="data"?cpNativeRecordHtml(rec):cpNativeMissionHtml(rec);cpModalOpen(modal)}
+function cpNativeRecordHtml(r){
+ if(!r)return '<p class="cp-status">Nu avem încă date locale verificate pentru patrula selectată. Nu afișăm linkuri externe și nu inventăm conținut.</p>';
+ var h='';
+ (r.armyRules||[]).forEach(function(x){h+='<article class="cp-content-card"><h3>Army Rule · '+esc(x.name)+'</h3><p>'+esc(x.text)+'</p></article>'});
+ (r.detachmentRules||[]).forEach(function(x){h+='<article class="cp-content-card"><h3>Patrol Rule · '+esc(x.name)+'</h3><p>'+esc(x.text)+'</p></article>'});
+ (r.enhancements||[]).forEach(function(x){h+='<article class="cp-content-card"><h3>Enhancement · '+esc(x.name)+'</h3><small>'+esc(x.unit)+'</small><p>'+esc(x.text)+'</p></article>'});
+ (r.units||[]).forEach(function(x){h+='<article class="cp-content-card"><h3>'+esc(x.name)+' · '+esc(x.models)+' models</h3><p><b>Profile:</b> '+esc(x.profile)+'</p>';if((x.weapons||[]).length)h+='<p><b>Weapons</b><br>'+x.weapons.map(esc).join('<br>')+'</p>';if((x.abilities||[]).length)h+='<p><b>Abilities</b><br>'+x.abilities.map(esc).join('<br>')+'</p>';h+='</article>'});
+ return h||'<p class="empty">Nu există datasheets locale pentru această patrulă.</p>';
+}
+function cpNativeMissionHtml(r){if(!r||!r.mission)return '<p class="cp-status">Misiunea acestei patrule nu este încă disponibilă local.</p>';var m=r.mission;return '<article class="cp-content-card"><h3>'+esc(m.name)+'</h3><p>'+esc(m.summary||'')+'</p>'+(m.scoring||[]).map(function(x){return'<p>• '+esc(x)+'</p>'}).join('')+(m.actions||[]).map(function(x){return'<section><h4>'+esc(x.name)+'</h4><p><b>Starts:</b> '+esc(x.starts)+'<br><b>Units:</b> '+esc(x.unit)+'<br><b>Limit:</b> '+esc(x.limit)+'<br><b>Completes:</b> '+esc(x.completes)+'<br><b>Effect:</b> '+esc(x.effect)+'</p></section>'}).join('')+'</article>'}
+function cpSideSetupHtml(s){var ps=PS(s),mine=own(s),live=M.status==="active",ed=M.cpEdition||"11",arr=cpPatrolList(ed),selected=cpPatrolFor(s),h='<section class="side setup"><h2>'+esc(P(s).name)+(App.me===M[s]?' <small>(tu)</small>':'')+(ps.ready?' <small class="ok">✓ confirmat</small>':'')+'</h2><div class="info">Combat Patrol · '+ed+'th Edition</div>';
+ if(mine&&live&&!ps.ready){h+='<label class="opt">Alege Combat Patrol-ul tău<select data-act="cpPatrol" data-s="'+s+'"><option value="">Selectează patrula…</option>'+arr.map(function(p){return'<option value="'+esc(p.id)+'"'+(p.id===ps.cpPatrolId?' selected':'')+'>'+esc(p.name)+' · '+esc(p.sourceFaction||p.group)+'</option>'}).join('')+'</select></label>';
+ if(selected)h+='<div class="cp-mission-summary"><b>'+esc(selected.name)+'</b><p class="legend">'+esc(selected.sourceFaction||selected.group)+' · biblioteca proprie se deschide în JoiHammer.</p></div>';
+ h+='<div class="vpb">'+B("ready",s,"Confirmă Combat Patrol-ul",'',!selected)+'</div><div class="legend">Fiecare jucător își alege propria patrulă. Nu poți selecta patrula adversarului.</div>';
+ }else{h+='<div class="info">Combat Patrol ales: <b>'+esc(selected?selected.name:"Încă nu a ales")+'</b></div>';if(selected&&mine&&live)h+='<div class="vpb">'+B("unready",s,"Schimbă Combat Patrol-ul",'',false,"ghost")+'</div>'}
+ return h+'</section>'}
+
 
 function rd(){return M.turn>=10?5:Math.floor(M.turn/2)+1}
 function actS(){if(M.first==null||M.turn>=10)return null;return M.turn%2===0?M.first:(M.first==="a"?"b":"a")}
@@ -8,7 +37,7 @@ function PS(s){return M[s==="a"?"sa":"sb"]}
 function upd(o){return App.db.collection("matches").doc(mid).update(o).catch(fail)}
 function cpBalance(ps,s,events){var base=(ps.log||[]).reduce(function(a,e){return a+(e.k==="cp"?e.v:0)},0);return base+(events||M.cpAuto||[]).reduce(function(a,e){return a+(e.s===s?e.v:0)},0)}
 function cpEvent(events,s,v,k,label,ps,targetRound,targetTurn){var current=cpBalance(ps,s,events),amount=v>0?Math.min(v,Math.max(0,25-current)):v;if(!amount)return;events.push({s:s,v:amount,k:k,l:label,r:targetRound,t:targetTurn,at:Date.now()})}
-function awardCommandCP(events,players,roundStart,targetRound,targetTurn){["a","b"].forEach(function(s){cpEvent(events,s,1,"cp_base","CP de bază – Command Phase",players[s],targetRound,targetTurn);if(roundStart&&players[s]&&players[s].warlordExtraCP)cpEvent(events,s,1,"cp_warlord","CP Warlord – Battle Round",players[s],targetRound,targetTurn)})}
+function awardCommandCP(events,players,roundStart,targetRound,targetTurn){["a","b"].forEach(function(s){cpEvent(events,s,1,"cp_base","CP de bază – Command Phase",players[s],targetRound,targetTurn);if(M&&M.type!=="combat-patrol"&&roundStart&&players[s]&&players[s].warlordExtraCP)cpEvent(events,s,1,"cp_warlord","CP Warlord – Battle Round",players[s],targetRound,targetTurn)})}
 function saveTurnEnd(){var ref=App.db.collection("matches").doc(mid);return App.db.runTransaction(function(tx){return tx.get(ref).then(function(doc){if(!doc.exists)throw new Error("Meciul nu există.");var d=doc.data();if(d.status!=="active"||d.first==null||d.turn>=10)throw new Error("Meciul nu mai este într-o tură activă.");var oldTurn=d.turn||0,oldTs=d.ts||0,tt=Object.assign({},d.tt||{}),cur=oldTurn%2===0?d.first:(d.first==="a"?"b":"a");if(oldTs)tt[cur]=(tt[cur]||0)+Math.max(0,Date.now()-oldTs);var events=(d.cpAuto||[]).slice(),players={a:d.pa||{},b:d.pb||{}},next=oldTurn+1;M=Object.assign({},M,d);awardCommandCP(events,players,next%2===0,Math.floor(next/2)+1,next);tx.update(ref,{turn:next,ts:Date.now(),tt:tt,cpAuto:events,turnUndo:{turn:oldTurn,ts:oldTs,tt:d.tt||{},cpAuto:d.cpAuto||[],savedAt:Date.now()}})})}) .catch(fail)}
 function undoTurn(){var ref=App.db.collection("matches").doc(mid);return App.db.runTransaction(function(tx){return tx.get(ref).then(function(doc){if(!doc.exists)throw new Error("Meciul nu există.");var d=doc.data(),u=d.turnUndo;if(!u)throw new Error("Nu există o tură de anulat.");tx.update(ref,{turn:u.turn,ts:Date.now(),tt:u.tt||{},cpAuto:u.cpAuto||[],turnUndo:firebase.firestore.FieldValue.delete()})})}).catch(fail)}
 function saveS(s){var o={};o[s==="a"?"sa":"sb"]=PS(s);if(M&&M.turnUndo)o.turnUndo=firebase.firestore.FieldValue.delete();upd(o)}
@@ -117,6 +146,12 @@ function sideHtml(s){
   return h;
 }
 
+function cpSideGameHtml(s){var ps=PS(s),pl=P(s),mine=own(s),live=M.status==="active",started=M.first!=null,ended=M.turn>=10,patrol=cpPatrolFor(s),cp=cpOf(ps,s),score=(ps.log||[]).filter(function(e){return e.k==="cpvp"}).reduce(function(a,e){return a+e.v},0),h='<section class="side"><h2>'+esc(pl.name)+(App.me===M[s]?' <small>(tu)</small>':'')+'</h2><div class="info">'+esc(patrol?patrol.name:"Combat Patrol neales")+' · '+(M.cpEdition||"11")+'th Edition</div><div class="board"><div class="bt"><span>Mission VP</span><b>'+score+'</b></div><div><span>Battle Round</span><b>'+rd()+'/5</b></div></div><div class="cpbox'+(mine&&live?'':' ro')+'">'+(mine&&live?B("cp",s,"−",' data-v="-1" aria-label="Scade CP"',cp<=0):'')+'<div class="cpnum"><span>CP</span><b>'+cp+'</b></div>'+(mine&&live?B("cp",s,"+",' data-v="1" aria-label="Adaugă CP"',false):'')+'</div>';
+ h+='<div class="cp-score-entry"><input type="text" maxlength="90" placeholder="Motivul punctajului (ex. Primary objective)" data-cp-reason="'+s+'" '+(!mine||!live||!started||ended?'disabled':'')+'><button type="button" data-act="cpvp" data-s="'+s+'" data-v="1" '+(!mine||!live||!started||ended?'disabled':'')+'>+1 VP</button><button type="button" class="ghost" data-act="cpvp" data-s="'+s+'" data-v="-1" '+(!mine||!live||!started||ended||score<=0?'disabled':'')+'>−1 VP</button></div>';
+ h+='<div class="legend">VP din misiunea Combat Patrol. Înregistrează fiecare punctare cu o descriere pentru jurnal. CP-ul folosește aceleași controale și jurnal ca meciul normal.</div>';
+ if(patrol)h+='<div class="cp-mission-summary"><b>Mission · '+esc(patrol.name)+'</b><p class="legend">Misiunea proprie a patrulei selectate. Deschide „Mission” pentru condițiile oficiale.</p><button type="button" class="sm ghost" data-open-own-mission="1">Deschide misiunea</button></div>';
+ h+='<details><summary>Istoric ('+(ps.log.length+(M.cpAuto||[]).filter(function(e){return e.s===s}).length)+')</summary>'+(ps.log.concat((M.cpAuto||[]).filter(function(e){return e.s===s}).map(function(e){return{k:"cp",v:e.v,l:e.l,r:e.r}}))).map(function(e){return'<div class="lg">R'+e.r+' · '+(e.k==="cp"?"CP":e.k==="cpvp"?"Mission VP":"")+' '+(e.v>0?"+":"")+e.v+' · '+esc(e.l)+'</div>'}).reverse().join("")+'</details></section>';return h}
+
 function fmtT(ms){
   var s=Math.max(0,Math.floor(ms/1000)),h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;
   return (h?h+":"+(m<10?"0":""):"")+m+":"+(x<10?"0":"")+x;
@@ -138,6 +173,10 @@ function chart(ca,cb){
 }
 function summaryHtml(){
   var m=M,na=esc(m.pa.name),nb=esc(m.pb.name);
+  if(m.type==="combat-patrol"){
+    function csum(ps){return (ps.log||[]).filter(function(e){return e.k==="cpvp"}).reduce(function(a,e){return a+e.v},0)}
+    return '<section class="summ"><h2>Combat Patrol · Rezumat</h2><div class="tblw"><table class="tbl"><tr><th>Jucător</th><th>Combat Patrol</th><th>Mission VP</th><th>CP</th></tr><tr><td>'+na+'</td><td>'+esc(cpPatrolFor("a")?cpPatrolFor("a").name:"—")+'</td><td>'+csum(m.sa)+'</td><td>'+cpOf(m.sa,"a")+'</td></tr><tr><td>'+nb+'</td><td>'+esc(cpPatrolFor("b")?cpPatrolFor("b").name:"—")+'</td><td>'+csum(m.sb)+'</td><td>'+cpOf(m.sb,"b")+'</td></tr></table></div></section>';
+  }
   var h='<section class="summ"><h2>Rezumat</h2>'+chart(cumul(m.sa),cumul(m.sb))+'<div class="legend"><span style="color:var(--brass)">■</span> '+na+' · <span style="color:var(--blood)">■</span> '+nb+' · VP cumulat pe runde</div>';
   h+='<div class="tblw"><table class="tbl"><tr><th></th><th>Jucător</th>'+[1,2,3,4,5].map(function(i){return '<th>R'+i+'</th>'}).join("")+'<th>F</th><th>+10</th><th>Total</th></tr>';
   ["a","b"].forEach(function(s){
@@ -161,15 +200,15 @@ function render(){
   ["sa","sb"].forEach(function(k){m[k]=Object.assign(newPS(),m[k])});
   var rdy=!!(m.sa.ready&&m.sb.ready),roleOk=!!m.atk,na=esc(m.pa.name),nb=esc(m.pb.name);
   var h='<h1>'+na+' <span class="vs">vs</span> '+nb+'</h1>';
-  h+='<div class="depbar"><div class="info">'+(m.type==="tournament"?"Meci de turneu":"Meci amical")+(m.deploy?' · Deployment: <b>'+esc(m.deploy)+'</b>'+(DEPNOTE[m.deploy]?'<br><small>'+esc(DEPNOTE[m.deploy])+'</small>':''):'')+(m.twist?' · Twist: <b>'+esc(m.twist)+'</b> – '+esc(TWISTS[m.twist]):'')+'</div>'+(m.deploy?Data.depImg(m.deploy):'')+'</div>';
+  h+='<div class="depbar"><div class="info">'+(m.type==="tournament"?"Meci de turneu":m.type==="combat-patrol"?"Combat Patrol · "+(m.cpEdition||"11")+"th Edition":"Meci amical")+(m.deploy?' · Deployment: <b>'+esc(m.deploy)+'</b>'+(DEPNOTE[m.deploy]?'<br><small>'+esc(DEPNOTE[m.deploy])+'</small>':''):'')+(m.twist?' · Twist: <b>'+esc(m.twist)+'</b> – '+esc(TWISTS[m.twist]):'')+'</div>'+(m.deploy?Data.depImg(m.deploy):'')+'</div>';
   if(m.status==="invited"){
-    h+='<div class="banner">Invitație în așteptare.'+(App.me===m.b?'<div class="vpb" style="justify-content:center">'+B("acc","","Acceptă","")+B("dec","","Refuză","",false,"ghost")+'</div>':' Așteaptă răspunsul lui '+esc(m.b)+'.'+(App.me===m.a?'<div class="vpb" style="justify-content:center">'+B("dec","","Anulează invitația","",false,"ghost")+'</div>':''))+'</div>';
+    h+='<div class="banner">'+(m.type==="combat-patrol"?"Invitație Combat Patrol ("+(m.cpEdition||"11")+"th Edition) în așteptare.":"Invitație în așteptare.")+(App.me===m.b?'<div class="vpb" style="justify-content:center">'+B("acc","","Acceptă","")+B("dec","","Refuză","",false,"ghost")+'</div>':' Așteaptă răspunsul lui '+esc(m.b)+'.'+(App.me===m.a?'<div class="vpb" style="justify-content:center">'+B("dec","","Anulează invitația","",false,"ghost")+'</div>':''))+'</div>';
     $("box").innerHTML=h;return;
   }
   if(m.status==="declined"||m.status==="cancelled"){$("box").innerHTML=h+'<div class="banner">'+(m.status==="cancelled"?"Meciul a fost anulat.":"Invitația a fost refuzată sau anulată.")+'</div>';return}
 
   var head=h;
-  h='<div class="banner">'+(started||m.status!=="active"?'<div class="bigsc">'+totalPS(m.sa)+' – '+totalPS(m.sb)+'</div>':'');
+  h='<div class="banner">'+(started||m.status!=="active"?'<div class="bigsc">'+matchScore(m.sa)+' – '+matchScore(m.sb)+'</div>':'');
   if(m.status==="done"){
     h+=(m.winner==="draw"?'Remiză':'Câștigător: <b>'+esc(m.winner==="a"?m.pa.name:m.pb.name)+'</b>'+(m.wo?' (neprezentare)':'')+(m.early?' (încheiat anticipat)':''))+(App.isAdmin?'<div class="vpb" style="justify-content:center">'+B("reopen","","Redeschide meciul","",false,"ghost")+'</div>':'');
   }else if(m.status==="confirm"){
@@ -188,17 +227,21 @@ function render(){
     var an=m[a];
     h+='Runda <b>'+rd()+'</b> din 5 · Tura lui <b>'+esc(P(a).name)+'</b> · <span class="timer" id="tmr" data-ts="'+(m.ts||0)+'"></span><div class="vpb" style="justify-content:center">'+B("end","","Termină tura",'',!(App.isAdmin||App.me===an))+B("back","","Undo End Turn","",!m.turnUndo,"ghost")+'</div>';
   }else{
-    h+='Bătălia s-a încheiat. Adaugă punctele „Final bătălie” (F), apoi propune scorul final.<div class="vpb" style="justify-content:center">'+((App.me===m.a||App.me===m.b)?B("propose","","Propune scorul final",""):'')+(App.isAdmin?B("finish","","Încheie direct (admin)","",false,"ghost"):'')+B("back","","Undo End Turn","",!m.turnUndo,"ghost")+'</div>';
+    h+=(m.type==="combat-patrol"?"Bătălia Combat Patrol s-a încheiat. Propune scorul final.":"Bătălia s-a încheiat. Adaugă punctele „Final bătălie” (F), apoi propune scorul final.")+'<div class="vpb" style="justify-content:center">'+((App.me===m.a||App.me===m.b)?B("propose","","Propune scorul final",""):'')+(App.isAdmin?B("finish","","Încheie direct (admin)","",false,"ghost"):'')+B("back","","Undo End Turn","",!m.turnUndo,"ghost")+'</div>';
   }
   var fr=m.type==="friendly"&&m.status==="active"&&(App.isAdmin||App.me===m.a||App.me===m.b);
   if(fr)h+='<div class="vpb" style="justify-content:center">'+B("early","","Încheie cu scorul de acum",'',!started,"ghost")+B("cancel","","Anulează meciul",'',false,"ghost")+'</div><div class="legend">Doar la meciurile amicale. „Anulează” nu se numără în statistici; încheierea anticipată se numără și cere confirmarea adversarului.</div>';
   h+='</div>';
   var bn=h;h=head;
   var first=App.me===m.b?"b":"a",second=first==="a"?"b":"a",pre=!started&&m.status==="active";
-  var sd='<div class="sides">'+(pre?setupHtml(first)+setupHtml(second):sideHtml(first)+sideHtml(second))+'</div>';
+  var sd='<div class="sides">'+(pre?(m.type==="combat-patrol"?cpSideSetupHtml(first)+cpSideSetupHtml(second):setupHtml(first)+setupHtml(second)):(m.type==="combat-patrol"?cpSideGameHtml(first)+cpSideGameHtml(second):sideHtml(first)+sideHtml(second)))+'</div>';
   h+=pre?sd+bn:bn+(m.status==="done"?summaryHtml():'')+sd;
   if(App.isAdmin)h+='<p style="margin-top:24px">'+B("del","","Șterge meciul","",false,"ghost")+'</p>';
   $("box").innerHTML=h;
+  var isCP=m.type==="combat-patrol",ownSide=cpOwnSide(),ownPatrol=ownSide&&cpPatrolFor(ownSide);
+  $("openCoreStratagems").textContent=isCP?"⚔ Stratagems":"⚔ Core Stratagems";
+  $("openPatrolDatasheets").hidden=!isCP;$("openPatrolMission").hidden=!isCP;
+  $("matchToolsHint").textContent=isCP?(ownPatrol?"Core + "+ownPatrol.name:"Alege-ți Combat Patrol-ul pentru a încărca regulile."):"Referință rapidă · fără să părăsești meciul";
   [].forEach.call(document.querySelectorAll("details[data-k]"),function(d){d.addEventListener("toggle",function(){openS[d.getAttribute("data-k")]=d.open})});
 }
 
@@ -215,7 +258,7 @@ function syncProfile(){
 }
 function afterDone(){if(M.type==="tournament"&&M.tid)Tourney.tryAdvance(M.tid).catch(fail)}
 function verdict(){
-  var ta=totalPS(M.sa),tb=totalPS(M.sb),w=ta>tb?"a":(tb>ta?"b":"draw");
+  var ta=M.type==="combat-patrol"?M.sa.log.filter(function(e){return e.k==="cpvp"}).reduce(function(a,e){return a+e.v},0):totalPS(M.sa),tb=M.type==="combat-patrol"?M.sb.log.filter(function(e){return e.k==="cpvp"}).reduce(function(a,e){return a+e.v},0):totalPS(M.sb),w=ta>tb?"a":(tb>ta?"b":"draw");
   if(w==="draw"&&M.type==="tournament"&&(M.fmt||"elim")==="elim")w=confirm("Egalitate "+ta+"–"+tb+". "+M.pa.name+" trece mai departe? OK = "+M.pa.name+", Anulează = "+M.pb.name)?"a":"b";
   return {ta:ta,tb:tb,w:w};
 }
@@ -224,8 +267,9 @@ function go(a,el){
   var s=el.getAttribute("data-s"),n=el.getAttribute("data-n"),v=+el.getAttribute("data-v"),i=+el.getAttribute("data-i");
   if(a==="acc"){upd({status:"active",pa:App.snapOr(M.a,M.pa),pb:App.snapOr(M.b,M.pb)});return}
   if(a==="dec"){upd({status:"declined"});return}
-  if(a==="ready"){mut(s,function(ps){ps.ready=true});return}
+  if(a==="ready"){if(M.type==="combat-patrol"&&!PS(s).cpPatrolId)return;mut(s,function(ps){ps.ready=true});return}
   if(a==="unready"){mut(s,function(ps){ps.ready=false});return}
+  if(a==="cpvp"){var reason=document.querySelector('[data-cp-reason="'+s+'"]'),label=reason&&reason.value.trim()||"Mission scoring";if(v<0){var bal=(PS(s).log||[]).filter(function(e){return e.k==="cpvp"}).reduce(function(t,e){return t+e.v},0);if(bal<=0)return}mut(s,function(ps){logAdd(ps,"cpvp",v,label)});return}
   if(a==="atk"){upd({atk:el.getAttribute("data-v")});return}
   if(a==="first"){if(!(M.sa.ready&&M.sb.ready&&M.atk))return;var chosen=el.getAttribute("data-v")==="rand"?pick(["a","b"]):el.getAttribute("data-v");var ref=App.db.collection("matches").doc(mid);App.db.runTransaction(function(tx){return tx.get(ref).then(function(doc){var d=doc.data();if(!doc.exists||d.first!=null||d.status!=="active")return;var events=(d.cpAuto||[]).slice();M=Object.assign({},M,d);awardCommandCP(events,{a:d.pa||{},b:d.pb||{}},true,1,0);tx.update(ref,{first:chosen,ts:Date.now(),cpAuto:events,turnUndo:null})})}).catch(fail);return}
   if(a==="end"){saveTurnEnd();return}
@@ -268,6 +312,7 @@ function go(a,el){
 function onChange(el){
   var a=el.getAttribute("data-act"),s=el.getAttribute("data-s");
   if(a==="br")mut(s,function(ps){ps.br=el.checked});
+  if(a==="cpPatrol"){if(cpPatrolList(M.cpEdition||"11").some(function(p){return p.id===el.value}))mut(s,function(ps){ps.cpPatrolId=el.value;ps.ready=false})}
   if(a==="mode")mut(s,function(ps){ps.mode=el.value;if(el.value!=="F")ps.fixed=[]});
   if(a==="fd"){if(!el.value||Data.fdsFor(P(s).army,P(s).dets).indexOf(el.value)<0)return;var o={};o[s==="a"?"pa":"pb"]=Object.assign({},P(s),{fd:el.value});upd(o)}
   if(a==="fix"){
@@ -279,19 +324,24 @@ function onChange(el){
 
 App.start(function(){
   var stratModal=$("coreStratagemModal"),stratSearch=$("matchStratQ"),stratList=$("matchCoreStratagemList");
-  function closeStratagems(){if(stratModal)stratModal.hidden=true}
-  function openStratagems(){if(!stratModal)return;stratModal.hidden=false;renderCoreStratagems(stratList,stratSearch.value)}
+  function closeStratagems(){cpModalClose("coreStratagemModal");}
+  function openStratagems(){if(!stratModal)return;if(M&&M.type==="combat-patrol")cpOpenPatrolModal("strat");else{stratModal.hidden=false;$("cpStratTabs").hidden=true;$("cpPatrolStratPanel").hidden=true;$("matchCoreStratagemList").hidden=false;$("matchStratQ").hidden=false;$("stratModalTitle").textContent="Core Stratagems";$("stratModalDesc").textContent="Core Rules reference";renderCoreStratagems(stratList,stratSearch.value)}}
   $("openCoreStratagems").addEventListener("click",openStratagems);
+  $("openPatrolDatasheets").addEventListener("click",function(){cpOpenPatrolModal("data")});
+  $("openPatrolMission").addEventListener("click",function(){cpOpenPatrolModal("mission")});
   $("closeCoreStratagems").addEventListener("click",closeStratagems);
   stratModal.addEventListener("click",function(e){if(e.target===stratModal)closeStratagems()});
-  stratSearch.addEventListener("input",function(){renderCoreStratagems(stratList,stratSearch.value)});
-  document.addEventListener("keydown",function(e){if(e.key==="Escape")closeStratagems()});
+  document.querySelectorAll("[data-cp-tab]").forEach(function(b){b.addEventListener("click",function(){cpSetTab(this.getAttribute("data-cp-tab"))})});
+  document.querySelectorAll("[data-close-modal]").forEach(function(b){b.addEventListener("click",function(){cpModalClose(this.getAttribute("data-close-modal"))})});
+  ["patrolDatasheetModal","patrolMissionModal"].forEach(function(id){var x=$(id);x.addEventListener("click",function(e){if(e.target===x)cpModalClose(id)})});
+  stratSearch.addEventListener("input",function(){if(M&&M.type==="combat-patrol"){var ed=M.cpEdition||"11";if(ed==="11")renderCoreStratagems(stratList,stratSearch.value,CORE_STRATAGEMS.filter(function(x){return ["Explosives","Crushing Impact","Rapid Ingress"].indexOf(x.name)<0}));}else renderCoreStratagems(stratList,stratSearch.value)});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"){closeStratagems();cpModalClose("patrolDatasheetModal");cpModalClose("patrolMissionModal")}});
   App.onPlayers=syncProfile;
   setInterval(function(){var e=$("tmr");if(e){var ts=+e.getAttribute("data-ts");e.textContent=ts?fmtT(Date.now()-ts):""}},1000);
-  App.db.collection("matches").doc(mid).onSnapshot(function(d){
+  fetch("data/combat-patrol.json",{cache:"no-cache"}).then(function(r){if(!r.ok)throw new Error("Nu pot încărca biblioteca Combat Patrol.");return r.json()}).catch(function(e){console.warn(e);CPMATCH={factions:[],patrols11_extra:[],sources:{}}}).then(function(data){if(data)CPMATCH=data;App.db.collection("matches").doc(mid).onSnapshot(function(d){
     if(!d.exists){$("box").innerHTML='<p class="err">Meciul nu există.</p>';return}
     M=Object.assign({id:d.id,cpAuto:[]},d.data());if(!Array.isArray(M.cpAuto))M.cpAuto=[];render();syncProfile();
-  },fail);
-  $("box").addEventListener("click",function(e){var el=e.target.closest("button[data-act]");if(el&&!el.disabled&&M)go(el.getAttribute("data-act"),el)});
+  },fail)}).catch(fail);
+  $("box").addEventListener("click",function(e){var mission=e.target.closest("[data-open-own-mission]");if(mission){cpOpenPatrolModal("mission");return}var el=e.target.closest("button[data-act]");if(el&&!el.disabled&&M)go(el.getAttribute("data-act"),el)});
   $("box").addEventListener("change",function(e){if(M&&e.target.getAttribute("data-act"))onChange(e.target)});
 });

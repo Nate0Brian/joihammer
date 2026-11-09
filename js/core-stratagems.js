@@ -38,9 +38,9 @@ function coreStratagemCard(s){
  var turnLabel=s.turnType==='your'?'Tura ta':s.turnType==='opponent'?'Tura adversarului':'Tura oricărui jucător';
  return '<details class="core-strat-card turn-'+s.turnType+'"><summary><span class="core-strat-summary-main"><strong>'+esc(s.name)+'</strong><small>'+esc(s.ref)+' · CORE STRATAGEM</small><span class="core-strat-turn">'+turnLabel+'</span></span><span class="core-strat-cp">'+s.cp+' CP</span><span class="core-strat-chevron" aria-hidden="true">＋</span></summary><div class="core-strat-details"><div class="core-strat-field"><b>WHEN</b><p>'+esc(s.when)+'</p></div><div class="core-strat-field"><b>TARGET</b><p>'+esc(s.target)+'</p></div><div class="core-strat-field"><b>EFFECT</b><p>'+esc(s.effect)+'</p></div>'+(s.restriction?'<div class="core-strat-restriction"><b>RESTRICTION</b><p>'+esc(s.restriction)+'</p></div>':'')+'<div class="core-strat-tags">'+tags+'</div></div></details>';
 }
-function renderCoreStratagems(container,query){
+function renderCoreStratagems(container,query,source){
  var q=(query||'').toLocaleLowerCase('ro');
- var list=CORE_STRATAGEMS.filter(function(s){return [s.name,s.when,s.target,s.effect,s.restriction||'',s.tags.join(' ')].join(' ').toLocaleLowerCase('ro').indexOf(q)>=0});
+ var list=(source||CORE_STRATAGEMS).filter(function(s){return [s.name,s.when,s.target,s.effect,s.restriction||'',s.tags.join(' ')].join(' ').toLocaleLowerCase('ro').indexOf(q)>=0});
  container.innerHTML=list.map(coreStratagemCard).join('')||'<p class="empty">Nu am găsit stratageme.</p>';
  return list.length;
 }

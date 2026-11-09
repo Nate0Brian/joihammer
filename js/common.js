@@ -102,11 +102,11 @@ App.watchMatches=function(cb){
   q.where("a","==",App.me).onSnapshot(function(s){A=map(s);out()},fail);
   q.where("b","==",App.me).onSnapshot(function(s){B=map(s);out()},fail);
 };
-App.score=function(m){return totalPS(Object.assign(newPS(),m.sa))+" – "+totalPS(Object.assign(newPS(),m.sb))};
+App.score=function(m){if(m.type==="combat-patrol"){function v(p){return (p.log||[]).filter(function(e){return e.k==="cpvp"}).reduce(function(a,e){return a+e.v},0)}return v(Object.assign(newPS(),m.sa))+" – "+v(Object.assign(newPS(),m.sb))}return totalPS(Object.assign(newPS(),m.sa))+" – "+totalPS(Object.assign(newPS(),m.sb))};
 App.matchRow=function(m){
   var st={invited:"Invitație",declined:"Refuzat",cancelled:"Anulat",active:"În desfășurare",confirm:"Așteaptă confirmarea scorului",done:"Încheiat"}[m.status]||m.status;
   var res=m.status==="done"&&m.winner?" · "+(m.winner==="draw"?"remiză":"câștigă "+esc(m.winner==="a"?m.a:m.b)+(m.wo?" (neprezentare)":"")):"";
-  return '<a class="card rowlink" href="match.html?id='+m.id+'"><b>'+(m.type==="tournament"?"Turneu":"Amical")+' · '+esc(m.a)+' vs '+esc(m.b)+'</b><span>'+st+(m.status==="invited"||m.status==="declined"||m.status==="cancelled"?"":" · "+App.score(m))+res+'</span></a>';
+  return '<a class="card rowlink" href="match.html?id='+m.id+'"><b>'+(m.type==="tournament"?"Turneu":m.type==="combat-patrol"?"Combat Patrol "+(m.cpEdition||"11")+"th":"Amical")+' · '+esc(m.a)+' vs '+esc(m.b)+'</b><span>'+st+(m.status==="invited"||m.status==="declined"||m.status==="cancelled"?"":" · "+App.score(m))+res+'</span></a>';
 };
 
 /* notificare: număr de invitații pe meniu + notificare de browser (cât timp aplicația e deschisă) */

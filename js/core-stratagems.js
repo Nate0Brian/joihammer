@@ -44,3 +44,13 @@ function renderCoreStratagems(container,query,source){
  container.innerHTML=list.map(coreStratagemCard).join('')||'<p class="empty">Nu am găsit stratageme.</p>';
  return list.length;
 }
+
+/* Core Stratagems for 10th-edition Combat Patrol, based on the official Strike Force Octavius CP reference list. */
+var CORE_STRATAGEMS_10 = [
+ {name:'Command Re-roll',turnType:'either',cp:1,ref:'10th Edition · Core',when:'Any phase, immediately after a qualifying roll or saving throw for a unit/model from your army.',target:'The unit or model for which the roll was made.',effect:'Re-roll that roll or saving throw.',tags:['Any phase','Re-roll']},
+ {name:'Insane Bravery',turnType:'your',cp:1,ref:'10th Edition · Core',when:'Battle-shock step of your Command phase, just before taking a Battle-shock test for a unit from your army.',target:'That unit.',effect:'Treat the test as having been passed.',restriction:'Once per battle.',tags:['Command phase','Battle-shock']},
+ {name:'Fire Overwatch',turnType:'opponent',cp:1,ref:'10th Edition · Core',when:'Your opponent’s Movement or Charge phase, after an enemy unit is set up or starts/ends a move or declares a charge.',target:'A friendly unit within 24” that would be eligible to shoot.',effect:'Shoot the enemy unit as if it were your Shooting phase. Until the end of the phase, unmodified Hit rolls of 6 are required and the Stratagem can only be used once per turn.',tags:['Opponent turn','Shooting']},
+ {name:'Rapid Ingress',turnType:'opponent',cp:1,ref:'10th Edition · Core',when:'End of your opponent’s Movement phase.',target:'One unit from your army in Reserves.',effect:'Set up that unit as if it were the Reinforcements step of your Movement phase.',restriction:'Cannot enable arrival in a battle round in which the unit would not normally be able to arrive.',tags:['Opponent Movement phase','Reserves']},
+ {name:'Go to Ground',turnType:'opponent',cp:1,ref:'10th Edition · Core',when:'Your opponent’s Shooting phase, after an enemy unit has selected its targets.',target:'One INFANTRY unit from your army targeted by one or more of those attacks.',effect:'Until the end of the phase, models in your unit have a 6+ invulnerable save and Benefit of Cover.',tags:['Opponent Shooting phase','Defence']},
+ {name:'Heroic Intervention',turnType:'opponent',cp:2,ref:'10th Edition · Core',when:'Your opponent’s Charge phase, just after an enemy unit ends a Charge move.',target:'One friendly unit within 6” that would be eligible to declare a charge against that enemy unit.',effect:'Declare and resolve a charge targeting only that enemy unit.',restriction:'A VEHICLE can only be selected if it has WALKER. A successful charge does not grant Charge bonuses this turn.',tags:['Opponent Charge phase','Counter-charge']}
+];

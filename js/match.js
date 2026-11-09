@@ -1,33 +1,78 @@
 var mid=new URLSearchParams(location.search).get("id"),M=null,openS={},CPMATCH=null,cpModalTab="core";
 function cpPatrolList(ed){if(!CPMATCH)return[];if(ed==="11")return (CPMATCH.factions||[]).filter(function(f){return !!f.url11}).map(function(f){return{id:f.id,name:f.patrol11Name,group:f.group,url:f.url11,sourceFaction:f.name}}).concat(CPMATCH.patrols11_extra||[]);return (CPMATCH.factions||[]).filter(function(f){return f.edition10Available!==false}).map(function(f){return{id:f.id,name:f.name,group:f.group,url:f.pdf10,sourceFaction:f.name}})}
-function cpPatrolFor(s){var ps=PS(s),ed=M.cpEdition||"11";return cpPatrolList(ed).filter(function(x){return x.id===ps.cpPatrolId})[0]||null}
+function cpEditionFor(s){return PS(s).cpEdition==="10"?"10":(PS(s).cpEdition==="11"?"11":(M&&M.cpEdition==="10"?"10":"11"))}
+function cpPatrolFor(s){var ps=PS(s),ed=cpEditionFor(s);return cpPatrolList(ed).filter(function(x){return x.id===ps.cpPatrolId})[0]||null}
 function cpOwnSide(){if(!M)return null;if(App.me===M.a)return"a";if(App.me===M.b)return"b";return null}
 function cpSource(s){var p=cpPatrolFor(s);return p&&p.url?p.url:""}
 function matchScore(ps){return M&&M.type==="combat-patrol"?(ps.log||[]).filter(function(e){return e.k==="cpvp"}).reduce(function(a,e){return a+e.v},0):totalPS(ps)}
 function cpModalOpen(id){var x=$(id);if(x){x.hidden=false;document.body.classList.add("modal-open")}}
 function cpModalClose(id){var x=$(id);if(x)x.hidden=true;document.body.classList.remove("modal-open")}
 function cpSetTab(tab){cpModalTab=tab;var core=$("cpCoreStratPanel"),patrol=$("cpPatrolStratPanel");if(core)core.hidden=tab!=="core";if(patrol)patrol.hidden=tab!=="patrol";document.querySelectorAll("[data-cp-tab]").forEach(function(b){b.classList.toggle("on",b.getAttribute("data-cp-tab")===tab)})}
-function cpRecordFor(side){if(!window.CP_CONTENT||!M)return null;var ps=PS(side);return CP_CONTENT.patrols[(M.cpEdition||"11")+":"+ps.cpPatrolId]||null}
+function cpRecordFor(side){if(!window.CP_CONTENT||!M)return null;var ps=PS(side);return CP_CONTENT.patrols[cpEditionFor(side)+":"+ps.cpPatrolId]||null}
 function cpNativeStratHtml(items){return (items||[]).map(function(x){return '<details class="core-strat-card"><summary><span class="core-strat-summary-main"><strong>'+esc(x.name)+'</strong><small>'+esc(x.phase||'Combat Patrol')+'</small></span><span class="core-strat-cp">'+x.cp+' CP</span><span class="core-strat-chevron">＋</span></summary><div class="core-strat-details"><div class="core-strat-field"><b>WHEN</b><p>'+esc(x.when)+'</p></div><div class="core-strat-field"><b>TARGET</b><p>'+esc(x.target)+'</p></div><div class="core-strat-field"><b>EFFECT</b><p>'+esc(x.effect)+'</p></div></div></details>'}).join('')||'<p class="empty">Nu există stratageme locale verificate pentru această patrulă.</p>'}
-function cpOpenPatrolModal(kind){var side=cpOwnSide();if(!side){alert("Doar participanții la meci pot vedea regulile propriei patrule.");return}var patrol=cpPatrolFor(side),rec=cpRecordFor(side);if(!patrol){alert("Alege mai întâi Combat Patrol-ul tău.");return}var edition=M.cpEdition||"11",label=patrol.name+" · "+edition+"th Edition";if(kind==="strat"){$("stratModalTitle").textContent="Stratagems · "+label;$ ("stratModalDesc").textContent="Core Stratagems eligibile + stratagemele exclusiv ale patrulei tale.";$ ("cpPatrolStratLabel").textContent="Combat Patrol propriu: "+label;var core=edition==="11"?CORE_STRATAGEMS.filter(function(x){return ["Explosives","Crushing Impact","Rapid Ingress"].indexOf(x.name)<0}):[];if(edition==="11")renderCoreStratagems($("matchCoreStratagemList"),$("matchStratQ").value,core);else $("matchCoreStratagemList").innerHTML="<p class=\"cp-status\">Biblioteca Core Stratagems 10th Edition nu este încă integrată local. Nu afișăm stratageme din ediția greșită.</p>";$ ("cpPatrolStratPanel").innerHTML='<div id="cpPatrolNativeStrats" class="match-strat-list">'+cpNativeStratHtml(rec&&rec.stratagems)+'</div>';$("cpCoreRulesFrame")&&($("cpCoreRulesFrame").hidden=true);$("cpStratTabs").hidden=false;$("cpCoreStratPanel").hidden=false;cpSetTab("core");cpModalOpen("coreStratagemModal");return}
- var modal=kind==="data"?"patrolDatasheetModal":"patrolMissionModal",title=kind==="data"?"patrolDatasheetTitle":"patrolMissionTitle",desc=kind==="data"?"patrolDatasheetDesc":"patrolMissionDesc",body=kind==="data"?"patrolDatasheetBody":"patrolMissionBody";$(title).textContent=(kind==="data"?"Datasheets & Army Rules · ":"Mission · ")+label;$(desc).textContent=kind==="data"?"Conținutul local al patrulei tale.":"Misiunea și scoring-ul propriu patrulei tale.";$(body).innerHTML=kind==="data"?cpNativeRecordHtml(rec):cpNativeMissionHtml(rec);cpModalOpen(modal)}
+function cpOpenPatrolModal(kind){var side=cpOwnSide();if(!side){alert("Doar participanții la meci pot vedea regulile propriei patrule.");return}var patrol=cpPatrolFor(side),rec=cpRecordFor(side);if(!patrol){alert("Alege mai întâi Combat Patrol-ul tău.");return}var edition=cpEditionFor(side),label=patrol.name+" · "+edition+"th Edition";if(kind==="strat"){$("stratModalTitle").textContent="Stratagems · "+label;$ ("stratModalDesc").textContent="Core Stratagems eligibile + stratagemele exclusiv ale patrulei tale.";$ ("cpPatrolStratLabel").textContent="Combat Patrol propriu: "+label;var core=edition==="11"?CORE_STRATAGEMS.filter(function(x){return ["Explosives","Crushing Impact","Rapid Ingress"].indexOf(x.name)<0}):CORE_STRATAGEMS_10;renderCoreStratagems($("matchCoreStratagemList"),$("matchStratQ").value,core);$ ("cpPatrolStratPanel").innerHTML='<div id="cpPatrolNativeStrats" class="match-strat-list">'+cpNativeStratHtml(rec&&rec.stratagems)+'</div>';$("cpCoreRulesFrame")&&($("cpCoreRulesFrame").hidden=true);$("cpStratTabs").hidden=false;$("cpCoreStratPanel").hidden=false;cpSetTab("core");cpModalOpen("coreStratagemModal");return}
+ var modal="patrolDatasheetModal";$("patrolDatasheetTitle").textContent="Datasheets & Army Rules · "+label;$("patrolDatasheetDesc").textContent="Conținutul local al patrulei tale."; $("patrolDatasheetBody").innerHTML=cpNativeRecordHtml(rec);cpModalOpen(modal)}
+
+function cpSplitAbility(x){
+ if(typeof x==="object"&&x)return {name:x.name||"Ability",description:x.description||x.text||""};
+ var t=String(x||"").trim(),i=t.indexOf(":");
+ return i>0?{name:t.slice(0,i).trim(),description:t.slice(i+1).trim()}:{name:"Ability",description:t};
+}
+function cpProfileFields(profile){
+ var t=String(profile||""),get=function(re){var m=t.match(re);return m?m[1]:"—"};
+ var o={M:get(/\bM\s*([0-9D]+["”]?(?:\s*-\s*[0-9D]+["”]?)?)/i),T:get(/\bT\s*([0-9]+)/i),SV:get(/\bSv\s*([0-9+]+)/i),W:get(/\bW\s*([0-9]+)/i),LD:get(/\bLd\s*([0-9+]+)/i),OC:get(/\bOC\s*([0-9]+)/i),INV:get(/\bInv\s*([0-9+]+)/i)};o.hasStats=o.M!=="—"&&o.T!=="—"&&o.SV!=="—";return o;
+}
+function cpWeaponFields(raw){
+ if(typeof raw==="object"&&raw)return raw;
+ var t=String(raw||"").trim(),parts=t.split(/\s*[—–]\s*/),name=parts.shift()||t,stats=parts.join(" — "),keywords=[];
+ var known=["CLOSE-QUARTERS","RAPID FIRE 1","RAPID FIRE 2","ASSAULT","HEAVY","BLAST","TORRENT","IGNORES COVER","HAZARDOUS","PSYCHIC","PRECISION","DEVASTATING WOUNDS","ANTI-CHARACTER 5+","ANTI-MONSTER/VEHICLE 4+","MELTA 2"];
+ known.forEach(function(k){var re=new RegExp("\\b"+k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\b","i");if(re.test(name)){keywords.push(k);name=name.replace(re,"").trim()}});
+ var vals={range:"—",a:"—",skill:"—",s:"—",ap:"—",d:"—"};
+ if(stats){var m=stats.match(/^([^,]+),\s*A\s*([^,]+),\s*(?:BS|WS)\s*([^,]+),\s*S\s*([^,]+),\s*AP\s*([^,]+),\s*D\s*(.+)$/i);if(m){vals.range=m[1].trim();vals.a=m[2].trim();vals.skill=m[3].trim();vals.s=m[4].trim();vals.ap=m[5].trim();vals.d=m[6].trim()}}
+ var anti=name.match(/\b(Anti-[A-Za-z/]+\s+\d+\+)\b/i);if(anti){keywords.push(anti[1].toUpperCase());name=name.replace(anti[0],"").trim()}
+ ["PRECISION","DEVASTATING WOUNDS","HAZARDOUS","PSYCHIC","CLOSE-QUARTERS","TORRENT","IGNORES COVER","ASSAULT","HEAVY","BLAST"].forEach(function(k){if(new RegExp("\\b"+k+"\\b","i").test(name)){keywords.push(k);name=name.replace(new RegExp("\\b"+k+"\\b","ig"),"").trim()}});
+ return {name:name.replace(/\s+/g," ").trim(),range:vals.range,a:vals.a,skill:vals.skill,s:vals.s,ap:vals.ap,d:vals.d,keywords:keywords};
+}
+function cpKeywordHtml(items){return (items||[]).map(function(k){return '<span class="cp-keyword">'+esc(k)+'</span>'}).join("")}
 function cpNativeRecordHtml(r){
- if(!r)return '<p class="cp-status">Nu avem încă date locale verificate pentru patrula selectată. Nu afișăm linkuri externe și nu inventăm conținut.</p>';
+ if(!r)return '<p class="cp-status">Nu există încă date locale pentru patrula selectată.</p>';
  var h='';
- (r.armyRules||[]).forEach(function(x){h+='<article class="cp-content-card"><h3>Army Rule · '+esc(x.name)+'</h3><p>'+esc(x.text)+'</p></article>'});
- (r.detachmentRules||[]).forEach(function(x){h+='<article class="cp-content-card"><h3>Patrol Rule · '+esc(x.name)+'</h3><p>'+esc(x.text)+'</p></article>'});
- (r.enhancements||[]).forEach(function(x){h+='<article class="cp-content-card"><h3>Enhancement · '+esc(x.name)+'</h3><small>'+esc(x.unit)+'</small><p>'+esc(x.text)+'</p></article>'});
- (r.units||[]).forEach(function(x){h+='<article class="cp-content-card"><h3>'+esc(x.name)+' · '+esc(x.models)+' models</h3><p><b>Profile:</b> '+esc(x.profile)+'</p>';if((x.weapons||[]).length)h+='<p><b>Weapons</b><br>'+x.weapons.map(esc).join('<br>')+'</p>';if((x.abilities||[]).length)h+='<p><b>Abilities</b><br>'+x.abilities.map(esc).join('<br>')+'</p>';h+='</article>'});
+ (r.armyRules||[]).forEach(function(x){h+='<article class="cp-content-card"><h3>Army Rule · '+esc(x.name)+'</h3><p>'+esc(x.text||x.description||"")+'</p></article>'});
+ (r.detachmentRules||[]).forEach(function(x){h+='<article class="cp-content-card"><h3>Patrol Rule · '+esc(x.name)+'</h3><p>'+esc(x.text||x.description||"")+'</p></article>'});
+ (r.enhancements||[]).forEach(function(x){h+='<article class="cp-content-card"><h3>Enhancement · '+esc(x.name)+'</h3><small>'+esc(x.unit||"")+'</small><p>'+esc(x.text||x.description||"")+'</p></article>'});
+ (r.units||[]).forEach(function(x){
+  var p=cpProfileFields(x.profile),weapons=(x.weapons||[]).map(cpWeaponFields).filter(function(w){return !!(w.range||w.attacks||w.a)}),abilities=(x.abilities||[]).map(cpSplitAbility),equipment=x.equipment||[];
+  h+='<article class="cp-ds-card"><h3>'+esc(x.name)+' <small>· '+esc(x.models||"")+' models</small></h3>';
+  if(x.keywords&&x.keywords.length)h+='<div class="cp-ds-keywords">'+cpKeywordHtml(x.keywords)+'</div>';
+  if(x.factionKeywords&&x.factionKeywords.length)h+='<p><small>Faction keywords</small></p><div class="cp-ds-keywords">'+cpKeywordHtml(x.factionKeywords)+'</div>';
+  if(x.profileRows&&x.profileRows.length){h+='<div class="tblw"><table class="cp-ds-profile"><thead><tr><th>Model</th><th>M</th><th>T</th><th>SV</th><th>W</th><th>LD</th><th>OC</th><th>INV</th></tr></thead><tbody>'+x.profileRows.map(function(q){return'<tr><td>'+esc(q.model)+'</td><td>'+esc(q.M)+'</td><td>'+esc(q.T)+'</td><td>'+esc(q.SV)+'</td><td>'+esc(q.W)+'</td><td>'+esc(q.LD)+'</td><td>'+esc(q.OC)+'</td><td>'+esc(q.INV)+'</td></tr>'}).join('')+'</tbody></table></div>'}
+  else if(p.hasStats){h+='<div class="tblw"><table class="cp-ds-profile"><thead><tr><th>M</th><th>T</th><th>SV</th><th>W</th><th>LD</th><th>OC</th><th>INV</th></tr></thead><tbody><tr><td>'+esc(p.M)+'</td><td>'+esc(p.T)+'</td><td>'+esc(p.SV)+'</td><td>'+esc(p.W)+'</td><td>'+esc(p.LD)+'</td><td>'+esc(p.OC)+'</td><td>'+esc(p.INV)+'</td></tr></tbody></table></div>'}
+  else if(x.profile){h+='<p class="legend">'+esc(x.profile)+'</p>'}
+  if(weapons.length){h+='<h4>Weapons</h4><div class="tblw"><table class="cp-ds-weapons"><thead><tr><th>Weapon / Keywords</th><th>Range</th><th>A</th><th>BS/WS</th><th>S</th><th>AP</th><th>D</th></tr></thead><tbody>'+weapons.map(function(w){return'<tr><td><span class="cp-ds-weapon-name">'+esc(w.name)+'</span>'+(w.keywords&&w.keywords.length?'<div class="cp-ds-keywords">'+cpKeywordHtml(w.keywords)+'</div>':'')+'</td><td>'+esc(w.range||'—')+'</td><td>'+esc(w.attacks||w.a||'—')+'</td><td>'+esc(w.skill?((w.skillType&&w.skillType!=='BS/WS')?w.skillType+' ':'')+w.skill:'—')+'</td><td>'+esc(w.strength||w.s||'—')+'</td><td>'+esc(w.ap||'—')+'</td><td>'+esc(w.damage||w.d||'—')+'</td></tr>'}).join("")+'</tbody></table></div>'}
+  if(equipment.length)h+='<h4>Loadout / Equipment</h4><div class="cp-ds-keywords">'+cpKeywordHtml(equipment)+'</div>';
+  if(abilities.length)h+='<h4>Abilities</h4><div class="cp-ds-abilities">'+abilities.map(function(a){return'<div class="cp-ds-ability"><b>'+esc(a.name)+'</b><div>'+esc(a.description)+'</div></div>'}).join("")+'</div>';
+  if(x.composition)h+='<p><b>Unit composition:</b> '+esc(x.composition)+'</p>';
+  h+='</article>';
+ });
  return h||'<p class="empty">Nu există datasheets locale pentru această patrulă.</p>';
 }
-function cpNativeMissionHtml(r){if(!r||!r.mission)return '<p class="cp-status">Misiunea acestei patrule nu este încă disponibilă local.</p>';var m=r.mission;return '<article class="cp-content-card"><h3>'+esc(m.name)+'</h3><p>'+esc(m.summary||'')+'</p>'+(m.scoring||[]).map(function(x){return'<p>• '+esc(x)+'</p>'}).join('')+(m.actions||[]).map(function(x){return'<section><h4>'+esc(x.name)+'</h4><p><b>Starts:</b> '+esc(x.starts)+'<br><b>Units:</b> '+esc(x.unit)+'<br><b>Limit:</b> '+esc(x.limit)+'<br><b>Completes:</b> '+esc(x.completes)+'<br><b>Effect:</b> '+esc(x.effect)+'</p></section>'}).join('')+'</article>'}
-function cpSideSetupHtml(s){var ps=PS(s),mine=own(s),live=M.status==="active",ed=M.cpEdition||"11",arr=cpPatrolList(ed),selected=cpPatrolFor(s),h='<section class="side setup"><h2>'+esc(P(s).name)+(App.me===M[s]?' <small>(tu)</small>':'')+(ps.ready?' <small class="ok">✓ confirmat</small>':'')+'</h2><div class="info">Combat Patrol · '+ed+'th Edition</div>';
- if(mine&&live&&!ps.ready){h+='<label class="opt">Alege Combat Patrol-ul tău<select data-act="cpPatrol" data-s="'+s+'"><option value="">Selectează patrula…</option>'+arr.map(function(p){return'<option value="'+esc(p.id)+'"'+(p.id===ps.cpPatrolId?' selected':'')+'>'+esc(p.name)+' · '+esc(p.sourceFaction||p.group)+'</option>'}).join('')+'</select></label>';
- if(selected)h+='<div class="cp-mission-summary"><b>'+esc(selected.name)+'</b><p class="legend">'+esc(selected.sourceFaction||selected.group)+' · biblioteca proprie se deschide în JoiHammer.</p></div>';
- h+='<div class="vpb">'+B("ready",s,"Confirmă Combat Patrol-ul",'',!selected)+'</div><div class="legend">Fiecare jucător își alege propria patrulă. Nu poți selecta patrula adversarului.</div>';
- }else{h+='<div class="info">Combat Patrol ales: <b>'+esc(selected?selected.name:"Încă nu a ales")+'</b></div>';if(selected&&mine&&live)h+='<div class="vpb">'+B("unready",s,"Schimbă Combat Patrol-ul",'',false,"ghost")+'</div>'}
- return h+'</section>'}
 
+
+function cpSideSetupHtml(s){
+ var ps=PS(s),mine=own(s),live=M.status==="active",ed=cpEditionFor(s),arr=cpPatrolList(ed),selected=cpPatrolFor(s),other=s==="a"?"b":"a",otherEd=PS(other).cpEdition||"",sameEdition=!otherEd||otherEd===ed;
+ var h='<section class="side setup"><h2>'+esc(P(s).name)+(App.me===M[s]?' <small>(tu)</small>':'')+(ps.ready?' <small class="ok">✓ confirmat</small>':'')+'</h2><div class="info">Combat Patrol · '+ed+'th Edition</div>';
+ if(mine&&live&&!ps.ready){
+  h+='<label class="opt">Ediția ta<select data-act="cpEdition" data-s="'+s+'"><option value="11"'+(ed==="11"?' selected':'')+'>11th Edition</option><option value="10"'+(ed==="10"?' selected':'')+'>10th Edition</option></select></label>';
+  h+='<label class="opt">Alege Combat Patrol-ul tău<select data-act="cpPatrol" data-s="'+s+'"><option value="">Selectează patrula…</option>'+arr.map(function(p){return'<option value="'+esc(p.id)+'"'+(p.id===ps.cpPatrolId?' selected':'')+'>'+esc(p.name)+' · '+esc(p.sourceFaction||p.group)+'</option>'}).join('')+'</select></label>';
+  if(selected)h+='<div class="cp-mission-summary"><b>'+esc(selected.name)+'</b><p class="legend">'+esc(selected.sourceFaction||selected.group)+' · '+ed+'th Edition</p></div>';
+  if(!sameEdition)h+='<div class="cp-edition-warning">Edițiile selectate nu coincid. Pentru un meci oficial Combat Patrol, ambii jucători trebuie să folosească aceeași ediție.</div>';
+  h+='<div class="vpb">'+B("ready",s,"Confirmă Combat Patrol-ul",'',!selected||!sameEdition)+'</div><div class="legend">Fiecare jucător își alege individual ediția și patrula. Lista este filtrată după ediția proprie.</div>';
+ }else{
+  h+='<div class="info">Ediție: <b>'+ed+'th</b> · Combat Patrol ales: <b>'+esc(selected?selected.name:"Încă nu a ales")+'</b></div>';
+  if(selected&&mine&&live)h+='<div class="vpb">'+B("unready",s,"Schimbă Combat Patrol-ul",'',false,"ghost")+'</div>';
+ }
+ return h+'</section>';
+}
 
 function rd(){return M.turn>=10?5:Math.floor(M.turn/2)+1}
 function actS(){if(M.first==null||M.turn>=10)return null;return M.turn%2===0?M.first:(M.first==="a"?"b":"a")}
@@ -146,11 +191,31 @@ function sideHtml(s){
   return h;
 }
 
-function cpSideGameHtml(s){var ps=PS(s),pl=P(s),mine=own(s),live=M.status==="active",started=M.first!=null,ended=M.turn>=10,patrol=cpPatrolFor(s),cp=cpOf(ps,s),score=(ps.log||[]).filter(function(e){return e.k==="cpvp"}).reduce(function(a,e){return a+e.v},0),h='<section class="side"><h2>'+esc(pl.name)+(App.me===M[s]?' <small>(tu)</small>':'')+'</h2><div class="info">'+esc(patrol?patrol.name:"Combat Patrol neales")+' · '+(M.cpEdition||"11")+'th Edition</div><div class="board"><div class="bt"><span>Mission VP</span><b>'+score+'</b></div><div><span>Battle Round</span><b>'+rd()+'/5</b></div></div><div class="cpbox'+(mine&&live?'':' ro')+'">'+(mine&&live?B("cp",s,"−",' data-v="-1" aria-label="Scade CP"',cp<=0):'')+'<div class="cpnum"><span>CP</span><b>'+cp+'</b></div>'+(mine&&live?B("cp",s,"+",' data-v="1" aria-label="Adaugă CP"',false):'')+'</div>';
- h+='<div class="cp-score-entry"><input type="text" maxlength="90" placeholder="Motivul punctajului (ex. Primary objective)" data-cp-reason="'+s+'" '+(!mine||!live||!started||ended?'disabled':'')+'><button type="button" data-act="cpvp" data-s="'+s+'" data-v="1" '+(!mine||!live||!started||ended?'disabled':'')+'>+1 VP</button><button type="button" class="ghost" data-act="cpvp" data-s="'+s+'" data-v="-1" '+(!mine||!live||!started||ended||score<=0?'disabled':'')+'>−1 VP</button></div>';
- h+='<div class="legend">VP din misiunea Combat Patrol. Înregistrează fiecare punctare cu o descriere pentru jurnal. CP-ul folosește aceleași controale și jurnal ca meciul normal.</div>';
- if(patrol)h+='<div class="cp-mission-summary"><b>Mission · '+esc(patrol.name)+'</b><p class="legend">Misiunea proprie a patrulei selectate. Deschide „Mission” pentru condițiile oficiale.</p><button type="button" class="sm ghost" data-open-own-mission="1">Deschide misiunea</button></div>';
- h+='<details><summary>Istoric ('+(ps.log.length+(M.cpAuto||[]).filter(function(e){return e.s===s}).length)+')</summary>'+(ps.log.concat((M.cpAuto||[]).filter(function(e){return e.s===s}).map(function(e){return{k:"cp",v:e.v,l:e.l,r:e.r}}))).map(function(e){return'<div class="lg">R'+e.r+' · '+(e.k==="cp"?"CP":e.k==="cpvp"?"Mission VP":"")+' '+(e.v>0?"+":"")+e.v+' · '+esc(e.l)+'</div>'}).reverse().join("")+'</details></section>';return h}
+
+function cpMissionScoreControls(s,patrol,score,mine,live,started,ended){
+ function entryScore(label){return (PS(s).log||[]).filter(function(e){return e.k==="cpvp"&&e.l===label}).reduce(function(a,e){return a+e.v},0)}
+ var rec=cpRecordFor(s),m=rec&&rec.mission;if(!m)return '<div class="cp-mission-inline"><h3>Mission · '+esc(patrol?patrol.name:"Combat Patrol")+'</h3><p class="legend">Misiunea nu are încă condiții de scoring structurate local.</p></div>';
+ var items=m.scoring||[],h='<div class="cp-mission-inline"><h3>Mission · '+esc(m.name)+'</h3><p class="legend">'+esc(m.summary||"")+'</p>';
+ items.forEach(function(item){
+  var text=typeof item==="string"?item:(item.description||item.condition||item.name||""),when=typeof item==="object"?(item.when||""):"",vp=typeof item==="object"?Number(item.vp||0):0;
+  if(!vp){var mm=text.match(/(\d+)\s*VP/i);if(mm)vp=Number(mm[1])}
+  var full=text+" "+when,requiresFinal=/end of the battle|at the end of the battle|la sfârșitul bătăliei|sfarsitul bataliei/i.test(full),fromRound2=/second battle round onwards|from battle round 2|din battle round 2|din runda 2|round 2 onwards/i.test(full);
+  var label=(when?when+" · ":"")+text,labelKey=label.slice(0,60),entry=entryScore(labelKey),disabled=!mine||!live||!started||(!requiresFinal&&ended)||(requiresFinal&&!ended)||(fromRound2&&rd()<2);
+  h+='<div class="cp-mission-score-row"><p>'+esc(label)+'</p>';
+  if(vp)h+='<div class="vpb">'+B("cpvp",s,"+"+vp+" VP",' data-v="'+vp+'" data-n="'+esc(labelKey)+'"',disabled)+B("cpvp",s,"−"+vp+" VP",' data-v="'+(-vp)+'" data-n="'+esc(labelKey)+'"',!mine||!live||!started||(!requiresFinal&&ended)||entry<vp,"ghost")+'</div>';
+  else h+='<small class="legend">Scoring manual: nu este definită o valoare VP structurată.</small>';
+  h+='</div>';
+ });
+ (m.actions||[]).forEach(function(a){h+='<div class="cp-mission-score-row"><b>'+esc(a.name)+'</b><p><b>Starts:</b> '+esc(a.starts)+' · <b>Units:</b> '+esc(a.unit)+' · <b>Limit:</b> '+esc(a.limit)+' · <b>Completes:</b> '+esc(a.completes)+' · <b>Effect:</b> '+esc(a.effect)+'</p></div>'});
+ return h+'</div>';
+}
+function cpSideGameHtml(s){
+ var ps=PS(s),pl=P(s),mine=own(s),live=M.status==="active",started=M.first!=null,ended=M.turn>=10,patrol=cpPatrolFor(s),cp=cpOf(ps,s),score=(ps.log||[]).filter(function(e){return e.k==="cpvp"}).reduce(function(a,e){return a+e.v},0),ed=cpEditionFor(s);
+ var h='<section class="side"><h2>'+esc(pl.name)+(App.me===M[s]?' <small>(tu)</small>':'')+'</h2><div class="info">'+esc(patrol?patrol.name:"Combat Patrol neales")+' · '+ed+'th Edition</div><div class="board"><div class="bt"><span>Mission VP</span><b>'+score+'</b></div><div><span>Battle Round</span><b>'+rd()+'/5</b></div></div><div class="cpbox'+(mine&&live?'':' ro')+'">'+(mine&&live?B("cp",s,"−",' data-v="-1" aria-label="Scade CP"',cp<=0):'')+'<div class="cpnum"><span>CP</span><b>'+cp+'</b></div>'+(mine&&live?B("cp",s,"+",' data-v="1" aria-label="Adaugă CP"',false):'')+'</div>';
+ h+=cpMissionScoreControls(s,patrol,score,mine,live,started,ended);
+ h+='<details><summary>Istoric ('+(ps.log.length+(M.cpAuto||[]).filter(function(e){return e.s===s}).length)+')</summary>'+(ps.log.concat((M.cpAuto||[]).filter(function(e){return e.s===s}).map(function(e){return{k:"cp",v:e.v,l:e.l,r:e.r}}))).map(function(e){return'<div class="lg">R'+e.r+' · '+(e.k==="cp"?"CP":e.k==="cpvp"?"Mission VP":"")+' '+(e.v>0?"+":"")+e.v+' · '+esc(e.l)+'</div>'}).reverse().join("")+'</details></section>';
+ return h;
+}
 
 function fmtT(ms){
   var s=Math.max(0,Math.floor(ms/1000)),h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;
@@ -175,7 +240,7 @@ function summaryHtml(){
   var m=M,na=esc(m.pa.name),nb=esc(m.pb.name);
   if(m.type==="combat-patrol"){
     function csum(ps){return (ps.log||[]).filter(function(e){return e.k==="cpvp"}).reduce(function(a,e){return a+e.v},0)}
-    return '<section class="summ"><h2>Combat Patrol · Rezumat</h2><div class="tblw"><table class="tbl"><tr><th>Jucător</th><th>Combat Patrol</th><th>Mission VP</th><th>CP</th></tr><tr><td>'+na+'</td><td>'+esc(cpPatrolFor("a")?cpPatrolFor("a").name:"—")+'</td><td>'+csum(m.sa)+'</td><td>'+cpOf(m.sa,"a")+'</td></tr><tr><td>'+nb+'</td><td>'+esc(cpPatrolFor("b")?cpPatrolFor("b").name:"—")+'</td><td>'+csum(m.sb)+'</td><td>'+cpOf(m.sb,"b")+'</td></tr></table></div></section>';
+    return '<section class="summ"><h2>Combat Patrol · Rezumat</h2><div class="tblw"><table class="tbl"><tr><th>Jucător</th><th>Ediție / Combat Patrol</th><th>Mission VP</th><th>CP</th></tr><tr><td>'+na+'</td><td>'+cpEditionFor("a")+"th · "+esc(cpPatrolFor("a")?cpPatrolFor("a").name:"—")+'</td><td>'+csum(m.sa)+'</td><td>'+cpOf(m.sa,"a")+'</td></tr><tr><td>'+nb+'</td><td>'+cpEditionFor("b")+"th · "+esc(cpPatrolFor("b")?cpPatrolFor("b").name:"—")+'</td><td>'+csum(m.sb)+'</td><td>'+cpOf(m.sb,"b")+'</td></tr></table></div></section>';
   }
   var h='<section class="summ"><h2>Rezumat</h2>'+chart(cumul(m.sa),cumul(m.sb))+'<div class="legend"><span style="color:var(--brass)">■</span> '+na+' · <span style="color:var(--blood)">■</span> '+nb+' · VP cumulat pe runde</div>';
   h+='<div class="tblw"><table class="tbl"><tr><th></th><th>Jucător</th>'+[1,2,3,4,5].map(function(i){return '<th>R'+i+'</th>'}).join("")+'<th>F</th><th>+10</th><th>Total</th></tr>';
@@ -198,11 +263,11 @@ function summaryHtml(){
 function render(){
   var m=M,started=m.first!=null,ended=m.turn>=10,a=actS(),live=m.status==="active";
   ["sa","sb"].forEach(function(k){m[k]=Object.assign(newPS(),m[k])});
-  var rdy=!!(m.sa.ready&&m.sb.ready),roleOk=!!m.atk,na=esc(m.pa.name),nb=esc(m.pb.name);
+  var rdy=!!(m.sa.ready&&m.sb.ready&&(m.type!=="combat-patrol"||cpEditionFor("a")===cpEditionFor("b"))),roleOk=!!m.atk,na=esc(m.pa.name),nb=esc(m.pb.name);
   var h='<h1>'+na+' <span class="vs">vs</span> '+nb+'</h1>';
-  h+='<div class="depbar"><div class="info">'+(m.type==="tournament"?"Meci de turneu":m.type==="combat-patrol"?"Combat Patrol · "+(m.cpEdition||"11")+"th Edition":"Meci amical")+(m.deploy?' · Deployment: <b>'+esc(m.deploy)+'</b>'+(DEPNOTE[m.deploy]?'<br><small>'+esc(DEPNOTE[m.deploy])+'</small>':''):'')+(m.twist?' · Twist: <b>'+esc(m.twist)+'</b> – '+esc(TWISTS[m.twist]):'')+'</div>'+(m.deploy?Data.depImg(m.deploy):'')+'</div>';
+  h+='<div class="depbar"><div class="info">'+(m.type==="tournament"?"Meci de turneu":m.type==="combat-patrol"?"Combat Patrol":"Meci amical")+(m.deploy?' · Deployment: <b>'+esc(m.deploy)+'</b>'+(DEPNOTE[m.deploy]?'<br><small>'+esc(DEPNOTE[m.deploy])+'</small>':''):'')+(m.twist?' · Twist: <b>'+esc(m.twist)+'</b> – '+esc(TWISTS[m.twist]):'')+'</div>'+(m.deploy?Data.depImg(m.deploy):'')+'</div>';
   if(m.status==="invited"){
-    h+='<div class="banner">'+(m.type==="combat-patrol"?"Invitație Combat Patrol ("+(m.cpEdition||"11")+"th Edition) în așteptare.":"Invitație în așteptare.")+(App.me===m.b?'<div class="vpb" style="justify-content:center">'+B("acc","","Acceptă","")+B("dec","","Refuză","",false,"ghost")+'</div>':' Așteaptă răspunsul lui '+esc(m.b)+'.'+(App.me===m.a?'<div class="vpb" style="justify-content:center">'+B("dec","","Anulează invitația","",false,"ghost")+'</div>':''))+'</div>';
+    h+='<div class="banner">'+(m.type==="combat-patrol"?"Invitație Combat Patrol în așteptare.":"Invitație în așteptare.")+(App.me===m.b?'<div class="vpb" style="justify-content:center">'+B("acc","","Acceptă","")+B("dec","","Refuză","",false,"ghost")+'</div>':' Așteaptă răspunsul lui '+esc(m.b)+'.'+(App.me===m.a?'<div class="vpb" style="justify-content:center">'+B("dec","","Anulează invitația","",false,"ghost")+'</div>':''))+'</div>';
     $("box").innerHTML=h;return;
   }
   if(m.status==="declined"||m.status==="cancelled"){$("box").innerHTML=h+'<div class="banner">'+(m.status==="cancelled"?"Meciul a fost anulat.":"Invitația a fost refuzată sau anulată.")+'</div>';return}
@@ -234,14 +299,15 @@ function render(){
   h+='</div>';
   var bn=h;h=head;
   var first=App.me===m.b?"b":"a",second=first==="a"?"b":"a",pre=!started&&m.status==="active";
+  if(pre&&m.type==="combat-patrol"&&cpEditionFor("a")!==cpEditionFor("b"))h+='<div class="cp-edition-warning">Edițiile selectate de jucători nu coincid. Partida nu poate începe până când ambii aleg aceeași ediție.</div>';
   var sd='<div class="sides">'+(pre?(m.type==="combat-patrol"?cpSideSetupHtml(first)+cpSideSetupHtml(second):setupHtml(first)+setupHtml(second)):(m.type==="combat-patrol"?cpSideGameHtml(first)+cpSideGameHtml(second):sideHtml(first)+sideHtml(second)))+'</div>';
   h+=pre?sd+bn:bn+(m.status==="done"?summaryHtml():'')+sd;
   if(App.isAdmin)h+='<p style="margin-top:24px">'+B("del","","Șterge meciul","",false,"ghost")+'</p>';
   $("box").innerHTML=h;
   var isCP=m.type==="combat-patrol",ownSide=cpOwnSide(),ownPatrol=ownSide&&cpPatrolFor(ownSide);
   $("openCoreStratagems").textContent=isCP?"⚔ Stratagems":"⚔ Core Stratagems";
-  $("openPatrolDatasheets").hidden=!isCP;$("openPatrolMission").hidden=!isCP;
-  $("matchToolsHint").textContent=isCP?(ownPatrol?"Core + "+ownPatrol.name:"Alege-ți Combat Patrol-ul pentru a încărca regulile."):"Referință rapidă · fără să părăsești meciul";
+  $("openPatrolDatasheets").hidden=!isCP;
+  $("matchToolsHint").textContent=isCP?(ownPatrol?cpEditionFor(ownSide)+"th · Core + "+ownPatrol.name:"Alege-ți ediția și Combat Patrol-ul pentru a încărca regulile."):"Referință rapidă · fără să părăsești meciul";
   [].forEach.call(document.querySelectorAll("details[data-k]"),function(d){d.addEventListener("toggle",function(){openS[d.getAttribute("data-k")]=d.open})});
 }
 
@@ -267,9 +333,9 @@ function go(a,el){
   var s=el.getAttribute("data-s"),n=el.getAttribute("data-n"),v=+el.getAttribute("data-v"),i=+el.getAttribute("data-i");
   if(a==="acc"){upd({status:"active",pa:App.snapOr(M.a,M.pa),pb:App.snapOr(M.b,M.pb)});return}
   if(a==="dec"){upd({status:"declined"});return}
-  if(a==="ready"){if(M.type==="combat-patrol"&&!PS(s).cpPatrolId)return;mut(s,function(ps){ps.ready=true});return}
+  if(a==="ready"){if(M.type==="combat-patrol"&&(!PS(s).cpPatrolId||cpEditionFor("a")!==cpEditionFor("b")))return;mut(s,function(ps){ps.ready=true});return}
   if(a==="unready"){mut(s,function(ps){ps.ready=false});return}
-  if(a==="cpvp"){var reason=document.querySelector('[data-cp-reason="'+s+'"]'),label=reason&&reason.value.trim()||"Mission scoring";if(v<0){var bal=(PS(s).log||[]).filter(function(e){return e.k==="cpvp"}).reduce(function(t,e){return t+e.v},0);if(bal<=0)return}mut(s,function(ps){logAdd(ps,"cpvp",v,label)});return}
+  if(a==="cpvp"){var label=el.getAttribute("data-n")||"Mission scoring";if(v<0){var bal=(PS(s).log||[]).filter(function(e){return e.k==="cpvp"}).reduce(function(t,e){return t+e.v},0);if(bal<=0)return}mut(s,function(ps){logAdd(ps,"cpvp",v,label)});return}
   if(a==="atk"){upd({atk:el.getAttribute("data-v")});return}
   if(a==="first"){if(!(M.sa.ready&&M.sb.ready&&M.atk))return;var chosen=el.getAttribute("data-v")==="rand"?pick(["a","b"]):el.getAttribute("data-v");var ref=App.db.collection("matches").doc(mid);App.db.runTransaction(function(tx){return tx.get(ref).then(function(doc){var d=doc.data();if(!doc.exists||d.first!=null||d.status!=="active")return;var events=(d.cpAuto||[]).slice();M=Object.assign({},M,d);awardCommandCP(events,{a:d.pa||{},b:d.pb||{}},true,1,0);tx.update(ref,{first:chosen,ts:Date.now(),cpAuto:events,turnUndo:null})})}).catch(fail);return}
   if(a==="end"){saveTurnEnd();return}
@@ -312,7 +378,8 @@ function go(a,el){
 function onChange(el){
   var a=el.getAttribute("data-act"),s=el.getAttribute("data-s");
   if(a==="br")mut(s,function(ps){ps.br=el.checked});
-  if(a==="cpPatrol"){if(cpPatrolList(M.cpEdition||"11").some(function(p){return p.id===el.value}))mut(s,function(ps){ps.cpPatrolId=el.value;ps.ready=false})}
+  if(a==="cpEdition"){if(["10","11"].indexOf(el.value)>=0)mut(s,function(ps){ps.cpEdition=el.value;ps.cpPatrolId="";ps.ready=false})}
+  if(a==="cpPatrol"){if(cpPatrolList(cpEditionFor(s)).some(function(p){return p.id===el.value}))mut(s,function(ps){ps.cpPatrolId=el.value;ps.ready=false})}
   if(a==="mode")mut(s,function(ps){ps.mode=el.value;if(el.value!=="F")ps.fixed=[]});
   if(a==="fd"){if(!el.value||Data.fdsFor(P(s).army,P(s).dets).indexOf(el.value)<0)return;var o={};o[s==="a"?"pa":"pb"]=Object.assign({},P(s),{fd:el.value});upd(o)}
   if(a==="fix"){
@@ -328,20 +395,19 @@ App.start(function(){
   function openStratagems(){if(!stratModal)return;if(M&&M.type==="combat-patrol")cpOpenPatrolModal("strat");else{stratModal.hidden=false;$("cpStratTabs").hidden=true;$("cpPatrolStratPanel").hidden=true;$("matchCoreStratagemList").hidden=false;$("matchStratQ").hidden=false;$("stratModalTitle").textContent="Core Stratagems";$("stratModalDesc").textContent="Core Rules reference";renderCoreStratagems(stratList,stratSearch.value)}}
   $("openCoreStratagems").addEventListener("click",openStratagems);
   $("openPatrolDatasheets").addEventListener("click",function(){cpOpenPatrolModal("data")});
-  $("openPatrolMission").addEventListener("click",function(){cpOpenPatrolModal("mission")});
   $("closeCoreStratagems").addEventListener("click",closeStratagems);
   stratModal.addEventListener("click",function(e){if(e.target===stratModal)closeStratagems()});
   document.querySelectorAll("[data-cp-tab]").forEach(function(b){b.addEventListener("click",function(){cpSetTab(this.getAttribute("data-cp-tab"))})});
   document.querySelectorAll("[data-close-modal]").forEach(function(b){b.addEventListener("click",function(){cpModalClose(this.getAttribute("data-close-modal"))})});
-  ["patrolDatasheetModal","patrolMissionModal"].forEach(function(id){var x=$(id);x.addEventListener("click",function(e){if(e.target===x)cpModalClose(id)})});
-  stratSearch.addEventListener("input",function(){if(M&&M.type==="combat-patrol"){var ed=M.cpEdition||"11";if(ed==="11")renderCoreStratagems(stratList,stratSearch.value,CORE_STRATAGEMS.filter(function(x){return ["Explosives","Crushing Impact","Rapid Ingress"].indexOf(x.name)<0}));}else renderCoreStratagems(stratList,stratSearch.value)});
-  document.addEventListener("keydown",function(e){if(e.key==="Escape"){closeStratagems();cpModalClose("patrolDatasheetModal");cpModalClose("patrolMissionModal")}});
+  ["patrolDatasheetModal"].forEach(function(id){var x=$(id);x.addEventListener("click",function(e){if(e.target===x)cpModalClose(id)})});
+  stratSearch.addEventListener("input",function(){if(M&&M.type==="combat-patrol"){var ed=cpEditionFor(cpOwnSide()),src=ed==="11"?CORE_STRATAGEMS.filter(function(x){return ["Explosives","Crushing Impact","Rapid Ingress"].indexOf(x.name)<0}):CORE_STRATAGEMS_10;renderCoreStratagems(stratList,stratSearch.value,src)}else renderCoreStratagems(stratList,stratSearch.value)});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"){closeStratagems();cpModalClose("patrolDatasheetModal");}});
   App.onPlayers=syncProfile;
   setInterval(function(){var e=$("tmr");if(e){var ts=+e.getAttribute("data-ts");e.textContent=ts?fmtT(Date.now()-ts):""}},1000);
   fetch("data/combat-patrol.json",{cache:"no-cache"}).then(function(r){if(!r.ok)throw new Error("Nu pot încărca biblioteca Combat Patrol.");return r.json()}).catch(function(e){console.warn(e);CPMATCH={factions:[],patrols11_extra:[],sources:{}}}).then(function(data){if(data)CPMATCH=data;App.db.collection("matches").doc(mid).onSnapshot(function(d){
     if(!d.exists){$("box").innerHTML='<p class="err">Meciul nu există.</p>';return}
     M=Object.assign({id:d.id,cpAuto:[]},d.data());if(!Array.isArray(M.cpAuto))M.cpAuto=[];render();syncProfile();
   },fail)}).catch(fail);
-  $("box").addEventListener("click",function(e){var mission=e.target.closest("[data-open-own-mission]");if(mission){cpOpenPatrolModal("mission");return}var el=e.target.closest("button[data-act]");if(el&&!el.disabled&&M)go(el.getAttribute("data-act"),el)});
+  $("box").addEventListener("click",function(e){var el=e.target.closest("button[data-act]");if(el&&!el.disabled&&M)go(el.getAttribute("data-act"),el)});
   $("box").addEventListener("change",function(e){if(M&&e.target.getAttribute("data-act"))onChange(e.target)});
 });

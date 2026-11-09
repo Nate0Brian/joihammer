@@ -40,15 +40,31 @@
 .match-strat-list .core-strat-card{background:var(--surface)}
 @media(min-width:760px){.core-strat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .cp-modal-tabs{display:flex;gap:8px;margin:8px 0 12px;position:sticky;top:45px;background:var(--bg);z-index:2;padding:5px 0}.cp-modal-tabs button{flex:1}.cp-modal-tabs button.on{border-color:var(--brass);background:var(--btn);color:var(--btn-ink)}.cp-rules-frame[hidden]{display:none!important}.cp-rules-frame{display:block;width:100%;height:min(68vh,760px);border:1px solid var(--line);border-radius:7px;background:#111}.cp-player-select{display:grid;gap:8px;margin:10px 0}.cp-player-select select{width:100%;min-height:42px}.cp-match-tools{display:flex;flex-wrap:wrap;gap:8px}.cp-mission-summary{border:1px solid var(--brass);padding:12px;border-radius:8px;margin:12px 0}.cp-score-entry{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.cp-score-entry input{flex:1;min-width:130px}.cp-score-entry button{min-width:62px}@media(max-width:520px){.cp-rules-frame{height:68vh}.cp-modal-tabs{top:42px}}
+
+.cp-ds-card{border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:12px;margin:10px 0}
+.cp-ds-card h3{font:700 17px Cinzel,Georgia,serif;margin:0 0 8px;color:var(--brass)}
+.cp-ds-profile,.cp-ds-weapons{width:100%;border-collapse:collapse;font-size:13px;margin:7px 0 12px}
+.cp-ds-profile th,.cp-ds-profile td,.cp-ds-weapons th,.cp-ds-weapons td{border:1px solid var(--line);padding:7px 6px;text-align:center;white-space:nowrap}
+.cp-ds-profile th,.cp-ds-weapons th{background:var(--bg);color:var(--brass);font-size:10px;letter-spacing:.06em}
+.cp-ds-weapons td:first-child{text-align:left;white-space:normal;min-width:130px}
+.cp-ds-weapon-name{font-weight:700;display:block}.cp-ds-keywords{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.cp-ds-keywords span,.cp-keyword{font-size:10px;border:1px solid var(--line);border-radius:20px;padding:2px 6px;color:var(--muted);display:inline-block}
+.cp-ds-abilities{display:grid;gap:7px;margin:8px 0}.cp-ds-ability{border-left:3px solid var(--brass);background:var(--bg);padding:8px 10px;border-radius:4px}
+.cp-ds-ability b{display:block;color:var(--brass);margin-bottom:3px}
+.cp-mission-inline{border-top:1px solid var(--line);margin-top:12px;padding-top:12px}.cp-mission-inline h3{font:700 16px Cinzel,Georgia,serif;margin:0 0 8px;color:var(--brass)}
+.cp-mission-score-row{border:1px solid var(--line);border-radius:7px;padding:9px;margin:7px 0;background:var(--bg)}
+.cp-mission-score-row p{font-size:13px;line-height:1.45;margin:4px 0 8px}.cp-mission-score-row .vpb{justify-content:flex-start}
+.cp-edition-warning{border:1px solid var(--blood);padding:8px;border-radius:6px;margin:8px 0;font-size:12px}
+@media(max-width:520px){.cp-ds-profile,.cp-ds-weapons{font-size:11px}.cp-ds-profile th,.cp-ds-profile td,.cp-ds-weapons th,.cp-ds-weapons td{padding:5px 3px}.cp-ds-weapons td:first-child{min-width:110px}}
 </style>
 </head>
 <body>
 <nav id="nav"></nav>
 <main class="wide">
-<div class="match-tools" id="matchTools"><button id="openCoreStratagems" type="button">⚔ Core Stratagems</button><button id="openPatrolDatasheets" type="button" hidden>▤ Datasheets / Army Rules</button><button id="openPatrolMission" type="button" hidden>◇ Mission</button><span id="matchToolsHint">Referință rapidă · fără să părăsești meciul</span></div>
+<div class="match-tools" id="matchTools"><button id="openCoreStratagems" type="button">⚔ Core Stratagems</button><button id="openPatrolDatasheets" type="button" hidden>▤ Datasheets / Army Rules</button><span id="matchToolsHint">Referință rapidă · fără să părăsești meciul</span></div>
 <div id="coreStratagemModal" class="strat-modal" hidden><div class="strat-modal-panel" role="dialog" aria-modal="true" aria-labelledby="stratModalTitle"><div class="strat-modal-head"><div><h2 id="stratModalTitle">Stratagems</h2><p id="stratModalDesc">Core Stratagems</p></div><button id="closeCoreStratagems" class="ghost" type="button" aria-label="Închide">✕</button></div><div id="cpStratTabs" class="cp-modal-tabs" hidden><button type="button" data-cp-tab="core" class="on">Core Stratagems</button><button type="button" data-cp-tab="patrol">My Combat Patrol</button></div><section id="cpCoreStratPanel"><div class="core-strat-legend"><span class="either">● Tura oricărui jucător</span><span class="your">● Tura ta</span><span class="opponent">● Tura adversarului</span></div><input id="matchStratQ" type="search" placeholder="Caută stratagemă, fază sau efect…"><div id="matchCoreStratagemList" class="match-strat-list"></div></section><section id="cpPatrolStratPanel" hidden><p id="cpPatrolStratLabel" class="legend"></p><div id="cpPatrolNativeStrats" class="match-strat-list"></div></section></div></div>
 <div id="patrolDatasheetModal" class="strat-modal" hidden><div class="strat-modal-panel" role="dialog" aria-modal="true" aria-labelledby="patrolDatasheetTitle"><div class="strat-modal-head"><div><h2 id="patrolDatasheetTitle">My Combat Patrol · Datasheets & Army Rules</h2><p id="patrolDatasheetDesc"></p></div><button type="button" class="ghost" data-close-modal="patrolDatasheetModal">✕</button></div><div id="patrolDatasheetBody" class="cp-native-content"></div></div></div>
-<div id="patrolMissionModal" class="strat-modal" hidden><div class="strat-modal-panel" role="dialog" aria-modal="true" aria-labelledby="patrolMissionTitle"><div class="strat-modal-head"><div><h2 id="patrolMissionTitle">My Combat Patrol Mission</h2><p id="patrolMissionDesc"></p></div><button type="button" class="ghost" data-close-modal="patrolMissionModal">✕</button></div><div id="patrolMissionBody" class="cp-native-content"></div></div></div>
+</div>
 <p id="st" class="err"></p><div id="box"></div>
 </main>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>

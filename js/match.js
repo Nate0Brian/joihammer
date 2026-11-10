@@ -278,8 +278,8 @@ function render(){
   }else{
     h+=(m.type==="combat-patrol"?"Bătălia Combat Patrol s-a încheiat. Propune scorul final.":"Bătălia s-a încheiat. Adaugă punctele „Final bătălie” (F), apoi propune scorul final.")+'<div class="vpb" style="justify-content:center">'+((App.me===m.a||App.me===m.b)?B("propose","","Propune scorul final",""):'')+(App.isAdmin?B("finish","","Încheie direct (admin)","",false,"ghost"):'')+B("back","","Undo End Turn","",!m.turnUndo,"ghost")+'</div>';
   }
-  var fr=m.type==="friendly"&&m.status==="active"&&(App.isAdmin||App.me===m.a||App.me===m.b);
-  if(fr)h+='<div class="vpb" style="justify-content:center">'+B("early","","Încheie cu scorul de acum",'',!started,"ghost")+B("cancel","","Anulează meciul",'',false,"ghost")+'</div><div class="legend">Doar la meciurile amicale. „Anulează” nu se numără în statistici; încheierea anticipată se numără și cere confirmarea adversarului.</div>';
+  var fr=(m.type==="friendly"||m.type==="combat-patrol")&&m.status==="active"&&(App.isAdmin||App.me===m.a||App.me===m.b);
+  if(fr){var cpGame=m.type==="combat-patrol";h+='<div class="vpb" style="justify-content:center">'+B("early","",cpGame?"Oprește jocul cu scorul curent":"Încheie cu scorul de acum",'',!started,"ghost")+B("cancel","",cpGame?"Anulează jocul complet":"Anulează meciul",'',false,"ghost")+'</div><div class="legend">'+(cpGame?'Poți opri partida după ce a început: scorul curent este propus adversarului și devine final după confirmare. Anularea marchează partida ca anulată și nu o înregistrează ca rezultat.':'Încheierea anticipată propune scorul actual și cere confirmarea adversarului. Anularea nu se numără în statistici.')+'</div>';}
   h+='</div>';
   var bn=h;h=head;
   var first=App.me===m.b?"b":"a",second=first==="a"?"b":"a",pre=!started&&m.status==="active";
@@ -329,8 +329,8 @@ function go(a,el){
   if(a==="propose"){var q=verdict();upd({status:"confirm",pw:q.w,pBy:App.me===M.b?"b":"a",pta:q.ta,ptb:q.tb});return}
   if(a==="confirm"){upd({status:"done",winner:M.pw,fta:M.pta,ftb:M.ptb}).then(afterDone);return}
   if(a==="contest"||a==="withdraw"){upd({status:"active",pw:null,pBy:null,early:false});return}
-  if(a==="cancel"){if(confirm("Anulezi meciul? Nu se va număra în statistici și dispare din Live."))upd({status:"cancelled",pw:null,pBy:null});return}
-  if(a==="early"){var e=verdict();if(confirm("Încheii meciul cu scorul de acum ("+e.ta+" – "+e.tb+")? Adversarul trebuie să confirme."))upd({status:"confirm",pw:e.w,pBy:App.me===M.b?"b":"a",pta:e.ta,ptb:e.tb,early:true});return}
+  if(a==="cancel"){if(confirm(M.type==="combat-patrol"?"Anulezi complet partida Combat Patrol? Nu va fi înregistrată ca rezultat.":"Anulezi meciul? Nu se va număra în statistici și dispare din Live."))upd({status:"cancelled",pw:null,pBy:null,early:false});return}
+  if(a==="early"){var e=verdict();if(confirm("Oprești jocul cu scorul curent ("+e.ta+" – "+e.tb+")? Adversarul trebuie să confirme scorul."))upd({status:"confirm",pw:e.w,pBy:App.me===M.b?"b":"a",pta:e.ta,ptb:e.tb,early:true});return}
   if(a==="pv"){var pn=primOf(s),L=parseLine(PRI[pn].r[i]);mut(s,function(ps){logAdd(ps,"pri",v,pn+" – "+L.text.slice(0,45),L.w==="F")});return}
   if(a==="sv"){mut(s,function(ps){logAdd(ps,"sec",v,n);if(ps.mode==="T"){rm(ps.hand,n);rm(ps.fresh,n);ps.used.push(n)}});return}
   if(a==="toss"){mut(s,function(ps){var amount=Math.min(1,Math.max(0,25-cpBalance(ps,s)));if(amount)logAdd(ps,"cp",amount,"CP Tactical discard: "+n);rm(ps.hand,n);rm(ps.fresh,n);ps.used.push(n)});return}

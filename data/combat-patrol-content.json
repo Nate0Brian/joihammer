@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 2,
-  "notice": "Date structurate pentru interfața JoiHammer. Conținutul incomplet este marcat; valorile neconfirmate nu sunt completate prin presupuneri.",
+  "schemaVersion": 1,
+  "notice": "Biblioteca nativă JoiHammer. Pentru ediția 11 sunt incluse misiunile și componența patrulelor pentru toate cele 24 de patrule din catalog; fișele complete de unități, arme, abilități și unele detalii de reguli sunt încă în curs de transcriere și verificare. Ediția 10 păstrează momentan rezumatul local deja existent pentru Space Marines; celelalte PDF-uri oficiale nu sunt încă transcrise în biblioteca nativă.",
   "patrols": {
     "11:space-marines": {
       "edition": 11,
@@ -36,20 +36,8 @@
         "name": "Honour the Chapter",
         "summary": "Misiune primară Assault Force.",
         "scoring": [
-          {
-            "name": "Hold the line",
-            "vp": 5,
-            "when": "Din Battle Round 2: la sfârșitul Command phase (sau la sfârșitul turei în BR5).",
-            "description": "Controlezi cel puțin un obiectiv și controlezi cel puțin la fel de multe obiective ca adversarul.",
-            "repeatable": "once-per-scoring-window"
-          },
-          {
-            "name": "Seize two objectives",
-            "vp": 10,
-            "when": "Din Battle Round 2: la sfârșitul Command phase (sau la sfârșitul turei în BR5).",
-            "description": "Controlezi cel puțin două obiective care nu sunt obiectivul tău de acasă.",
-            "repeatable": "once-per-scoring-window"
-          }
+          "Din Battle Round 2: la sfârșitul Command phase (sau la sfârșitul turei în Battle Round 5), primești 5 VP dacă controlezi cel puțin un obiectiv și controlezi cel puțin la fel de multe obiective ca adversarul.",
+          "Din Battle Round 2: în aceeași verificare, primești 10 VP dacă controlezi cel puțin două obiective, fără a include obiectivul propriu de acasă."
         ]
       },
       "stratagems": [
@@ -84,51 +72,12 @@
           "models": "1",
           "profile": "M 6\" · T4 · Sv 3+ · W6 · Ld 6+ · OC1 · Inv 4+",
           "weapons": [
-            {
-              "name": "Heavy Bolt Pistol",
-              "range": "18\"",
-              "attacks": "1",
-              "skillType": "BS",
-              "skill": "2+",
-              "strength": "4",
-              "ap": "-1",
-              "damage": "1",
-              "keywords": [
-                "CLOSE-QUARTERS"
-              ]
-            },
-            {
-              "name": "Master-crafted Power Weapon",
-              "range": "Melee",
-              "attacks": "6",
-              "skillType": "WS",
-              "skill": "2+",
-              "strength": "5",
-              "ap": "-2",
-              "damage": "2",
-              "keywords": []
-            }
+            "Heavy Bolt Pistol — 18\", A1, BS2+, S4, AP-1, D1",
+            "Master-crafted Power Weapon — Melee, A6, WS2+, S5, AP-2, D2"
           ],
           "abilities": [
-            {
-              "name": "Relic Shield",
-              "description": "+1 Wound (inclus în profil)."
-            },
-            {
-              "name": "Master of War",
-              "description": "la sfârșitul Charge phase a adversarului, dacă unitatea este neangajată și în 6\" de un inamic, poate face un Charge; rezultatul charge mai mare de 6 devine 6."
-            }
-          ],
-          "keywords": [
-            "CHARACTER",
-            "IMPERIUM",
-            "EXPLOSIVES",
-            "ASSAULT FORCE",
-            "TACTICUS",
-            "INFANTRY"
-          ],
-          "factionKeywords": [
-            "ADEPTUS ASTARTES"
+            "Relic Shield: +1 Wound (inclus în profil).",
+            "Master of War: la sfârșitul Charge phase a adversarului, dacă unitatea este neangajată și în 6\" de un inamic, poate face un Charge; rezultatul charge mai mare de 6 devine 6."
           ]
         },
         {
@@ -136,76 +85,14 @@
           "models": "1",
           "profile": "M 6\" · T4 · Sv 3+ · W4 · Ld 6+ · OC1 · Inv 4+",
           "weapons": [
-            {
-              "name": "Fulmination – Electropulse",
-              "range": "24\"",
-              "attacks": "2",
-              "skillType": "BS",
-              "skill": "3+",
-              "strength": "8",
-              "ap": "-2",
-              "damage": "3",
-              "keywords": []
-            },
-            {
-              "name": "Fulmination – Electrosurge",
-              "range": "24\"",
-              "attacks": "3",
-              "skillType": "BS",
-              "skill": "3+",
-              "strength": "4",
-              "ap": "-1",
-              "damage": "1",
-              "keywords": []
-            },
-            {
-              "name": "Bolt Pistol",
-              "range": "12\"",
-              "attacks": "1",
-              "skillType": "BS",
-              "skill": "3+",
-              "strength": "4",
-              "ap": "0",
-              "damage": "1",
-              "keywords": [
-                "CLOSE-QUARTERS"
-              ]
-            },
-            {
-              "name": "Force Weapon",
-              "range": "Melee",
-              "attacks": "4",
-              "skillType": "WS",
-              "skill": "3+",
-              "strength": "6",
-              "ap": "-1",
-              "damage": "2",
-              "keywords": [
-                "PSYCHIC"
-              ]
-            }
+            "Fulmination – Electropulse: 24\", A2, BS3+, S8, AP-2, D3",
+            "Fulmination – Electrosurge: 24\", A3, BS3+, S4, AP-1, D1",
+            "Bolt Pistol: 12\", A1, BS3+, S4, AP0, D1",
+            "Force Weapon: Melee, A4, WS3+, S6, AP-1, D2"
           ],
           "abilities": [
-            {
-              "name": "Empyric Insight",
-              "description": "atacurile ranged ale unității ignoră modificatorii la BS, Hit rolls și Wound rolls."
-            },
-            {
-              "name": "Leader",
-              "description": "se poate atașa la Assault Force Intercessor Squad."
-            }
-          ],
-          "keywords": [
-            "INFANTRY",
-            "EXPLOSIVES",
-            "TACTICUS",
-            "CHARACTER",
-            "PSYKER",
-            "IMPERIUM",
-            "ASSAULT FORCE"
-          ],
-          "factionKeywords": [
-            "ADEPTUS ASTARTES"
+            "Empyric Insight: atacurile ranged ale unității ignoră modificatorii la BS, Hit rolls și Wound rolls.",
+            "Leader: se poate atașa la Assault Force Intercessor Squad."
           ]
         },
         {
@@ -213,85 +100,14 @@
           "models": "5",
           "profile": "M 6\" · T4 · Sv 3+ · W2 · Ld 6+ · OC3",
           "weapons": [
-            {
-              "name": "Bolt Pistol",
-              "range": "12\"",
-              "attacks": "1",
-              "skillType": "BS",
-              "skill": "3+",
-              "strength": "4",
-              "ap": "0",
-              "damage": "1",
-              "keywords": [
-                "CLOSE-QUARTERS"
-              ]
-            },
-            {
-              "name": "Bolt Rifle",
-              "range": "24\"",
-              "attacks": "2",
-              "skillType": "BS",
-              "skill": "3+",
-              "strength": "4",
-              "ap": "-1",
-              "damage": "1",
-              "keywords": [
-                "ASSAULT",
-                "HEAVY"
-              ]
-            },
-            {
-              "name": "Grenade Launcher Frag",
-              "range": "24\"",
-              "attacks": "2",
-              "skillType": "BS",
-              "skill": "3+",
-              "strength": "4",
-              "ap": "-1",
-              "damage": "1",
-              "keywords": []
-            },
-            {
-              "name": "Grenade Launcher Krak",
-              "range": "24\"",
-              "attacks": "2",
-              "skillType": "BS",
-              "skill": "3+",
-              "strength": "5",
-              "ap": "-2",
-              "damage": "3",
-              "keywords": []
-            },
-            {
-              "name": "Chainsword",
-              "range": "Melee",
-              "attacks": "5",
-              "skillType": "WS",
-              "skill": "3+",
-              "strength": "4",
-              "ap": "-1",
-              "damage": "1",
-              "keywords": [
-                "SUSTAINED HITS 1"
-              ]
-            }
+            "Bolt Pistol: 12\", A1, BS3+, S4, AP0, D1",
+            "Bolt Rifle: 24\", A2, BS3+, S4, AP-1, D1",
+            "Grenade Launcher Frag: 24\", A2, BS3+, S4, AP-1, D1",
+            "Grenade Launcher Krak: 24\", A2, BS3+, S5, AP-2, D3",
+            "Chainsword: Melee, A5, WS3+, S4, AP-1, D1"
           ],
           "abilities": [
-            {
-              "name": "Stalwart Defenders",
-              "description": "când este țintită de un inamic, dacă toate modelele sunt în range-ul unui obiectiv, atacurile împotriva unității au -1 AP."
-            }
-          ],
-          "keywords": [
-            "ASSAULT FORCE",
-            "TACTICUS",
-            "INFANTRY",
-            "EXPLOSIVES",
-            "BATTLELINE",
-            "IMPERIUM"
-          ],
-          "factionKeywords": [
-            "ADEPTUS ASTARTES"
+            "Stalwart Defenders: când este țintită de un inamic, dacă toate modelele sunt în range-ul unui obiectiv, atacurile împotriva unității au -1 AP."
           ]
         },
         {
@@ -299,137 +115,27 @@
           "models": "1",
           "profile": "M 14\" · T8 · Sv 3+ · W9 · Ld 6+ · OC2",
           "weapons": [
-            {
-              "name": "Multi-melta",
-              "range": "18\"",
-              "attacks": "2",
-              "skillType": "BS",
-              "skill": "3+",
-              "strength": "10",
-              "ap": "-4",
-              "damage": "6",
-              "keywords": [
-                "MELTA 2"
-              ]
-            },
-            {
-              "name": "Heavy Flamer: 12\", AD6, Torrent, S5, AP-1, D1",
-              "keywords": [
-                "IGNORES COVER",
-                "TORRENT"
-              ]
-            },
-            {
-              "name": "Stormfury Missile Launcher",
-              "range": "48\"",
-              "attacks": "1",
-              "skillType": "BS",
-              "skill": "3+",
-              "strength": "10",
-              "ap": "-3",
-              "damage": "4",
-              "keywords": []
-            },
-            {
-              "name": "Armoured Impact",
-              "range": "Melee",
-              "attacks": "4",
-              "skillType": "WS",
-              "skill": "3+",
-              "strength": "4",
-              "ap": "0",
-              "damage": "1",
-              "keywords": []
-            }
+            "Multi-melta: 18\", A2, BS3+, S10, AP-4, D6",
+            "Heavy Flamer: 12\", AD6, Torrent, S5, AP-1, D1",
+            "Stormfury Missile Launcher: 48\", A1, BS3+, S10, AP-3, D4",
+            "Armoured Impact: Melee, A4, WS3+, S4, AP0, D1"
           ],
-          "abilities": [],
-          "keywords": [
-            "FLY",
-            "ASSAULT FORCE",
-            "IMPERIUM",
-            "VEHICLE"
-          ],
-          "factionKeywords": [
-            "ADEPTUS ASTARTES"
+          "abilities": [
+            "Fly; Vehicle."
           ]
         },
         {
           "name": "Assault Force Vanguard Veteran Squad with Jump Packs",
           "models": "5",
           "profile": "M 12\" · T4 · Sv 3+ · W2 · Ld 6+ · OC1",
-          "weapons": [
-            {
-              "name": "Heavy Bolt Pistol",
-              "range": "18\"",
-              "attacks": "1",
-              "skillType": "BS",
-              "skill": "3+",
-              "strength": "4",
-              "ap": "-1",
-              "damage": "1",
-              "keywords": [
-                "CLOSE-QUARTERS"
-              ]
-            },
-            {
-              "name": "Plasma Pistol – Standard",
-              "range": "12\"",
-              "attacks": "1",
-              "skillType": "BS",
-              "skill": "3+",
-              "strength": "7",
-              "ap": "-2",
-              "damage": "1",
-              "keywords": [
-                "CLOSE-QUARTERS"
-              ]
-            },
-            {
-              "name": "Plasma Pistol – Supercharge",
-              "range": "12\"",
-              "attacks": "1",
-              "skillType": "BS",
-              "skill": "3+",
-              "strength": "8",
-              "ap": "-3",
-              "damage": "2",
-              "keywords": [
-                "CLOSE-QUARTERS",
-                "HAZARDOUS"
-              ]
-            },
-            {
-              "name": "Master-crafted Power Weapon",
-              "range": "Melee",
-              "attacks": "3",
-              "skillType": "WS",
-              "skill": "3+",
-              "strength": "5",
-              "ap": "-2",
-              "damage": "2",
-              "keywords": []
-            }
-          ],
+          "weapons": [],
           "abilities": [
-            {
-              "name": "Rapid Reactions",
-              "description": "Once per turn per unit, during the opponent’s Shooting phase after an enemy unit has shot this unit, if the unit is unengaged it can make a Normal move up to D6+1\"."
-            }
-          ],
-          "keywords": [
-            "IMPERIUM",
-            "VANGUARD VETERAN SQUAD",
-            "EXPLOSIVES",
-            "INFANTRY",
-            "ASSAULT FORCE",
-            "FLY",
-            "JUMP PACK"
-          ],
-          "factionKeywords": [
-            "ADEPTUS ASTARTES"
+            "Jump Pack infantry; consult loadout chosen for the patrol roster."
           ]
         }
-      ]
+      ],
+      "sourceType": "secondary-reference-verified",
+      "sourceUrl": "https://wahapedia.ru/wh40k11ed_cp/factions/assault-force/"
     },
     "11:black-templars": {
       "edition": 11,
@@ -469,27 +175,9 @@
         "name": "Uphold Your Vows",
         "summary": "Misiunea primară Vow-Sworn of Vedrenn.",
         "scoring": [
-          {
-            "name": "Blessed objectives",
-            "vp": 10,
-            "when": "La sfârșitul bătăliei.",
-            "description": "Pentru fiecare obiectiv binecuvântat de armata ta.",
-            "repeatable": "per-objective"
-          },
-          {
-            "name": "Enemy Characters destroyed",
-            "vp": 5,
-            "when": "La sfârșitul turei.",
-            "description": "Pentru fiecare model CHARACTER inamic distrus în această tură sau în cea precedentă.",
-            "repeatable": "per-model"
-          },
-          {
-            "name": "All enemy Characters destroyed",
-            "vp": 5,
-            "when": "La sfârșitul bătăliei.",
-            "description": "Toate modelele CHARACTER inamice sunt distruse.",
-            "repeatable": "once-per-battle"
-          }
+          "La sfârșitul bătăliei: primești 10 VP pentru fiecare obiectiv binecuvântat de armata ta.",
+          "La sfârșitul turei: primești 5 VP pentru fiecare model CHARACTER inamic distrus în această tură sau în cea precedentă.",
+          "La sfârșitul bătăliei: primești 5 VP dacă toate modelele CHARACTER inamice sunt distruse."
         ],
         "actions": [
           {
@@ -534,443 +222,40 @@
           "models": "1",
           "profile": "M 8\" · T4 · Sv 2+ · W5 · Ld 6+ · OC1 · Inv 4+",
           "weapons": [
-            {
-              "name": "Bolt Pistol",
-              "range": "12\"",
-              "attacks": "1",
-              "skillType": "BS",
-              "skill": "2+",
-              "strength": "4",
-              "ap": "0",
-              "damage": "1",
-              "keywords": [
-                "CLOSE-QUARTERS"
-              ]
-            },
-            {
-              "name": "Black Sword – Sweep",
-              "range": "Melee",
-              "attacks": "10",
-              "skillType": "WS",
-              "skill": "2+",
-              "strength": "6",
-              "ap": "-2",
-              "damage": "1",
-              "keywords": []
-            },
-            {
-              "name": "Black Sword – Strike",
-              "range": "Melee",
-              "attacks": "6",
-              "skillType": "WS",
-              "skill": "2+",
-              "strength": "8",
-              "ap": "-3",
-              "damage": "3; Anti-Character 5+, Precision",
-              "keywords": []
-            }
+            "Bolt Pistol: 12\", A1, BS2+, S4, AP0, D1",
+            "Black Sword – Sweep: Melee, A10, WS2+, S6, AP-2, D1",
+            "Black Sword – Strike: Melee, A6, WS2+, S8, AP-3, D3; Anti-Character 5+, Precision"
           ],
           "abilities": [
-            {
-              "name": "Deft Riposte",
-              "description": "atacurile melee care țintesc unitatea au Hazardous."
-            }
-          ],
-          "keywords": [
-            "VOW-SWORN OF VEDRENN",
-            "EMPEROR'S CHAMPION",
-            "IMPERIUM",
-            "EXPLOSIVES",
-            "CHARACTER",
-            "INFANTRY",
-            "TACTICUS"
-          ],
-          "factionKeywords": [
-            "ADEPTUS ASTARTES",
-            "BLACK TEMPLARS"
+            "Deft Riposte: atacurile melee care țintesc unitatea au Hazardous."
           ]
         },
         {
           "name": "Vow-Sworn Bladeguard Veteran Squad",
           "models": "3",
           "profile": "Infantry · Tacticus",
-          "weapons": [
-            {
-              "name": "Neo-Volkite Pistol",
-              "range": "12\"",
-              "attacks": "1",
-              "skillType": "BS",
-              "skill": "3+",
-              "strength": "5",
-              "ap": "0",
-              "damage": "2",
-              "keywords": [
-                "CLOSE-QUARTERS",
-                "DEVASTATING WOUNDS"
-              ]
-            },
-            {
-              "name": "Heavy Bolt Pistol",
-              "range": "18\"",
-              "attacks": "1",
-              "skillType": "BS",
-              "skill": "3+",
-              "strength": "4",
-              "ap": "-1",
-              "damage": "1",
-              "keywords": [
-                "CLOSE-QUARTERS"
-              ]
-            },
-            {
-              "name": "Master-crafted Power Weapon",
-              "range": "Melee",
-              "attacks": "4",
-              "skillType": "WS",
-              "skill": "3+",
-              "strength": "5",
-              "ap": "-2",
-              "damage": "2",
-              "keywords": []
-            }
-          ],
+          "weapons": [],
           "abilities": [
-            {
-              "name": "Bladeguard",
-              "description": "Once per turn per unit, in the Fight phase when selected to fight or when an enemy unit targets it, choose one: its melee attacks re-roll Hit rolls of 1, or it re-rolls saving rolls of 1."
-            }
-          ],
-          "keywords": [
-            "INFANTRY",
-            "TACTICUS",
-            "IMPERIUM",
-            "EXPLOSIVES",
-            "VOW-SWORN OF VEDRENN"
-          ],
-          "factionKeywords": [
-            "ADEPTUS ASTARTES",
-            "BLACK TEMPLARS"
-          ],
-          "profileRows": [
-            {
-              "model": "Bladeguard Veteran Sergeant",
-              "M": "6\"",
-              "T": "4",
-              "SV": "3+",
-              "W": "3",
-              "LD": "6+",
-              "OC": "1",
-              "INV": "4+"
-            },
-            {
-              "model": "Bladeguard Veteran",
-              "M": "6\"",
-              "T": "4",
-              "SV": "3+",
-              "W": "3",
-              "LD": "6+",
-              "OC": "1",
-              "INV": "4+"
-            }
+            "Vezi loadout-ul Combat Patrol și abilitatea detaliată în fișa de unitate."
           ]
         },
         {
           "name": "Vow-Sworn Crusader Squad",
           "models": "10",
           "profile": "Infantry · Battleline",
-          "weapons": [
-            {
-              "name": "Bolt Pistol",
-              "range": "12\"",
-              "attacks": "1",
-              "skillType": "BS",
-              "skill": "3+",
-              "strength": "4",
-              "ap": "0",
-              "damage": "1",
-              "keywords": [
-                "CLOSE-QUARTERS"
-              ]
-            },
-            {
-              "name": "Pyreblaster",
-              "range": "12\"",
-              "attacks": "D6",
-              "skillType": "BS",
-              "skill": "—",
-              "strength": "5",
-              "ap": "0",
-              "damage": "1",
-              "keywords": [
-                "IGNORES COVER",
-                "TORRENT"
-              ]
-            },
-            {
-              "name": "Heavy Bolt Pistol",
-              "range": "18\"",
-              "attacks": "1",
-              "skillType": "BS",
-              "skill": "3+",
-              "strength": "4",
-              "ap": "-1",
-              "damage": "1",
-              "keywords": [
-                "CLOSE-QUARTERS"
-              ]
-            },
-            {
-              "name": "Bolt Rifle",
-              "range": "24\"",
-              "attacks": "2",
-              "skillType": "BS",
-              "skill": "3+",
-              "strength": "4",
-              "ap": "-1",
-              "damage": "1",
-              "keywords": [
-                "ASSAULT",
-                "HEAVY"
-              ]
-            },
-            {
-              "name": "Neophyte Firearm",
-              "range": "18\"",
-              "attacks": "2",
-              "skillType": "BS",
-              "skill": "3+",
-              "strength": "4",
-              "ap": "0",
-              "damage": "1",
-              "keywords": [
-                "ASSAULT"
-              ]
-            },
-            {
-              "name": "Knives and Fists",
-              "range": "Melee",
-              "attacks": "3",
-              "skillType": "WS",
-              "skill": "3+",
-              "strength": "4",
-              "ap": "0",
-              "damage": "1",
-              "keywords": []
-            },
-            {
-              "name": "Master-crafted Power Weapon",
-              "range": "Melee",
-              "attacks": "3",
-              "skillType": "WS",
-              "skill": "2+",
-              "strength": "5",
-              "ap": "-2",
-              "damage": "2",
-              "keywords": [
-                "LETHAL HITS"
-              ]
-            },
-            {
-              "name": "Chainsword",
-              "range": "Melee",
-              "attacks": "4",
-              "skillType": "WS",
-              "skill": "3+",
-              "strength": "4",
-              "ap": "-1",
-              "damage": "1",
-              "keywords": [
-                "SUSTAINED HITS 1"
-              ]
-            }
-          ],
-          "abilities": [
-            {
-              "name": "Righteous Zeal",
-              "description": "Once per turn per unit, in the opponent’s Shooting phase after an enemy unit has shot, if those attacks destroyed a model in this unengaged unit, it can make a Surge move up to D6+2\"."
-            }
-          ],
-          "keywords": [
-            "IMPERIUM",
-            "BATTLELINE",
-            "INFANTRY",
-            "VOW-SWORN OF VEDRENN",
-            "TACTICUS",
-            "EXPLOSIVES"
-          ],
-          "factionKeywords": [
-            "ADEPTUS ASTARTES",
-            "BLACK TEMPLARS"
-          ],
-          "profileRows": [
-            {
-              "model": "Initiate / Sword Brother",
-              "M": "6\"",
-              "T": "4",
-              "SV": "3+",
-              "W": "2",
-              "LD": "6+",
-              "OC": "2",
-              "INV": "—"
-            },
-            {
-              "model": "Neophyte",
-              "M": "6\"",
-              "T": "4",
-              "SV": "4+",
-              "W": "2",
-              "LD": "6+",
-              "OC": "2",
-              "INV": "—"
-            }
-          ]
+          "weapons": [],
+          "abilities": []
         },
         {
           "name": "Vow-Sworn Sword Brethren Squad",
           "models": "5",
           "profile": "Infantry · Tacticus",
-          "weapons": [
-            {
-              "name": "Combi-Weapon",
-              "range": "24\"",
-              "attacks": "1",
-              "skillType": "BS",
-              "skill": "3+",
-              "strength": "4",
-              "ap": "0",
-              "damage": "1",
-              "keywords": [
-                "ANTI-INFANTRY 4+",
-                "DEVASTATING WOUNDS",
-                "RAPID FIRE 1"
-              ]
-            },
-            {
-              "name": "Heavy Bolt Pistol",
-              "range": "18\"",
-              "attacks": "1",
-              "skillType": "BS",
-              "skill": "3+",
-              "strength": "4",
-              "ap": "-1",
-              "damage": "1",
-              "keywords": [
-                "CLOSE-QUARTERS"
-              ]
-            },
-            {
-              "name": "Plasma Pistol – Standard",
-              "range": "12\"",
-              "attacks": "1",
-              "skillType": "BS",
-              "skill": "3+",
-              "strength": "7",
-              "ap": "-2",
-              "damage": "1",
-              "keywords": [
-                "CLOSE-QUARTERS"
-              ]
-            },
-            {
-              "name": "Plasma Pistol – Supercharge",
-              "range": "12\"",
-              "attacks": "1",
-              "skillType": "BS",
-              "skill": "3+",
-              "strength": "8",
-              "ap": "-3",
-              "damage": "2",
-              "keywords": [
-                "CLOSE-QUARTERS",
-                "HAZARDOUS"
-              ]
-            },
-            {
-              "name": "Pyre Pistol",
-              "range": "12\"",
-              "attacks": "D6",
-              "skillType": "BS",
-              "skill": "—",
-              "strength": "4",
-              "ap": "0",
-              "damage": "1",
-              "keywords": [
-                "CLOSE-QUARTERS",
-                "IGNORES COVER",
-                "TORRENT"
-              ]
-            },
-            {
-              "name": "Master-crafted Power Weapon",
-              "range": "Melee",
-              "attacks": "3",
-              "skillType": "WS",
-              "skill": "2+",
-              "strength": "5",
-              "ap": "-2",
-              "damage": "2",
-              "keywords": [
-                "LETHAL HITS"
-              ]
-            },
-            {
-              "name": "Chainsword",
-              "range": "Melee",
-              "attacks": "6",
-              "skillType": "WS",
-              "skill": "2+",
-              "strength": "4",
-              "ap": "-1",
-              "damage": "1",
-              "keywords": [
-                "SUSTAINED HITS 1"
-              ]
-            },
-            {
-              "name": "Twin Lightning Claws",
-              "range": "Melee",
-              "attacks": "5",
-              "skillType": "WS",
-              "skill": "2+",
-              "strength": "5",
-              "ap": "-2",
-              "damage": "1",
-              "keywords": [
-                "TWIN-LINKED"
-              ]
-            }
-          ],
-          "abilities": [
-            {
-              "name": "Exploit Their Cowardice",
-              "description": "When an enemy unit engaged with this unit is selected to Fall Back, after it ends that move, if this unit is unengaged it can make a Normal move."
-            }
-          ],
-          "keywords": [
-            "INFANTRY",
-            "IMPERIUM",
-            "VOW-SWORN OF VEDRENN",
-            "TACTICUS",
-            "EXPLOSIVES"
-          ],
-          "factionKeywords": [
-            "ADEPTUS ASTARTES",
-            "BLACK TEMPLARS"
-          ],
-          "profileRows": [
-            {
-              "model": "Sword Brethren",
-              "M": "6\"",
-              "T": "4",
-              "SV": "3+",
-              "W": "3",
-              "LD": "6+",
-              "OC": "1",
-              "INV": "—"
-            }
-          ]
+          "weapons": [],
+          "abilities": []
         }
-      ]
+      ],
+      "sourceType": "secondary-reference-verified",
+      "sourceUrl": "https://wahapedia.ru/wh40k11ed_cp/factions/vow-sworn-of-vedrenn/"
     },
     "10:space-marines": {
       "edition": 10,
@@ -999,20 +284,8 @@
       "mission": {
         "name": "Wrath of the Emperor / Shock Tactics",
         "scoring": [
-          {
-            "name": "Wrath of the Emperor",
-            "vp": 2,
-            "when": "La sfârșitul fiecărei faze.",
-            "description": "Captain Octavius a distrus cel puțin un model inamic în acea fază.",
-            "repeatable": "once-per-phase"
-          },
-          {
-            "name": "Shock Tactics",
-            "vp": 5,
-            "when": "La sfârșitul turei fiecărui jucător.",
-            "description": "Controlezi cel puțin un obiectiv controlat de adversar la începutul turei.",
-            "repeatable": "once-per-turn"
-          }
+          "Wrath of the Emperor (implicit): la sfârșitul fiecărei faze, 2 VP dacă Captain Octavius a distrus cel puțin un model inamic în acea fază.",
+          "Shock Tactics (alternativ): la sfârșitul turei fiecărui jucător, 5 VP dacă controlezi cel puțin un obiectiv controlat de adversar la începutul turei."
         ]
       },
       "stratagems": [
@@ -1047,51 +320,11 @@
           "models": "1",
           "profile": "M 5\" · T5 · Sv 2+ · W6 · Ld 6+ · OC1",
           "weapons": [
-            {
-              "name": "Storm Bolter",
-              "range": "24\"",
-              "attacks": "2",
-              "skillType": "BS",
-              "skill": "2+",
-              "strength": "4",
-              "ap": "0",
-              "damage": "1",
-              "keywords": [
-                "RAPID FIRE 2"
-              ]
-            },
-            {
-              "name": "Relic Weapon",
-              "range": "Melee",
-              "attacks": "6",
-              "skillType": "WS",
-              "skill": "2+",
-              "strength": "5",
-              "ap": "-2",
-              "damage": "2",
-              "keywords": []
-            }
+            "Storm Bolter: 24\", A2, BS2+, S4, AP0, D1",
+            "Relic Weapon: Melee, A6, WS2+, S5, AP-2, D2"
           ],
           "abilities": [
-            {
-              "name": "Champion Duellist",
-              "description": "Enhancement: the bearer’s melee weapons gain PRECISION and LETHAL HITS."
-            },
-            {
-              "name": "Warlord",
-              "description": "Captain Octavius is the Warlord of this Combat Patrol."
-            }
-          ],
-          "keywords": [
-            "INFANTRY",
-            "CHARACTER",
-            "IMPERIUM",
-            "TERMINATOR",
-            "CAPTAIN",
-            "OCTAVIUS"
-          ],
-          "factionKeywords": [
-            "ADEPTUS ASTARTES"
+            "Champion Duellist enhancement; Warlord."
           ]
         },
         {
@@ -1099,112 +332,1174 @@
           "models": "1",
           "profile": "M 5\" · T5 · Sv 2+ · W5 · Ld 6+ · OC1 · Inv 4+",
           "weapons": [
-            {
-              "name": "Smite Electropulse",
-              "range": "24\"",
-              "attacks": "6",
-              "skillType": "BS",
-              "skill": "3+",
-              "strength": "5",
-              "ap": "-1",
-              "damage": "3",
-              "keywords": [
-                "PSYCHIC"
-              ]
-            },
-            {
-              "name": "Force Weapon",
-              "range": "Melee",
-              "attacks": "4",
-              "skillType": "WS",
-              "skill": "3+",
-              "strength": "6",
-              "ap": "-1",
-              "damage": "3",
-              "keywords": [
-                "PSYCHIC"
-              ]
-            }
+            "Smite Electropulse: 24\", AD6, BS3+, S5, AP-1, DD3",
+            "Force Weapon: Melee, A4, WS3+, S6, AP-1, DD3"
           ],
           "abilities": [
-            {
-              "name": "Deep Strike",
-              "description": "This unit can be set up in Reserves and arrive using the Deep Strike ability."
-            },
-            {
-              "name": "Leader",
-              "description": "This model can be attached to the Terminator Squad."
-            },
-            {
-              "name": "Veil of Time",
-              "description": "While this model is leading a unit, weapons equipped by models in that unit have Sustained Hits 1."
-            }
-          ],
-          "keywords": [
-            "INFANTRY",
-            "CHARACTER",
-            "PSYKER",
-            "IMPERIUM",
-            "TERMINATOR",
-            "LIBRARIAN TANTUS"
-          ],
-          "factionKeywords": [
-            "ADEPTUS ASTARTES"
+            "Deep Strike; Leader; Veil of Time: unit weapons gain Sustained Hits 1 while leading."
           ]
         },
         {
           "name": "Terminator Squad",
           "models": "5",
           "profile": "M 5\" · T5 · Sv 2+ · W3 · Ld 6+ · OC1",
-          "weapons": [],
+          "weapons": [
+            "Storm Bolter; Assault Cannon; Power Fist; Power Weapon"
+          ],
           "abilities": [
-            {
-              "name": "Deep Strike",
-              "description": "This unit can be set up in Reserves and arrive using the Deep Strike ability."
-            },
-            {
-              "name": "Fury of the First",
-              "description": "Each time a model in this unit makes an attack that targets your Oath of Moment target, add 1 to the Hit roll."
-            }
-          ],
-          "keywords": [
-            "INFANTRY",
-            "IMPERIUM",
-            "TERMINATOR",
-            "TERMINATOR SQUAD"
-          ],
-          "factionKeywords": [
-            "ADEPTUS ASTARTES"
-          ],
-          "equipment": [
-            "Storm Bolter",
-            "Assault Cannon",
-            "Power Fist",
-            "Power Weapon"
+            "Deep Strike; Fury of the First: +1 Hit against Oath of Moment target."
           ]
         },
         {
           "name": "Infernus Squad",
           "models": "5",
           "profile": "M 6\" · T4 · Sv 3+ · W2 · Ld 6+ · OC1",
-          "weapons": [],
-          "abilities": [],
-          "keywords": [
-            "INFANTRY",
-            "IMPERIUM",
-            "TACTICUS",
-            "INFERNUS SQUAD"
+          "weapons": [
+            "Bolt Pistol; Pyreblaster; Close Combat Weapon"
           ],
-          "factionKeywords": [
-            "ADEPTUS ASTARTES"
-          ],
-          "equipment": [
-            "Bolt Pistol",
-            "Pyreblaster",
-            "Close Combat Weapon"
-          ]
+          "abilities": []
         }
       ]
+    },
+    "11:blood-angels": {
+      "name": "Sanguinary Spearhead",
+      "sourceFaction": "Blood Angels",
+      "mission": {
+        "name": "Strike from on High",
+        "summary": "Misiune principală: controlul obiectivelor de extindere și prezența în centrul câmpului.",
+        "scoring": [
+          "Din Battle Round 2: la sfârșitul Command phase (sau la sfârșitul turei în Battle Round 5), primești 5 VP pentru fiecare obiectiv de extindere controlat.",
+          "Din Battle Round 3: la sfârșitul Command phase (sau la sfârșitul turei în Battle Round 5), primești 10 VP dacă ai o unitate prietenoasă în 3 inch de centrul câmpului."
+        ]
+      },
+      "roster": [
+        [
+          "Captain Raldeo",
+          "1"
+        ],
+        [
+          "Sanguinary Spearhead Assault Intercessor Squad",
+          "10"
+        ],
+        [
+          "Sanguinary Spearhead Sanguinary Guard",
+          "3 (două unități)"
+        ]
+      ],
+      "armyRules": [
+        {
+          "name": "Oath of Moment",
+          "text": "Alege o unitate inamică drept țintă; unitățile cu această regulă pot rerula Hit rolls împotriva ei."
+        },
+        {
+          "name": "The Sons of Sanguinius",
+          "text": "Regulă de facțiune Blood Angels; detaliile complete ale efectelor specifice patrulei necesită fișa completă."
+        }
+      ],
+      "detachmentRules": [
+        {
+          "name": "Rapid Manoeuvres",
+          "text": "Unitățile SANGUINARY SPEARHEAD pot rerula Advance rolls."
+        }
+      ],
+      "status": "mission-roster-verified; datasheets-incomplete",
+      "edition": 11,
+      "id": "blood-angels",
+      "units": [],
+      "sourceType": "secondary-reference-verified",
+      "sourceUrl": "https://wahapedia.ru/wh40k11ed_cp/factions/sanguinary-spearhead/"
+    },
+    "11:dark-angels": {
+      "name": "The Vengeful Brethren",
+      "sourceFaction": "Dark Angels",
+      "mission": {
+        "name": "Seize Their Strongholds",
+        "summary": "Misiune de control al obiectivelor, cu punctare în Command phase.",
+        "scoring": [
+          "Din Battle Round 2: la sfârșitul Command phase (sau la sfârșitul turei în Battle Round 5), primești 5 VP dacă controlezi mai multe obiective decât adversarul.",
+          "În aceeași verificare: primești 5 VP dacă deții obiectivul propriu de acasă.",
+          "În aceeași verificare: primești 5 VP dacă deții cel puțin un obiectiv în afara obiectivului propriu de acasă."
+        ]
+      },
+      "roster": [
+        [
+          "Master Zacharial",
+          "1"
+        ],
+        [
+          "Vengeful Brethren Bladeguard Veteran Squad",
+          "3"
+        ],
+        [
+          "Vengeful Brethren Hellblaster Squad",
+          "5"
+        ],
+        [
+          "Vengeful Brethren Intercessor Squad",
+          "10"
+        ]
+      ],
+      "armyRules": [
+        {
+          "name": "Oath of Moment",
+          "text": "Alege o unitate inamică drept țintă; unitățile cu această regulă pot rerula Hit rolls împotriva ei."
+        },
+        {
+          "name": "The Unforgiven",
+          "text": "Regulă de facțiune Dark Angels; detaliile complete sunt păstrate separat de rezumat."
+        },
+        {
+          "name": "The Ravenwing",
+          "text": "Regulă de facțiune Dark Angels; detaliile complete sunt păstrate separat de rezumat."
+        },
+        {
+          "name": "The Deathwing",
+          "text": "Regulă de facțiune Dark Angels; detaliile complete sunt păstrate separat de rezumat."
+        }
+      ],
+      "detachmentRules": [
+        {
+          "name": "Honoured Knights",
+          "text": "Regulă specifică patrulei; descrierea completă nu este transcrisă în această versiune."
+        }
+      ],
+      "status": "mission-roster-verified; datasheets-incomplete",
+      "edition": 11,
+      "id": "dark-angels",
+      "units": [],
+      "sourceType": "secondary-reference-verified",
+      "sourceUrl": "https://wahapedia.ru/wh40k11ed_cp/factions/the-vengeful-brethren/"
+    },
+    "11:space-wolves": {
+      "name": "Askar's Wolfpack",
+      "sourceFaction": "Space Wolves",
+      "mission": {
+        "name": "Encircle and Destroy",
+        "summary": "Punctează obiectivele de extindere în rundele timpurii, apoi obiectivele de acasă.",
+        "scoring": [
+          "În Battle Rounds 2–3: la sfârșitul Command phase, primești 5 VP pentru fiecare obiectiv de extindere controlat.",
+          "În Battle Rounds 4–5: la sfârșitul Command phase (sau la sfârșitul turei în Battle Round 5), primești 10 VP pentru fiecare obiectiv propriu de acasă controlat."
+        ]
+      },
+      "roster": [
+        [
+          "Fyrri Askar",
+          "1"
+        ],
+        [
+          "Askar's Wolfpack Blood Claws",
+          "10"
+        ],
+        [
+          "Askar's Wolfpack Wolf Guard Terminators",
+          "5"
+        ],
+        [
+          "Askar's Wolfpack Wulfen",
+          "5"
+        ]
+      ],
+      "armyRules": [
+        {
+          "name": "Curse of the Wulfen",
+          "text": "Regulă de facțiune Space Wolves; efectul complet trebuie consultat în fișa actualizată."
+        },
+        {
+          "name": "Sagas",
+          "text": "Regulă de facțiune Space Wolves; efectul complet trebuie consultat în fișa actualizată."
+        },
+        {
+          "name": "Sons of Russ",
+          "text": "Regulă de facțiune Space Wolves; efectul complet trebuie consultat în fișa actualizată."
+        }
+      ],
+      "detachmentRules": [
+        {
+          "name": "Hidden Hunters",
+          "text": "Regulă specifică patrulei; descrierea completă nu este transcrisă în această versiune."
+        }
+      ],
+      "status": "mission-roster-verified; datasheets-incomplete",
+      "edition": 11,
+      "id": "space-wolves",
+      "units": [],
+      "sourceType": "secondary-reference-verified",
+      "sourceUrl": "https://wahapedia.ru/wh40k11ed_cp/factions/askar-s-wolfpack/"
+    },
+    "11:adeptus-custodes": {
+      "name": "Tristraen's Gilded Blades",
+      "sourceFaction": "Adeptus Custodes",
+      "mission": {
+        "name": "Defenders of the Golden Throne",
+        "summary": "Misiune de control al centrului câmpului de luptă.",
+        "scoring": [
+          "Din Battle Round 2: la sfârșitul Command phase (sau la sfârșitul turei în Battle Round 5), primești 10 VP dacă o unitate prietenoasă care nu este Battle-shocked se află la 3 inch de centrul câmpului."
+        ]
+      },
+      "roster": [
+        [
+          "Tristraen of the Gilded Blades",
+          "1"
+        ],
+        [
+          "Gilded Blades Allarus Custodians",
+          "2"
+        ],
+        [
+          "Gilded Blades Custodian Guard",
+          "3"
+        ],
+        [
+          "Gilded Blades Custodian Wardens",
+          "3"
+        ]
+      ],
+      "armyRules": [
+        {
+          "name": "Martial Ka'tah",
+          "text": "Regulă de facțiune Adeptus Custodes; efectele complete sunt disponibile în referința oficială."
+        }
+      ],
+      "detachmentRules": [
+        {
+          "name": "Fearless and Unrelenting",
+          "text": "Regulă specifică patrulei; descrierea completă nu este transcrisă în această versiune."
+        }
+      ],
+      "status": "mission-roster-verified; datasheets-incomplete",
+      "edition": 11,
+      "id": "adeptus-custodes",
+      "units": [],
+      "sourceType": "secondary-reference-verified",
+      "sourceUrl": "https://wahapedia.ru/wh40k11ed_cp/factions/tristraen-s-gilded-blades/"
+    },
+    "11:death-guard": {
+      "name": "Maggot Lords",
+      "sourceFaction": "Death Guard",
+      "mission": {
+        "name": "Inexorable Conquest",
+        "summary": "Misiune de avansare spre obiectivul de acasă al adversarului.",
+        "scoring": [
+          "Din Battle Round 2: la sfârșitul Command phase (sau la sfârșitul turei în Battle Round 5), primești 10 VP dacă controlezi obiectivul adversarului de acasă.",
+          "Există și o a doua condiție de punctare în Command phase; textul complet necesită transcrierea integrală a secțiunii de misiune."
+        ]
+      },
+      "roster": [
+        [
+          "Septimol Fulg, Maggot Lords Tallyman",
+          "1"
+        ],
+        [
+          "Sholgor the Putrid",
+          "1"
+        ],
+        [
+          "Maggot Lords Chaos Rhino",
+          "1"
+        ],
+        [
+          "Maggot Lords Deathshroud Terminators",
+          "3"
+        ],
+        [
+          "Maggot Lords Plague Marines",
+          "7"
+        ]
+      ],
+      "armyRules": [
+        {
+          "name": "Nurgle's Gift (Aura)",
+          "text": "Regulă de facțiune Death Guard."
+        },
+        {
+          "name": "Pact of Decay",
+          "text": "Regulă de facțiune Death Guard."
+        }
+      ],
+      "detachmentRules": [
+        {
+          "name": "Creeping Rot",
+          "text": "Regulă specifică patrulei; descrierea completă nu este transcrisă în această versiune."
+        }
+      ],
+      "status": "mission-roster-partial; datasheets-incomplete",
+      "edition": 11,
+      "id": "death-guard",
+      "units": [],
+      "sourceType": "secondary-reference-verified",
+      "sourceUrl": "https://wahapedia.ru/wh40k11ed_cp/factions/maggot-lords/"
+    },
+    "11:chaos-space-marines": {
+      "name": "Zarkan's Daemonkin",
+      "sourceFaction": "Chaos Space Marines",
+      "mission": {
+        "name": "Shatter the Veil",
+        "summary": "Punctează obiectivele proprii și controlează centrul pentru a ține inamicul la distanță.",
+        "scoring": [
+          "Din Battle Round 2: la sfârșitul Command phase (sau la sfârșitul turei în Battle Round 5), primești 5 VP dacă deții obiectivul de acasă.",
+          "În aceeași verificare, primești 5 VP dacă deții cel puțin două obiective.",
+          "Din Battle Round 2: la sfârșitul turei, primești 5 VP dacă nu există unități inamice non-Battle-shocked la 6 inch de centrul câmpului și ai o unitate prietenoasă non-Battle-shocked la 12 inch de centru."
+        ]
+      },
+      "roster": [
+        [
+          "Aranis Zarkan",
+          "1"
+        ],
+        [
+          "Zarkan's Daemonkin Cultist Mob",
+          "10"
+        ],
+        [
+          "Zarkan's Daemonkin Legionaries",
+          "10"
+        ],
+        [
+          "Zarkan's Daemonkin Possessed",
+          "5"
+        ]
+      ],
+      "armyRules": [
+        {
+          "name": "Cults of the Dark Gods",
+          "text": "Regulă de facțiune Chaos Space Marines."
+        },
+        {
+          "name": "Dark Pacts",
+          "text": "Regulă de facțiune Chaos Space Marines."
+        }
+      ],
+      "detachmentRules": [
+        {
+          "name": "Abject Fear",
+          "text": "Regulă specifică patrulei; descrierea completă nu este transcrisă în această versiune."
+        }
+      ],
+      "status": "mission-roster-verified; datasheets-incomplete",
+      "edition": 11,
+      "id": "chaos-space-marines",
+      "units": [],
+      "sourceType": "secondary-reference-verified",
+      "sourceUrl": "https://wahapedia.ru/wh40k11ed_cp/factions/zarkan-s-daemonkin/"
+    },
+    "11:adeptus-mechanicus": {
+      "name": "Purge Corps Deltic-9",
+      "sourceFaction": "Adeptus Mechanicus",
+      "mission": {
+        "name": "Complete Annihilation",
+        "summary": "Selectează două unități inamice la început și urmărește distrugerea lor.",
+        "scoring": [
+          "La începutul bătăliei, selectezi o unitate inamică, iar adversarul selectează o altă unitate inamică.",
+          "Din Battle Round 2: la sfârșitul turei, primești 5 VP dacă controlezi cel puțin un obiectiv.",
+          "În aceeași verificare, primești încă 5 VP dacă controlezi cel puțin două obiective.",
+          "La sfârșitul bătăliei, primești 15 VP pentru fiecare dintre cele două unități inamice selectate care a fost distrusă."
+        ]
+      },
+      "roster": [
+        [
+          "Manipulus Skand",
+          "1"
+        ],
+        [
+          "Purge Corps Pteraxii Sterylizors",
+          "5"
+        ],
+        [
+          "Purge Corps Serberys Sulphurhounds",
+          "3"
+        ],
+        [
+          "Purge Corps Skitarii Vanguard",
+          "10"
+        ]
+      ],
+      "armyRules": [
+        {
+          "name": "Doctrina Imperatives",
+          "text": "Regulă de facțiune Adeptus Mechanicus."
+        }
+      ],
+      "detachmentRules": [
+        {
+          "name": "Imperative Overload",
+          "text": "Regulă specifică patrulei; descrierea completă nu este transcrisă în această versiune."
+        }
+      ],
+      "status": "mission-roster-verified; datasheets-incomplete",
+      "edition": 11,
+      "id": "adeptus-mechanicus",
+      "units": [],
+      "sourceType": "secondary-reference-verified",
+      "sourceUrl": "https://wahapedia.ru/wh40k11ed_cp/factions/purge-corps-deltic-9/"
+    },
+    "11:drukhari": {
+      "name": "Coven of Agonies",
+      "sourceFaction": "Drukhari",
+      "mission": {
+        "name": "Architects of Agony",
+        "summary": "Punctează prin controlul obiectivului adversarului, obiectivelor de extindere și distrugerea unităților inamice.",
+        "scoring": [
+          "Din Battle Round 2: la sfârșitul turei, primești 5 VP dacă controlezi obiectivul adversarului de acasă.",
+          "În aceeași verificare, primești 5 VP dacă controlezi cel puțin un obiectiv de extindere.",
+          "În orice Battle Round: la sfârșitul turei, primești 5 VP dacă o unitate inamică a fost distrusă în această tură sau în cea precedentă."
+        ]
+      },
+      "roster": [
+        [
+          "Xatrophos Nuul",
+          "1"
+        ],
+        [
+          "Coven of Agonies Cronos",
+          "1"
+        ],
+        [
+          "Coven of Agonies Talos",
+          "1"
+        ],
+        [
+          "Coven of Agonies Wracks",
+          "5 (două unități)"
+        ]
+      ],
+      "armyRules": [
+        {
+          "name": "Power from Pain",
+          "text": "Regulă de facțiune Drukhari."
+        },
+        {
+          "name": "Corsairs and Travelling Players",
+          "text": "Regulă de facțiune Drukhari."
+        }
+      ],
+      "detachmentRules": [
+        {
+          "name": "Pain Enlivens",
+          "text": "Când o unitate COVEN OF AGONIES prietenoasă este distrusă, primești un Pain token."
+        }
+      ],
+      "status": "mission-roster-verified; datasheets-incomplete",
+      "edition": 11,
+      "id": "drukhari",
+      "units": [],
+      "sourceType": "secondary-reference-verified",
+      "sourceUrl": "https://wahapedia.ru/wh40k11ed_cp/factions/coven-of-agonies/"
+    },
+    "11:tyranids": {
+      "name": "The Vardenghast Swarm",
+      "sourceFaction": "Tyranids",
+      "mission": {
+        "name": "Prepare the Way",
+        "summary": "Pătrunde în teritoriul adversarului și controlează obiectivele de extindere.",
+        "scoring": [
+          "În orice Battle Round: la sfârșitul turei, primești 10 VP dacă ai o unitate prietenoasă care nu este Battle-shocked în zona de desfășurare a adversarului.",
+          "Din Battle Round 2: există o a doua condiție de punctare la sfârșitul Command phase; textul complet necesită transcrierea integrală a secțiunii de misiune."
+        ]
+      },
+      "roster": [
+        [
+          "Terror of Vardenghast",
+          "1"
+        ],
+        [
+          "Vardenghast Swarm Barbgaunts",
+          "5"
+        ],
+        [
+          "Vardenghast Swarm Psychophage",
+          "1"
+        ],
+        [
+          "Vardenghast Swarm Termagants",
+          "10"
+        ],
+        [
+          "Vardenghast Swarm Von Ryan's Leapers",
+          "3"
+        ]
+      ],
+      "armyRules": [
+        {
+          "name": "Synapse",
+          "text": "Regulă de facțiune Tyranids."
+        },
+        {
+          "name": "Shadow in the Warp",
+          "text": "Regulă de facțiune Tyranids."
+        }
+      ],
+      "detachmentRules": [
+        {
+          "name": "Skittering Hordes",
+          "text": "Regulă specifică patrulei; descrierea completă nu este transcrisă în această versiune."
+        }
+      ],
+      "status": "mission-roster-partial; datasheets-incomplete",
+      "edition": 11,
+      "id": "tyranids",
+      "units": [],
+      "sourceType": "secondary-reference-verified",
+      "sourceUrl": "https://wahapedia.ru/wh40k11ed_cp/factions/the-vardenghast-swarm/"
+    },
+    "11:genestealer-cults": {
+      "name": "Claw of Ascension",
+      "sourceFaction": "Genestealer Cults",
+      "mission": {
+        "name": "Slay the Oppressors",
+        "summary": "Vânează Warlord-ul adversarului și controlează obiectivele din afara bazei proprii.",
+        "scoring": [
+          "La sfârșitul bătăliei, primești 15 VP dacă modelul WARLORD al adversarului a fost distrus.",
+          "Din Battle Round 3: la sfârșitul turei, primești 5 VP pentru fiecare obiectiv controlat, cu excepția obiectivului propriu de acasă."
+        ]
+      },
+      "roster": [
+        [
+          "Shanus Daskovian",
+          "1"
+        ],
+        [
+          "Claw of Ascension Achilles Ridgerunner",
+          "1"
+        ],
+        [
+          "Claw of Ascension Atalan Jackals",
+          "5"
+        ],
+        [
+          "Claw of Ascension Hybrid Metamorphs",
+          "5 (două unități)"
+        ]
+      ],
+      "armyRules": [
+        {
+          "name": "Cult Ambush",
+          "text": "Regulă de facțiune Genestealer Cults."
+        }
+      ],
+      "detachmentRules": [
+        {
+          "name": "Xenos Resilience",
+          "text": "Regulă specifică patrulei; descrierea completă nu este transcrisă în această versiune."
+        }
+      ],
+      "status": "mission-roster-verified; datasheets-incomplete",
+      "edition": 11,
+      "id": "genestealer-cults",
+      "units": [],
+      "sourceType": "secondary-reference-verified",
+      "sourceUrl": "https://wahapedia.ru/wh40k11ed_cp/factions/claw-of-ascension/"
+    },
+    "11:leagues-of-votann": {
+      "name": "Bane-slayer's Bulwark",
+      "sourceFaction": "Leagues of Votann",
+      "mission": {
+        "name": "For the Kindred",
+        "summary": "Misiune de pătrundere în teritoriul adversarului și securizare a resurselor.",
+        "scoring": [
+          "Din Battle Round 2: la sfârșitul turei, primești 5 VP dacă o unitate prietenoasă care nu este Battle-shocked se află în teritoriul adversarului.",
+          "Există o a doua condiție de punctare în Command phase; textul complet trebuie completat după verificarea secțiunii integrale."
+        ]
+      },
+      "roster": [
+        [
+          "Vynn Bane-Slayer",
+          "1"
+        ],
+        [
+          "Bane-Slayer's Bulwark Brokhyr Thunderkyn",
+          "3"
+        ],
+        [
+          "Bane-Slayer's Bulwark Einhyr Hearthguard",
+          "5"
+        ],
+        [
+          "Bane-Slayer's Bulwark Hearthkyn Warriors",
+          "10"
+        ]
+      ],
+      "armyRules": [
+        {
+          "name": "Prioritised Efficiency",
+          "text": "Regulă de facțiune Leagues of Votann."
+        }
+      ],
+      "detachmentRules": [
+        {
+          "name": "Secure Resources",
+          "text": "Regulă specifică patrulei; descrierea completă nu este transcrisă în această versiune."
+        }
+      ],
+      "status": "mission-roster-partial; datasheets-incomplete",
+      "edition": 11,
+      "id": "leagues-of-votann",
+      "units": [],
+      "sourceType": "secondary-reference-verified",
+      "sourceUrl": "https://wahapedia.ru/wh40k11ed_cp/factions/bane-slayer-s-bulwark/"
+    },
+    "11:necrons": {
+      "name": "Amonhotekh's Guard",
+      "sourceFaction": "Necrons",
+      "mission": {
+        "name": "Dynastic Reclamation",
+        "summary": "La începutul bătăliei, fiecare jucător desemnează câte un obiectiv; patrula punctează controlul lor și distrugerea inamicilor din apropierea obiectivelor.",
+        "scoring": [
+          "La începutul bătăliei, alegi un obiectiv, iar adversarul alege un alt obiectiv.",
+          "Din Battle Round 2: la sfârșitul Command phase (sau la sfârșitul turei în Battle Round 5), primești 5 VP dacă controlezi cel puțin unul dintre obiectivele selectate.",
+          "În aceeași verificare, primești încă 5 VP dacă le controlezi pe ambele.",
+          "În orice Battle Round: la sfârșitul turei, primești 5 VP dacă ai distrus o unitate inamică ce se afla în raza unui obiectiv la începutul fazei."
+        ]
+      },
+      "roster": [
+        [
+          "Overlord Amonhotekh",
+          "1"
+        ],
+        [
+          "Amonhotekh's Guard Canoptek Doomstalker",
+          "1"
+        ],
+        [
+          "Amonhotekh's Guard Canoptek Scarab Swarms",
+          "3"
+        ],
+        [
+          "Amonhotekh's Guard Necron Warriors",
+          "10"
+        ],
+        [
+          "Amonhotekh's Guard Skorpekh Destroyers",
+          "3"
+        ]
+      ],
+      "armyRules": [
+        {
+          "name": "Reanimation Protocols",
+          "text": "Regulă de facțiune Necrons."
+        }
+      ],
+      "detachmentRules": [
+        {
+          "name": "Territorial Imperatives",
+          "text": "Regulă specifică patrulei; descrierea completă nu este transcrisă în această versiune."
+        }
+      ],
+      "status": "mission-roster-verified; datasheets-incomplete",
+      "edition": 11,
+      "id": "necrons",
+      "units": [],
+      "sourceType": "secondary-reference-verified",
+      "sourceUrl": "https://wahapedia.ru/wh40k11ed_cp/factions/amonhotekh-s-guard/"
+    },
+    "11:orks": {
+      "name": "'Ardmob",
+      "sourceFaction": "Orks",
+      "mission": {
+        "name": "Duff 'Em Up!",
+        "summary": "Controlează obiectivele și distruge unități inamice pentru a acumula puncte.",
+        "scoring": [
+          "Din Battle Round 2: la sfârșitul Command phase (sau la sfârșitul turei în Battle Round 5), primești 5 VP dacă controlezi cel puțin un obiectiv în afara celui propriu de acasă.",
+          "În aceeași verificare, primești 5 VP dacă controlezi obiectivul adversarului de acasă.",
+          "În orice Battle Round: la sfârșitul turei, primești 5 VP dacă o unitate inamică a fost distrusă în această tură sau în cea precedentă."
+        ]
+      },
+      "roster": [
+        [
+          "'Ardmob Weirdboy",
+          "1"
+        ],
+        [
+          "'Ardmob Warboss",
+          "1"
+        ],
+        [
+          "'Ardmob Boyz (Kombi-rokkit Nob)",
+          "10"
+        ],
+        [
+          "'Ardmob Boyz (Kustom Shoota Nob)",
+          "10"
+        ],
+        [
+          "'Ardmob Gretchin",
+          "10"
+        ],
+        [
+          "'Ardmob Wartrakk",
+          "1"
+        ]
+      ],
+      "armyRules": [
+        {
+          "name": "Waaagh!",
+          "text": "Regulă de facțiune Orks."
+        }
+      ],
+      "detachmentRules": [
+        {
+          "name": "'Ard As Nails",
+          "text": "Regulă specifică patrulei; descrierea completă nu este transcrisă în această versiune."
+        }
+      ],
+      "status": "mission-roster-verified; datasheets-incomplete",
+      "edition": 11,
+      "id": "orks",
+      "units": [],
+      "sourceType": "secondary-reference-verified",
+      "sourceUrl": "https://wahapedia.ru/wh40k11ed_cp/factions/ardmob/"
+    },
+    "11:tau-empire": {
+      "name": "Sudden Dawn Cadre",
+      "sourceFaction": "T'au Empire",
+      "mission": {
+        "name": "Expansionary Campaign",
+        "summary": "Punctează rapid ocuparea obiectivelor de extindere, cu praguri diferite după primele două runde.",
+        "scoring": [
+          "În Battle Rounds 1–2: la sfârșitul turei, primești 15 VP dacă controlezi cel puțin două obiective de extindere; altfel, 10 VP dacă controlezi cel puțin unul.",
+          "Din Battle Round 3: la sfârșitul turei, primești 5 VP dacă controlezi cel puțin un obiectiv de extindere; 10 VP dacă controlezi cel puțin două."
+        ]
+      },
+      "roster": [
+        [
+          "Commander Cloudspear",
+          "1"
+        ],
+        [
+          "Sudden Dawn Cadre Breacher Team",
+          "10"
+        ],
+        [
+          "Sudden Dawn Cadre Devilfish",
+          "1"
+        ],
+        [
+          "Sudden Dawn Cadre Pathfinder Team",
+          "10"
+        ]
+      ],
+      "armyRules": [
+        {
+          "name": "Drones",
+          "text": "Regulă de facțiune T'au Empire."
+        },
+        {
+          "name": "For the Greater Good",
+          "text": "Regulă de facțiune T'au Empire."
+        }
+      ],
+      "detachmentRules": [
+        {
+          "name": "Co-ordinated Eradication",
+          "text": "Regulă specifică patrulei; descrierea completă nu este transcrisă în această versiune."
+        }
+      ],
+      "status": "mission-roster-verified; datasheets-incomplete",
+      "edition": 11,
+      "id": "tau-empire",
+      "units": [],
+      "sourceType": "secondary-reference-verified",
+      "sourceUrl": "https://wahapedia.ru/wh40k11ed_cp/factions/sudden-dawn-cadre/"
+    },
+    "11:aeldari": {
+      "name": "Kygharil's Protectors",
+      "sourceFaction": "Aeldari",
+      "mission": {
+        "name": "Outflank and Encircle",
+        "summary": "Misiune de infiltrare în teritoriul adversarului și ocupare a obiectivelor de extindere.",
+        "scoring": [
+          "În orice Battle Round: la sfârșitul turei, primești 5 VP dacă ai o unitate prietenoasă care nu este Battle-shocked în teritoriul adversarului.",
+          "În orice Battle Round: la sfârșitul turei, primești 5 VP pentru fiecare obiectiv de extindere controlat."
+        ]
+      },
+      "roster": [
+        [
+          "Spiritseer Kygharil",
+          "1"
+        ],
+        [
+          "Kygharil's Protectors Dire Avengers",
+          "5 (două unități)"
+        ],
+        [
+          "Kygharil's Protectors Warp Spiders",
+          "5"
+        ],
+        [
+          "Kygharil's Protectors Wraithblades",
+          "5"
+        ]
+      ],
+      "armyRules": [
+        {
+          "name": "Battle Focus",
+          "text": "Regulă de facțiune Aeldari."
+        }
+      ],
+      "detachmentRules": [
+        {
+          "name": "Graceful Warriors",
+          "text": "Regulă specifică patrulei; descrierea completă nu este transcrisă în această versiune."
+        }
+      ],
+      "status": "mission-roster-verified; datasheets-incomplete",
+      "edition": 11,
+      "id": "aeldari",
+      "units": [],
+      "sourceType": "secondary-reference-verified",
+      "sourceUrl": "https://wahapedia.ru/wh40k11ed_cp/factions/kygharil-s-protectors/"
+    },
+    "11:thousand-sons": {
+      "name": "Prism of Zadophon",
+      "sourceFaction": "Thousand Sons",
+      "mission": {
+        "name": "Cult Ritual",
+        "summary": "Folosește Rituals pentru a lega obiective și punctează controlul obiectivelor la finalul bătăliei.",
+        "scoring": [
+          "Din Battle Round 2: o dată pe tură pentru fiecare armată, când un model prietenos din raza unui obiectiv nelegat manifestă un Ritual cu Warp Charge 7+, nu rezolvi efectul Ritualului, iar obiectivul devine legat de tine; primești 10 VP.",
+          "La sfârșitul bătăliei, primești 5 VP pentru fiecare obiectiv controlat."
+        ]
+      },
+      "roster": [
+        [
+          "Kaa'skrek",
+          "1"
+        ],
+        [
+          "Zadophon the Soul Eater",
+          "1"
+        ],
+        [
+          "Prism of Zadophon Rubric Marines",
+          "5"
+        ],
+        [
+          "Prism of Zadophon Tzaangor Enlightened",
+          "3"
+        ]
+      ],
+      "armyRules": [
+        {
+          "name": "Cabal of Sorcerers",
+          "text": "Regulă de facțiune Thousand Sons."
+        },
+        {
+          "name": "Pact of Sorcery",
+          "text": "Regulă de facțiune Thousand Sons."
+        }
+      ],
+      "detachmentRules": [
+        {
+          "name": "Committed to the Ritual",
+          "text": "Regulă specifică patrulei; descrierea completă nu este transcrisă în această versiune."
+        }
+      ],
+      "status": "mission-roster-verified; datasheets-incomplete",
+      "edition": 11,
+      "id": "thousand-sons",
+      "units": [],
+      "sourceType": "secondary-reference-verified",
+      "sourceUrl": "https://wahapedia.ru/wh40k11ed_cp/factions/prism-of-zadophon/"
+    },
+    "11:emperors-children": {
+      "name": "Callous Blades",
+      "sourceFaction": "Emperor's Children",
+      "mission": {
+        "name": "Grandiose Slaughter",
+        "summary": "Punctează prin cucerirea obiectivelor recent pierdute de adversar, apoi prin controlul obiectivelor și eliminarea Warlord-ului.",
+        "scoring": [
+          "Din Battle Round 2: la sfârșitul turei, primești 5 VP dacă controlezi un obiectiv pe care nu îl controlai la începutul turei.",
+          "La sfârșitul bătăliei, primești 5 VP pentru fiecare obiectiv controlat.",
+          "În orice Battle Round: la sfârșitul turei, primești 10 VP dacă modelul WARLORD inamic a fost distrus în această tură sau în cea precedentă.",
+          "Dacă îndeplinești condiția Warlord înainte de sfârșitul Battle Round 3, primești încă 10 VP (cumulativ)."
+        ]
+      },
+      "roster": [
+        [
+          "Lord Kaphrael of the Callous Blades",
+          "1"
+        ],
+        [
+          "Callous Blades Flawless Blades",
+          "3"
+        ],
+        [
+          "Callous Blades Infractors",
+          "10"
+        ]
+      ],
+      "armyRules": [
+        {
+          "name": "Thrill Seekers",
+          "text": "Regulă de facțiune Emperor's Children."
+        },
+        {
+          "name": "Pact of Excess",
+          "text": "Regulă de facțiune Emperor's Children."
+        }
+      ],
+      "detachmentRules": [
+        {
+          "name": "Nimble Strikes",
+          "text": "Regulă specifică patrulei; descrierea completă nu este transcrisă în această versiune."
+        }
+      ],
+      "status": "mission-roster-verified; datasheets-incomplete",
+      "edition": 11,
+      "id": "emperors-children",
+      "units": [],
+      "sourceType": "secondary-reference-verified",
+      "sourceUrl": "https://wahapedia.ru/wh40k11ed_cp/factions/callous-blades/"
+    },
+    "11:grey-knights": {
+      "edition": 11,
+      "id": "grey-knights",
+      "name": "Crowe's Sanctifiers",
+      "sourceFaction": "Grey Knights",
+      "status": "mission-roster-verified; datasheets-incomplete",
+      "armyRules": [
+        {
+          "name": "Gate of Infinity",
+          "text": "La finalul Fight phase a adversarului, poți trimite în Strategic Reserves unități eligibile care au această regulă; pot face Ingress în următoarea Movement phase."
+        }
+      ],
+      "detachmentRules": [
+        {
+          "name": "Strike from the Warp",
+          "text": "Regulă specifică patrulei care interacționează cu Ingress și cu unitățile care au intrat prin Ingress; efectul complet trebuie consultat în fișa actualizată."
+        }
+      ],
+      "mission": {
+        "name": "Purification",
+        "summary": "Sanctifică obiectivele prin acțiunea Sanctification și păstrează controlul asupra lor.",
+        "scoring": [
+          "La sfârșitul bătăliei: primești 5 VP pentru fiecare obiectiv controlat.",
+          "La sfârșitul bătăliei: primești 10 VP pentru fiecare obiectiv sanctificat de armata ta."
+        ],
+        "actions": [
+          {
+            "name": "Sanctification",
+            "starts": "Începutul Shooting phase",
+            "unit": "O unitate CROWE'S SANCTIFIERS prietenoasă aflată în raza unui obiectiv care nu este sanctificat.",
+            "limit": "O dată pe tură",
+            "completes": "Sfârșitul următoarei Command phase sau sfârșitul bătăliei, oricare survine prima",
+            "effect": "Dacă unitatea nu este Battle-shocked, obiectivul devine sanctificat."
+          }
+        ]
+      },
+      "roster": [
+        [
+          "Sanctifiers Castellan Crowe",
+          "1"
+        ],
+        [
+          "Crowe's Sanctifiers Brotherhood Terminator Squad",
+          "5"
+        ],
+        [
+          "Crowe's Sanctifiers Venerable Dreadnought",
+          "1"
+        ],
+        [
+          "Crowe's Sanctifiers Strike Squad",
+          "10"
+        ]
+      ],
+      "units": [],
+      "sourceType": "secondary-reference-verified",
+      "sourceUrl": "https://wahapedia.ru/wh40k11ed_cp/factions/crowe-s-sanctifiers/"
+    },
+    "11:astra-militarum": {
+      "edition": 11,
+      "id": "astra-militarum",
+      "name": "Drayden's Lance",
+      "sourceFaction": "Astra Militarum",
+      "status": "mission-roster-verified; datasheets-incomplete",
+      "armyRules": [
+        {
+          "name": "Voice of Command",
+          "text": "Ofițerii pot emite ordine; ordinele modifică caracteristicile unităților vizate."
+        }
+      ],
+      "detachmentRules": [
+        {
+          "name": "Experienced Veterans",
+          "text": "Unitățile DRAYDEN'S LANCE pot rerula zarurile folosite pentru a determina Attacks și Damage."
+        }
+      ],
+      "mission": {
+        "name": "For Cadia!",
+        "summary": "Punctează prin ocuparea obiectivelor și eliminarea prezenței inamice din propriul teritoriu.",
+        "scoring": [
+          "Din Battle Round 2: la sfârșitul turei, primești 5 VP dacă controlezi cel puțin două obiective.",
+          "În aceeași verificare, primești 5 VP dacă controlezi cel puțin un obiectiv.",
+          "În orice Battle Round: la sfârșitul turei, primești 5 VP dacă nu există unități inamice care nu sunt Battle-shocked în teritoriul tău."
+        ]
+      },
+      "roster": [
+        [
+          "Drayden's Lance Command Squad",
+          "4"
+        ],
+        [
+          "Drayden's Lance Kasrkin",
+          "10"
+        ],
+        [
+          "Drayden's Lance Attilan Rough Riders",
+          "5 (două unități)"
+        ]
+      ],
+      "units": [],
+      "sourceType": "secondary-reference-verified",
+      "sourceUrl": "https://wahapedia.ru/wh40k11ed_cp/factions/drayden-s-lance/"
+    },
+    "11:adepta-sororitas": {
+      "edition": 11,
+      "id": "adepta-sororitas",
+      "name": "Sanctuary Guardians",
+      "sourceFaction": "Adepta Sororitas",
+      "status": "mission-roster-verified; datasheets-incomplete",
+      "armyRules": [
+        {
+          "name": "Acts of Faith",
+          "text": "Poți folosi Miracle dice pentru a înlocui anumite rezultate de zaruri."
+        }
+      ],
+      "detachmentRules": [
+        {
+          "name": "Blessed Believers",
+          "text": "Atacurile melee care țintesc unități SANCTUARY GUARDIANS au -1 la Hit rolls. În Command phase poți arunca un Miracle die pentru a primi 1 CP."
+        }
+      ],
+      "mission": {
+        "name": "On Holy Ground",
+        "summary": "Ține o unitate lângă obiectivul propriu și ocupă mai multe obiective.",
+        "scoring": [
+          "Din Battle Round 2: la sfârșitul turei, primești 5 VP dacă ai o unitate prietenoasă care nu este Battle-shocked în raza obiectivului propriu.",
+          "Din Battle Round 2: la sfârșitul turei, primești 5 VP dacă controlezi cel puțin trei obiective.",
+          "În aceeași verificare, primești 5 VP dacă controlezi cel puțin un obiectiv; primești 5 VP dacă controlezi cel puțin două obiective."
+        ]
+      },
+      "roster": [
+        [
+          "Sanctuary Canoness Adalya",
+          "1"
+        ],
+        [
+          "Sanctuary Guardians Arco-Flagellants",
+          "10"
+        ],
+        [
+          "Sanctuary Guardians Battle Sisters Squad",
+          "10"
+        ],
+        [
+          "Sanctuary Guardians Celestian Sacresants",
+          "5"
+        ]
+      ],
+      "units": [],
+      "sourceType": "secondary-reference-verified",
+      "sourceUrl": "https://wahapedia.ru/wh40k11ed_cp/factions/sanctuary-guardians/"
+    },
+    "11:world-eaters": {
+      "edition": 11,
+      "id": "world-eaters",
+      "name": "Frenzied Reavers",
+      "sourceFaction": "World Eaters",
+      "status": "mission-roster-verified; datasheets-incomplete",
+      "armyRules": [
+        {
+          "name": "Blessings of Khorne",
+          "text": "Regulă de facțiune World Eaters, cu efecte specifice selectării binecuvântărilor."
+        }
+      ],
+      "detachmentRules": [
+        {
+          "name": "Berzerker Charge",
+          "text": "Când o unitate FRENZIED REAVERS este selectată să lupte și a făcut Charge move în această tură, atacurile melee primesc +1 Strength. Daemon Prince începe în Strategic Reserves până în Battle Round 2."
+        }
+      ],
+      "mission": {
+        "name": "Indiscriminate Butchery",
+        "summary": "Controlează obiectivele de extindere și obține eliminări cu unitățile CHARACTER.",
+        "scoring": [
+          "Din Battle Round 2: la sfârșitul Command phase (sau la sfârșitul turei în Battle Round 5), primești 5 VP dacă controlezi două obiective de extindere.",
+          "În orice Battle Round: la sfârșitul turei, primești 5 VP dacă o unitate inamică a fost distrusă în această tură sau în cea precedentă și atacurile unei unități CHARACTER prietenoase au provocat pierderea a cel puțin unei răni în acea tură.",
+          "Din Battle Round 2: la sfârșitul Command phase (sau la sfârșitul turei în Battle Round 5), primești 5 VP dacă o unitate CHARACTER prietenoasă controlează un obiectiv."
+        ]
+      },
+      "roster": [
+        [
+          "Vorrakh, Lord of the Frenzied Reavers",
+          "1"
+        ],
+        [
+          "Frenzied Reavers Khorne Berzerkers",
+          "10"
+        ],
+        [
+          "Frenzied Reavers Jakhals",
+          "10"
+        ],
+        [
+          "Frenzied Reavers Master of Executions",
+          "1"
+        ]
+      ],
+      "units": [],
+      "sourceType": "secondary-reference-verified",
+      "sourceUrl": "https://wahapedia.ru/wh40k11ed_cp/factions/frenzied-reavers/"
+    },
+    "11:imperial-agents": {
+      "edition": 11,
+      "id": "imperial-agents",
+      "name": "Inquisitor's Hand",
+      "sourceFaction": "Imperial Agents",
+      "status": "mission-roster-verified; datasheets-incomplete",
+      "armyRules": [
+        {
+          "name": "Assigned Agents",
+          "text": "Regulă pentru agenții imperiali care pot fi atașați sau incluși în forțe imperiale."
+        }
+      ],
+      "detachmentRules": [
+        {
+          "name": "Marked for Death",
+          "text": "Regulă specifică patrulei; detaliul complet este rezumat în referința consultată."
+        }
+      ],
+      "mission": {
+        "name": "Inquisitorial Sanction",
+        "summary": "Vânează personajele inamice și controlează obiectivele.",
+        "scoring": [
+          "În orice Battle Round: la sfârșitul turei, primești 10 VP pentru fiecare model CHARACTER inamic distrus în această tură sau în cea precedentă.",
+          "Din Battle Round 2: la sfârșitul turei, primești 5 VP dacă controlezi cel puțin două obiective.",
+          "În aceeași verificare, primești 5 VP dacă controlezi cel puțin un obiectiv.",
+          "La sfârșitul bătăliei, primești 10 VP dacă toate modelele CHARACTER inamice sunt distruse."
+        ]
+      },
+      "roster": [
+        [
+          "Inquisitor's Hand Inquisitorial Agents",
+          "6"
+        ],
+        [
+          "Inquisitor's Hand Vigilant Squad",
+          "10 (două unități)"
+        ],
+        [
+          "Preacher Teguen",
+          "1"
+        ],
+        [
+          "Inquisitor's Hand Eversor Assassin",
+          "1"
+        ]
+      ],
+      "units": [],
+      "sourceType": "secondary-reference-verified",
+      "sourceUrl": "https://wahapedia.ru/wh40k11ed_cp/factions/inquisitor-s-hand/"
     }
   }
 }

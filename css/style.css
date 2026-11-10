@@ -310,3 +310,55 @@ html.jh-auth-pending body #nav,html.jh-auth-pending body main{visibility:hidden}
 
 /* Native Combat Patrol reference panels */
 .cp-native-content{display:grid;gap:10px;padding:4px 0 18px}.cp-content-card{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--brass);border-radius:8px;padding:12px 14px;overflow-wrap:anywhere}.cp-content-card h3,.cp-content-card h4{font-family:Cinzel,Georgia,serif;color:var(--ink);margin:0 0 8px}.cp-content-card h3 span,.cp-content-card h4 span{float:right;color:var(--brass);font:700 12px sans-serif}.cp-content-card p{line-height:1.5;margin:7px 0;color:var(--ink)}.cp-content-card small{color:var(--muted)}.cp-status{display:inline-block;color:var(--muted);font-size:12px;border:1px solid var(--line);padding:5px 8px;border-radius:5px}.cp-rules-frame{display:none!important}
+
+
+/* Combat Patrol datasheets: responsive tables and Romanian labels */
+.cp-unit-card{min-width:0;max-width:100%}
+.cp-unit-card h4{font:700 12px/1.3 'Source Sans 3',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--brass);margin:14px 0 7px}
+.cp-table-wrap{width:100%;max-width:100%;min-width:0;overflow-x:auto;overscroll-behavior-x:contain;border:1px solid var(--line);border-radius:7px}
+.cp-data-table{width:100%;max-width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px}
+.cp-data-table th,.cp-data-table td{padding:7px 5px;border-bottom:1px solid var(--line);text-align:center;vertical-align:middle;overflow-wrap:anywhere;word-break:normal}
+.cp-data-table thead th{background:var(--btn);color:var(--btn-ink);font-weight:800}
+.cp-data-table tbody tr:last-child th,.cp-data-table tbody tr:last-child td{border-bottom:0}
+.cp-profile-table th,.cp-profile-table td{width:auto;white-space:nowrap}
+.cp-profile-key{display:flex;flex-wrap:wrap;gap:5px 12px;padding:7px 8px;font-size:10px;color:var(--muted)}
+.cp-profile-key span{white-space:normal}
+.cp-weapon-table{min-width:0}
+.cp-weapon-table th:first-child{width:29%;text-align:left}
+.cp-weapon-table td,.cp-weapon-table th{font-size:11px;padding:7px 3px}
+.cp-weapon-table tbody th[scope=row]{text-align:left;background:var(--surface);font-weight:700}
+.cp-weapon-keywords td{background:var(--bg);text-align:left!important;font-size:10px!important;color:var(--muted)}
+.cp-abilities{display:grid;gap:8px}
+.cp-ability{padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);min-width:0}
+.cp-ability>b{display:block;color:var(--brass);font-size:13px}
+.cp-ability p{margin:4px 0 0;overflow-wrap:anywhere}
+.cp-muted,.cp-profile-fallback{font-size:12px;color:var(--muted)}
+.cp-keywords{font-size:11px;color:var(--muted);overflow-wrap:anywhere}
+.cp-mission-scoring{padding-left:22px}
+.cp-mission-scoring li{padding:5px 0;line-height:1.45}
+.cp-mission-action{padding:10px 0;border-top:1px solid var(--line)}
+.cp-mission-action dl{display:grid;grid-template-columns:minmax(110px,.35fr) minmax(0,1fr);gap:5px 10px;margin:8px 0;font-size:12px}
+.cp-mission-action dt{color:var(--muted);font-weight:700}
+.cp-mission-action dd{margin:0;overflow-wrap:anywhere}
+@media(max-width:520px){
+ .cp-content-card{padding:10px}
+ .cp-weapon-table{font-size:10px}
+ .cp-weapon-table th:first-child{width:26%}
+ .cp-weapon-table td,.cp-weapon-table th{font-size:10px;padding:6px 2px}
+ .cp-profile-key{gap:4px 8px}
+}
+
+
+/* Combat Patrol roster and inline mission scoring */
+.cp-roster{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px}
+.cp-roster li{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:12px}
+.cp-roster li span{min-width:0;overflow-wrap:anywhere}
+.cp-roster li b{flex:none;color:var(--brass);font-size:11px}
+.cp-mission-inline{margin-top:10px}
+.cp-mission-inline h4{font:700 12px 'Source Sans 3',sans-serif;color:var(--brass);text-transform:uppercase;letter-spacing:.07em;margin:10px 0 6px}
+.cp-mission-inline ul{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.cp-mission-inline li{padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);font-size:12px;line-height:1.45;overflow-wrap:anywhere}
+.cp-mission-awards{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.cp-mission-awards button,.cp-mission-awards span{border:1px solid var(--brass);border-radius:5px;padding:5px 9px;color:var(--brass);font-size:11px;font-weight:800;background:transparent}
+.cp-mission-awards button{cursor:pointer}
+.cp-mission-awards button:active{transform:translateY(1px)}

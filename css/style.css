@@ -323,7 +323,7 @@ html.jh-auth-pending body #nav,html.jh-auth-pending body main{visibility:hidden}
 .cp-profile-table th,.cp-profile-table td{width:auto;white-space:nowrap}
 .cp-profile-key{display:flex;flex-wrap:wrap;gap:5px 12px;padding:7px 8px;font-size:10px;color:var(--muted)}
 .cp-profile-key span{white-space:normal}
-.cp-weapon-table{min-width:0}
+.cp-weapon-table{min-width:620px}
 .cp-weapon-table th:first-child{width:29%;text-align:left}
 .cp-weapon-table td,.cp-weapon-table th{font-size:11px;padding:7px 3px}
 .cp-weapon-table tbody th[scope=row]{text-align:left;background:var(--surface);font-weight:700}

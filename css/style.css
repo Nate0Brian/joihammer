@@ -363,13 +363,14 @@ html.jh-auth-pending body #nav,html.jh-auth-pending body main{visibility:hidden}
 .cp-mission-awards button{cursor:pointer}
 .cp-mission-awards button:active{transform:translateY(1px)}
 
-/* Combat Patrol stratagem timing key */
-.cp-stratagem-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.cp-stratagem{border-left-width:5px}.cp-time-pill{display:inline-block;border-radius:5px;padding:4px 8px;font-size:10px;font-weight:800;letter-spacing:.04em}.cp-time-your{border-left-color:#3986d8!important}.cp-time-your .cp-time-pill{background:rgba(57,134,216,.18);color:#69a9f2;border:1px solid #3986d8}.cp-time-opponent{border-left-color:#c94b4b!important}.cp-time-opponent .cp-time-pill{background:rgba(201,75,75,.18);color:#ef7777;border:1px solid #c94b4b}.cp-time-either{border-left-color:#299b68!important}.cp-time-either .cp-time-pill{background:rgba(41,155,104,.18);color:#55c58d;border:1px solid #299b68}.cp-mission-card{border-left-color:#b38b4e!important}
-
-/* Combat Patrol stratagem timing colours */
-.core-strat-card.turn-your{border-left:5px solid #1676a8!important}
-.core-strat-card.turn-opponent{border-left:5px solid #c62828!important}
-.core-strat-card.turn-either{border-left:5px solid #138b78!important}
-.core-strat-card.turn-your summary .core-strat-summary-main small{color:#65b6df}
-.core-strat-card.turn-opponent summary .core-strat-summary-main small{color:#ef7777}
-.core-strat-card.turn-either summary .core-strat-summary-main small{color:#55c6ad}
+/* Combat Patrol mission scoring and format-separated statistics */
+.cp-mission-inline{margin:14px 0;padding:12px;border:1px solid var(--line, #39343a);border-radius:10px;background:rgba(255,255,255,.025)}
+.cp-mission-inline h4{margin:0 0 10px;font-family:Cinzel,serif}
+.cp-mission-inline ul{list-style:none;margin:0;padding:0}
+.cp-mission-inline li{padding:10px 0;border-top:1px solid var(--line, #39343a)}
+.cp-mission-inline li:first-child{border-top:0}
+.cp-mission-inline li p{margin:6px 0;color:var(--muted)}
+.cp-mission-awards{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+.cp-mission-awards button,.cp-secondary li>button{border:1px solid var(--brass);border-radius:7px;padding:6px 10px;background:rgba(190,151,79,.12);color:var(--text);font-weight:700}
+.cp-secondary{border-color:rgba(90,140,190,.5)}
+#flt button[data-f="cp"].on{border-color:var(--brass)}

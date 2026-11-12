@@ -441,3 +441,9 @@ html.jh-auth-pending body #nav,html.jh-auth-pending body main{visibility:hidden}
 .cp-army-rule-group .cp-rule-card{padding:16px}
 .cp-army-rule-group .cp-rule-field>b{margin-bottom:9px}
 @media(max-width:520px){.cp-rule-description{gap:12px}.cp-rule-description p{font-size:15px;line-height:1.68}}
+
+/* Clear top-level 40K / Combat Patrol mode switch on Army Performance */
+.army-mode-switch{display:flex;gap:10px;margin:24px 0 16px}
+.army-mode-switch button{flex:1;min-height:52px;font-weight:800;font-size:15px;border:1px solid var(--brass);border-radius:10px;background:rgba(185,149,72,.07);color:var(--text)}
+.army-mode-switch button.on{background:rgba(185,149,72,.24);border:2px solid var(--brass);color:#f0d28a;box-shadow:0 0 0 1px rgba(185,149,72,.15)}
+@media(max-width:520px){.army-mode-switch button{font-size:14px;min-height:50px;padding:9px 6px}}

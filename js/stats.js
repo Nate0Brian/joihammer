@@ -1,15 +1,15 @@
 var D=[],TS=[],flt="all";
-function pass(m){return !m.wo&&(flt==="all"||(flt==="t"?m.type==="tournament":m.type==="friendly"))}
+function pass(m){if(m.wo)return false;if(flt==="cp")return m.type==="combat-patrol";if(flt==="40k")return m.type!=="combat-patrol";return flt==="all"||(flt==="t"?m.type==="tournament":m.type==="friendly")}
 function rows(){
   var R={};
   D.filter(pass).forEach(function(m){
     ["a","b"].forEach(function(s){
       var o=s==="a"?"b":"a",n=m[s],ps=Object.assign(newPS(),m["s"+s]),os=Object.assign(newPS(),m["s"+o]);
       var r=R[n]||(R[n]={n:n,g:0,w:0,d:0,l:0,vp:0,diff:0,ar:{},atk:{g:0,w:0},def:{g:0,w:0},ti:0});
-      var mine=totalPS(ps),theirs=totalPS(os);
+      var mine=m.type==="combat-patrol"?(ps.log||[]).filter(function(e){return e.k==="cpvp"}).reduce(function(a,e){return a+e.v},0):totalPS(ps),theirs=m.type==="combat-patrol"?(os.log||[]).filter(function(e){return e.k==="cpvp"}).reduce(function(a,e){return a+e.v},0):totalPS(os);
       r.g++;r.vp+=mine;r.diff+=mine-theirs;
       if(m.winner===s)r.w++;else if(m.winner==="draw")r.d++;else r.l++;
-      var army=m["p"+s]&&m["p"+s].army;if(army)r.ar[army]=(r.ar[army]||0)+1;
+      var army=m.type==="combat-patrol"?(ps.cpPatrolId||"Combat Patrol"):(m["p"+s]&&m["p"+s].army);if(army)r.ar[army]=(r.ar[army]||0)+1;
       if(m.atk){var k=m.atk===s?r.atk:r.def;k.g++;if(m.winner===s)k.w++}
     });
   });
@@ -23,13 +23,13 @@ function h2h(){
   D.filter(pass).forEach(function(m){
     var s=m.a===App.me?"a":(m.b===App.me?"b":null);if(!s)return;
     var o=s==="a"?"b":"a",n=m[o],r=R[n]||(R[n]={n:n,g:0,w:0,d:0,l:0,vf:0,va:0});
-    r.g++;r.vf+=totalPS(Object.assign(newPS(),m["s"+s]));r.va+=totalPS(Object.assign(newPS(),m["s"+o]));
+    r.g++;var myps=Object.assign(newPS(),m["s"+s]),opps=Object.assign(newPS(),m["s"+o]);r.vf+=m.type==="combat-patrol"?(myps.log||[]).filter(function(e){return e.k==="cpvp"}).reduce(function(a,e){return a+e.v},0):totalPS(myps);r.va+=m.type==="combat-patrol"?(opps.log||[]).filter(function(e){return e.k==="cpvp"}).reduce(function(a,e){return a+e.v},0):totalPS(opps);
     if(m.winner===s)r.w++;else if(m.winner==="draw")r.d++;else r.l++;
   });
   return Object.keys(R).map(function(k){return R[k]}).sort(function(x,y){return y.g-x.g});
 }
 function render(){
-  var rs=rows();
+  var rs=rows();var cpMode=flt==="cp";var title=$("statsModeTitle");if(title)title.textContent=cpMode?"Clasament Combat Patrol":"Clasament Warhammer 40K";
   $("lb").innerHTML=rs.length?'<div class="tblw"><table class="tbl"><tr><th>#</th><th>Jucător</th><th>J</th><th>V</th><th>E</th><th>Î</th><th>V%</th><th>VP med.</th><th>Titluri</th></tr>'+rs.map(function(r,i){
     return '<tr><td>'+(i+1)+'</td><td>'+esc(r.n)+'<br><small class="sub">'+esc(fav(r))+'</small></td><td>'+r.g+'</td><td>'+r.w+'</td><td>'+r.d+'</td><td>'+r.l+'</td><td>'+pct(r.w,r.g)+'</td><td>'+(r.vp/r.g).toFixed(1)+'</td><td>'+(r.ti||"")+'</td></tr>';
   }).join("")+'</table></div>':'<p class="empty">Nu există încă meciuri încheiate.</p>';

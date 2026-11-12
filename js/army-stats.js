@@ -1,4 +1,10 @@
 var MATCHES=[],filterType="all",gameMode="40k",CP_NAMES={};
+function setArmyStatsMode(mode){
+ if(mode!=="40k"&&mode!=="cp")return;
+ gameMode=mode;
+ if(typeof render==="function")render();
+}
+
 function blankStat(n){return {name:n,g:0,w:0,d:0,l:0,vf:0,va:0,players:{}}}
 function pct(w,g){return g?Math.round(100*w/g)+"%":"—"}
 function isCP(m){return m.type==="combat-patrol"||m.type==="combat_patrol"||m.gameMode==="combat-patrol"||m.format==="combat-patrol"||m.combatPatrol===true}
@@ -53,7 +59,7 @@ function render(){
  document.querySelectorAll("#flt button").forEach(function(b){b.classList.toggle("on",b.dataset.f===filterType)});
 }
 App.start(function(){
- $("modeSwitch").addEventListener("click",function(e){var b=e.target.closest("button[data-mode]");if(b){gameMode=b.dataset.mode;render()}});
+ document.querySelectorAll("#modeSwitch button[data-mode]").forEach(function(b){b.addEventListener("click",function(){setArmyStatsMode(b.getAttribute("data-mode"))})});
  $("flt").addEventListener("click",function(e){var b=e.target.closest("button[data-f]");if(b){filterType=b.dataset.f;render()}});
  fetch("data/combat-patrol-armamentarium.json",{cache:"no-cache"}).then(function(r){return r.ok?r.json():null}).then(function(data){
   if(data&&data.patrols)Object.keys(data.patrols).forEach(function(k){var p=data.patrols[k];CP_NAMES[k]=p.displayName||p.name;CP_NAMES[p.category+":"+p.id]=p.displayName||p.name;CP_NAMES[p.id]=p.displayName||p.name});

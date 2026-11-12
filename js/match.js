@@ -92,21 +92,41 @@ function cpAbilityHtml(abilities){
 }
 function cpArmamentariumRecordHtml(r){
  if(!r)return '<p class="cp-status">Datele acestei patrule nu sunt disponibile local.</p>';
- var h='';
- (r.rules||[]).forEach(function(x){var c=x.characteristics||{},type=x.type||'Rule';h+='<article class="cp-content-card"><h3>'+esc(type)+' · '+esc(x.name)+'</h3>';
-  if(type==='Stratagem')h+='<p><b>CP:</b> '+esc(c.CP||'—')+'</p><p><b>When:</b> '+esc(c.When||'—')+'</p><p><b>Target:</b> '+esc(c.Target||'—')+'</p><p><b>Effect:</b> '+esc(c.Effect||'—')+'</p>';
-  else if(type==='Secondary Objective')h+='<p><b>Type:</b> '+esc(c.Type||'—')+'</p><p>'+esc(c.Effect||'')+'</p>';
-  else if(type==='Enhancement')h+='<p><b>Restriction:</b> '+esc(c.Restriction||'—')+'</p><p><b>Effect:</b> '+esc(c.Effect||'—')+'</p>';
-  else Object.keys(c).forEach(function(k){h+='<p><b>'+esc(k)+':</b> '+esc(c[k])+'</p>'});h+='</article>'});
- (r.units||[]).forEach(function(u){h+='<article class="cp-content-card cp-unit-card"><h3>'+esc(u.name)+' <span>'+esc(u.models==null?'':u.models)+' modele</span></h3>';
+ var h='',rules=r.rules||[];
+ /* Army Rules and detachment rules are grouped and displayed as readable cards.
+    Stratagems live in the Stratagems tab; secondary objectives live in mission scoring. */
+ var army=rules.filter(function(x){return x.type==='Army Rule'});
+ var detach=rules.filter(function(x){return x.type==='Detachment'});
+ var enhancements=rules.filter(function(x){return x.type==='Enhancement'});
+ function ruleSection(title,items,kind){
+  if(!items.length)return;
+  h+='<section class="cp-rule-section '+kind+'"><h3 class="cp-rule-section-title">'+title+'</h3>';
+  items.forEach(function(x){
+   var c=x.characteristics||{};
+   h+='<article class="cp-content-card cp-rule-card"><h4>'+esc(x.name)+'</h4>';
+   Object.keys(c).forEach(function(k){
+    var value=c[k];
+    if(value===null||value===undefined||String(value).trim()==='')return;
+    h+='<div class="cp-rule-field"><b>'+esc(k)+'</b><p>'+esc(value)+'</p></div>';
+   });
+   h+='</article>';
+  });
+  h+='</section>';
+ }
+ ruleSection('REGULA ARMATEI',army,'cp-army-rule-group');
+ ruleSection('REGULILE DETACHMENT-ULUI',detach,'cp-detachment-rule-group');
+ ruleSection('ENHANCEMENTS',enhancements,'cp-enhancement-rule-group');
+ (r.units||[]).forEach(function(u){
+  h+='<article class="cp-content-card cp-unit-card"><h3>'+esc(u.name)+' <span>'+esc(u.models==null?'':u.models)+' modele</span></h3>';
   var unit=(u.profiles||[]).filter(function(p){return p.type==='Unit'}),weapons=(u.profiles||[]).filter(function(p){return p.type==='Ranged Weapons'||p.type==='Melee Weapons'}),abilities=(u.profiles||[]).filter(function(p){return p.type==='Abilities'&&p.name.indexOf('Enhancement:')!==0});
   unit.forEach(function(p){var c=p.characteristics||{},keys=['M','T','SV','W','LD','OC'];h+='<p class="cp-note"><b>'+esc(p.name)+'</b></p><div class="cp-table-wrap"><table class="cp-data-table cp-profile-table"><thead><tr>'+keys.map(function(k){return'<th>'+k+'</th>'}).join('')+'</tr></thead><tbody><tr>'+keys.map(function(k){return'<td>'+esc(c[k]||'—')+'</td>'}).join('')+'</tr></tbody></table><div class="cp-profile-key"><span><b>M</b> Mișcare</span><span><b>T</b> Toughness / Rezistență</span><span><b>SV</b> Salvare</span><span><b>W</b> Răni</span><span><b>LD</b> Leadership</span><span><b>OC</b> Control obiective</span></div></div>'});
   if(weapons.length){h+='<h4>Arme</h4><div class="cp-table-wrap"><table class="cp-data-table cp-weapon-table"><thead><tr><th>Armă</th><th>Rază</th><th>A</th><th>BS/WS</th><th>S</th><th>AP</th><th>D</th><th>Reguli</th></tr></thead><tbody>'+weapons.map(function(p){var c=p.characteristics||{};return'<tr><th>'+esc(p.name)+'</th><td>'+esc(c.Range||'—')+'</td><td>'+esc(c.A||'—')+'</td><td>'+esc(c.BS||c.WS||'—')+'</td><td>'+esc(c.S||'—')+'</td><td>'+esc(c.AP||'—')+'</td><td>'+esc(c.D||'—')+'</td><td>'+esc(c.Keywords||'—')+'</td></tr>'}).join('')+'</tbody></table></div>'}
   if(abilities.length){h+='<h4>Abilități</h4>'+abilities.map(function(p){var c=p.characteristics||{};return'<div class="cp-ability"><b>'+esc(p.name)+'</b><p>'+esc(c.Description||'')+'</p></div>'}).join('')}
   if(u.keywords&&u.keywords.length)h+='<p class="cp-keywords"><b>Keywords:</b> '+esc(u.keywords.join(', '))+'</p>';
   if(u.wargear&&u.wargear.length)h+='<details><summary>Echipament fix</summary>'+u.wargear.map(function(w){return'<p>'+esc(w.name)+'</p>'}).join('')+'</details>';
-  h+='</article>'});
- return h||'<p class="empty">Nu există datasheets în înregistrarea locală.</p>';
+  h+='</article>';
+ });
+ return h||'<p class="empty">Nu există reguli de armată sau datasheets în înregistrarea locală.</p>';
 }
 function cpNativeRecordHtml(r){if(r&&r.units&&r.category)return cpArmamentariumRecordHtml(r);
  if(!r)return '<p class="cp-status">Nu avem încă date locale verificate pentru patrula selectată. Nu afișăm linkuri externe și nu inventăm conținut.</p>';

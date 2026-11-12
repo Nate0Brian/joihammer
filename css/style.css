@@ -379,3 +379,20 @@ html.jh-auth-pending body #nav,html.jh-auth-pending body main{visibility:hidden}
 #flt button{min-height:40px;padding:8px 14px;border:1px solid var(--line);border-radius:9px}
 #flt button.on{border-color:var(--brass);background:rgba(190,151,79,.16);color:var(--text);box-shadow:inset 0 0 0 1px var(--brass)}
 .cp-status{font-size:.82rem;color:var(--muted);font-weight:700}
+
+/* Clear, high-contrast category headers for the Combat Patrol picker */
+.cp-patrol-section-guide{display:grid;gap:8px;margin:12px 0 10px}
+.cp-patrol-section{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--line);border-left:4px solid var(--brass);border-radius:8px;background:rgba(190,151,79,.10);min-width:0}
+.cp-patrol-section b{font-size:10px;letter-spacing:.08em;color:var(--brass);white-space:nowrap}
+.cp-patrol-section span{font-size:12px;font-weight:800;color:var(--text);min-width:0}
+.cp-patrol-section em{font-style:normal;font-size:10px;font-weight:700;color:var(--muted);white-space:nowrap}
+.cp-patrol-section.cp-new{border-left-color:#4f9cbd;background:rgba(79,156,189,.11)}
+.cp-patrol-section.cp-new b{color:#78c5e4}
+.cp-patrol-section.cp-current{border-left-color:#63a77b;background:rgba(99,167,123,.12)}
+.cp-patrol-section.cp-current b{color:#83d49e}
+.cp-patrol-section.cp-fallback{border-left-color:#a78bd2;background:rgba(167,139,210,.12)}
+.cp-patrol-section.cp-fallback b{color:#c2a9ef}
+.cp-patrol-select{width:100%;min-height:46px;padding:10px;border:1px solid var(--brass);border-radius:8px;background:var(--surface);color:var(--text);font-weight:700}
+.cp-patrol-select optgroup{font-weight:900;color:var(--brass);background:var(--surface)}
+.cp-patrol-select option{font-weight:500;color:var(--text);background:var(--surface)}
+@media(max-width:520px){.cp-patrol-section{grid-template-columns:1fr auto;gap:3px 8px;padding:9px 10px}.cp-patrol-section b{grid-column:1/-1}.cp-patrol-section span{font-size:11px}.cp-patrol-section em{font-size:9px}}

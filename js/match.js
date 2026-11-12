@@ -36,6 +36,30 @@ function cpRecordFor(side){
  }
  if(!rec&&patrol)rec={edition:patrol.sourceEdition||Number(ps.cpEdition),id:patrol.id,name:patrol.name,sourceFaction:patrol.sourceFaction||patrol.group,rules:patrol.record&&patrol.record.rules||[],units:patrol.record&&patrol.record.units||[]};
  if(!rec)return null;
+ /* Merge the legacy verified Combat Patrol content with Armamentarium records.
+    Armamentarium may contain unit datasheets but omit Army Rule / enhancements. */
+ if(patrol&&rec.category&&window.CP_CONTENT&&CP_CONTENT.patrols){
+  var legacyList=Object.keys(CP_CONTENT.patrols).map(function(k){return CP_CONTENT.patrols[k]});
+  var legacy=legacyList.filter(function(x){
+   return Number(x.edition)===Number(ps.cpEdition)&&
+    ((x.sourceFaction&&x.sourceFaction===(patrol.sourceFaction||patrol.group))||
+     (x.id&&x.id===patrol.id));
+  })[0];
+  if(legacy){
+   rec.rules=rec.rules||[];
+   function hasRule(type,name){return rec.rules.some(function(x){return x.type===type&&x.name===name})}
+   (legacy.armyRules||[]).forEach(function(x){
+    if(!hasRule("Army Rule",x.name))rec.rules.push({type:"Army Rule",name:x.name,characteristics:{Description:x.text||x.description||""}});
+   });
+   (legacy.detachmentRules||[]).forEach(function(x){
+    if(!hasRule("Detachment",x.name))rec.rules.push({type:"Detachment",name:x.name,characteristics:{Description:x.text||x.description||""}});
+   });
+   (legacy.enhancements||[]).forEach(function(x){
+    if(!hasRule("Enhancement",x.name))rec.rules.push({type:"Enhancement",name:x.name,characteristics:{Restriction:x.unit||"",Effect:x.text||x.description||""}});
+   });
+   if(!rec.mission&&legacy.mission)rec.mission=legacy.mission;
+  }
+ }
  if(!rec.mission&&window.CP_CONTENT&&CP_CONTENT.patrols){
   var candidates=Object.keys(CP_CONTENT.patrols).map(function(k){return CP_CONTENT.patrols[k]});
   var mr=candidates.filter(function(x){return x.sourceFaction=== (patrol&&patrol.sourceFaction) && x.mission && x.edition===Number(ps.cpEdition)})[0];

@@ -29,18 +29,32 @@ function cpModalClose(id){var x=$(id);if(x)x.hidden=true;document.body.classList
 function cpSetTab(tab){cpModalTab=tab;var core=$("cpCoreStratPanel"),patrol=$("cpPatrolStratPanel");if(core)core.hidden=tab!=="core";if(patrol)patrol.hidden=tab!=="patrol";document.querySelectorAll("[data-cp-tab]").forEach(function(b){b.classList.toggle("on",b.getAttribute("data-cp-tab")===tab)})}
 function cpRecordFor(side){
  if(!M)return null;
- var patrol=cpPatrolFor(side),ps=PS(side);
- if(patrol&&patrol.record){
-  var rec=Object.assign({},patrol.record),missionRecord=null;
-  if(window.CP_CONTENT&&CP_CONTENT.patrols){
-   var candidates=Object.keys(CP_CONTENT.patrols).map(function(k){return CP_CONTENT.patrols[k]});
-   missionRecord=candidates.filter(function(x){return x.sourceFaction===patrol.sourceFaction&&x.mission&&((patrol.sourceEdition===11&&x.edition===11)||(patrol.sourceEdition===10&&x.edition===10))})[0]||null;
-  }
-  if(missionRecord)rec.mission=missionRecord.mission;
-  return rec;
+ var patrol=cpPatrolFor(side),ps=PS(side),rec=null;
+ if(patrol&&patrol.record)rec=Object.assign({},patrol.record);
+ if(!rec&&window.CP_CONTENT&&CP_CONTENT.patrols){
+  rec=CP_CONTENT.patrols[(ps.cpEdition||'')+":"+ps.cpPatrolId]||null;
  }
- if(!window.CP_CONTENT)return null;
- return ps.cpEdition?CP_CONTENT.patrols[ps.cpEdition+":"+ps.cpPatrolId]||null:null;
+ if(!rec&&patrol)rec={edition:patrol.sourceEdition||Number(ps.cpEdition),id:patrol.id,name:patrol.name,sourceFaction:patrol.sourceFaction||patrol.group,rules:patrol.record&&patrol.record.rules||[],units:patrol.record&&patrol.record.units||[]};
+ if(!rec)return null;
+ if(!rec.mission&&window.CP_CONTENT&&CP_CONTENT.patrols){
+  var candidates=Object.keys(CP_CONTENT.patrols).map(function(k){return CP_CONTENT.patrols[k]});
+  var mr=candidates.filter(function(x){return x.sourceFaction=== (patrol&&patrol.sourceFaction) && x.mission && x.edition===Number(ps.cpEdition)})[0];
+  if(mr)rec.mission=mr.mission;
+ }
+ if(!rec.mission){
+  rec.mission={name:"Contested Ground — misiune comunitară",summary:"Misiune fan-made de rezervă pentru patrulele fără misiune documentată. Nu este o misiune oficială Games Workshop.",scoring:[
+   "La sfârșitul fiecărei Command phase, din Battle Round 2: primești 5 VP dacă controlezi cel puțin un obiectiv.",
+   "La sfârșitul fiecărei Command phase, din Battle Round 2: primești încă 5 VP dacă controlezi mai multe obiective decât adversarul."
+  ],fanMade:true};
+ }
+ var secondaries=(rec.rules||[]).filter(function(x){return x.type==="Secondary Objective"});
+ if(!secondaries.length){
+  rec.rules=(rec.rules||[]).concat([
+   {name:"Secure the Field",type:"Secondary Objective",characteristics:{Description:"Fan-made: la sfârșitul turei tale, primești 2 VP dacă controlezi un obiectiv din zona neutră. Maximum 10 VP pe bătălie."}},
+   {name:"Break Their Lines",type:"Secondary Objective",characteristics:{Description:"Fan-made: la sfârșitul turei tale, primești 2 VP dacă o unitate a armatei tale se află în zona de desfășurare adversă. Maximum 10 VP pe bătălie."}}
+  ]);
+ }
+ return rec;
 }
 function cpArmProfiles(rec,type){return (rec&&rec.rules||[]).filter(function(x){return x.type===type})}
 function cpSelectedEnhancement(side,rec){var ps=PS(side),items=cpArmProfiles(rec,"Enhancement");return items.filter(function(x){return x.name===ps.cpEnhancementId})[0]||null}

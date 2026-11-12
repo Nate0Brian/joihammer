@@ -432,3 +432,12 @@ html.jh-auth-pending body #nav,html.jh-auth-pending body main{visibility:hidden}
 .cp-detachment-rule-group .cp-rule-field>b{color:#8fd0eb}
 .cp-enhancement-rule-group .cp-rule-section-title{border-left-color:#a78bd2;background:rgba(167,139,210,.12);color:#c7b0ed}
 .cp-enhancement-rule-group .cp-rule-field>b{color:#c7b0ed}
+
+/* Army Rule description typography: sentence blocks, key game terms and spacing */
+.cp-rule-description{display:flex;flex-direction:column;gap:10px;margin-top:2px}
+.cp-rule-description p{margin:0;padding:0 0 10px;line-height:1.62;white-space:normal;font-size:15px;color:var(--text);border-bottom:1px solid rgba(255,255,255,.09)}
+.cp-rule-description p:last-child{border-bottom:0;padding-bottom:0}
+.cp-rule-description strong{font-weight:850;color:#f0d28a;text-decoration:underline;text-decoration-color:rgba(240,210,138,.35);text-underline-offset:2px}
+.cp-army-rule-group .cp-rule-card{padding:16px}
+.cp-army-rule-group .cp-rule-field>b{margin-bottom:9px}
+@media(max-width:520px){.cp-rule-description{gap:12px}.cp-rule-description p{font-size:15px;line-height:1.68}}

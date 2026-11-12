@@ -90,6 +90,27 @@ function cpAbilityHtml(abilities){
  if(!abilities||!abilities.length)return '<p class="cp-muted">Nu sunt listate abilități suplimentare.</p>';
  return '<div class="cp-abilities">'+abilities.map(function(a){var t=String(a||""),i=t.indexOf(":");return'<div class="cp-ability"><b>'+esc(i>0?t.slice(0,i).trim():"Abilitate")+'</b><p>'+esc(i>0?t.slice(i+1).trim():t)+'</p></div>'}).join('')+'</div>';
 }
+
+function cpRuleDescriptionHtml(value){
+ var raw=String(value==null?'':value).replace(/\s+/g,' ').trim();
+ if(!raw)return '';
+ /* Split long official descriptions into readable sentence-sized paragraphs. */
+ var parts=raw.match(/[^.!?]+(?:[.!?]+(?=\s|$)|$)/g)||[raw];
+ var terms=['ASTRA MILITARUM','OFFICER','COMMAND phase','BATTLE-SHOCKED','TRANSPORT','Battle-shocked','Battle Round','Move characteristic','Weapon Skill characteristic','Ballistic Skill characteristic','Attacks characteristic','Rapid Fire','within 6"'];
+ function emphasize(text){
+  var out=esc(text);
+  terms.forEach(function(term){
+   var safe=term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+   out=out.replace(new RegExp('('+safe+')','gi'),'<strong>$1</strong>');
+  });
+  return out;
+ }
+ return '<div class="cp-rule-description">'+parts.map(function(part){
+  var sentence=part.trim();
+  return sentence?'<p>'+emphasize(sentence)+'</p>':'';
+ }).join('')+'</div>';
+}
+
 function cpArmamentariumRecordHtml(r){
  if(!r)return '<p class="cp-status">Datele acestei patrule nu sunt disponibile local.</p>';
  var h='',rules=r.rules||[];
@@ -107,7 +128,7 @@ function cpArmamentariumRecordHtml(r){
    Object.keys(c).forEach(function(k){
     var value=c[k];
     if(value===null||value===undefined||String(value).trim()==='')return;
-    h+='<div class="cp-rule-field"><b>'+esc(k)+'</b><p>'+esc(value)+'</p></div>';
+    h+='<div class="cp-rule-field"><b>'+esc(k)+'</b>'+(String(k).toLowerCase()==='description'?cpRuleDescriptionHtml(value):'<p>'+esc(value)+'</p>')+'</div>';
    });
    h+='</article>';
   });

@@ -27,7 +27,23 @@ function matchScore(ps){return M&&M.type==="combat-patrol"?(ps.log||[]).filter(f
 function cpModalOpen(id){var x=$(id);if(x){x.hidden=false;document.body.classList.add("modal-open")}}
 function cpModalClose(id){var x=$(id);if(x)x.hidden=true;document.body.classList.remove("modal-open")}
 function cpSetTab(tab){cpModalTab=tab;var core=$("cpCoreStratPanel"),patrol=$("cpPatrolStratPanel");if(core)core.hidden=tab!=="core";if(patrol)patrol.hidden=tab!=="patrol";document.querySelectorAll("[data-cp-tab]").forEach(function(b){b.classList.toggle("on",b.getAttribute("data-cp-tab")===tab)})}
-function cpRecordFor(side){if(!M)return null;var patrol=cpPatrolFor(side),ps=PS(side);if(patrol&&patrol.record){var rec=Object.assign({},patrol.record),missionRecord=null;if(window.CP_CONTENT&&CP_CONTENT.patrols){var candidates=Object.keys(CP_CONTENT.patrols).map(function(k){return CP_CONTENT.patrols[k]});missionRecord=candidates.filter(function(x){return x.sourceFaction===patrol.sourceFaction&&x.mission&&((patrol.sourceEdition===11&&x.edition===11)||(patrol.sourceEdition===10&&x.edition===10))})[0]||null}if(missionRecord)rec.mission=missionRecord.mission;return rec}if(!window.CP_CONTENT)return null;return ps.cpEdition?CP_CONTENT.patrols[ps.cpEdition+":"+ps.cpPatrolId]||null:null}
+function cpRecordFor(side){
+ if(!M)return null;
+ var patrol=cpPatrolFor(side),ps=PS(side),rec=patrol&&patrol.record?Object.assign({},patrol.record):null;
+ if(!rec&&window.CP_CONTENT&&CP_CONTENT.patrols&&ps.cpEdition)rec=CP_CONTENT.patrols[ps.cpEdition+":"+ps.cpPatrolId]||null;
+ if(!rec)return null;
+ /* Mission lookup is deliberately independent from the Armamentarium unit/rule record.
+    Prefer the exact edition; if it has no mission, use the newest available 10e mission
+    for that faction, then the original 10e mission. Never borrow a different faction's mission. */
+ if(!rec.mission&&window.CP_CONTENT&&CP_CONTENT.patrols&&patrol){
+  var candidates=Object.keys(CP_CONTENT.patrols).map(function(k){return CP_CONTENT.patrols[k]}).filter(function(x){return x.sourceFaction===patrol.sourceFaction&&x.mission});
+  var exact=candidates.filter(function(x){return x.edition===patrol.sourceEdition});
+  var tenFallback=candidates.filter(function(x){return x.edition===10});
+  var pick=exact[0]||tenFallback[0]||null;
+  if(pick){rec.mission=pick.mission;rec.missionFallback=true;rec.missionSourceEdition=pick.edition;rec.missionSourceName=pick.name;}
+ }
+ return rec;
+}
 function cpArmProfiles(rec,type){return (rec&&rec.rules||[]).filter(function(x){return x.type===type})}
 function cpSelectedEnhancement(side,rec){var ps=PS(side),items=cpArmProfiles(rec,"Enhancement");return items.filter(function(x){return x.name===ps.cpEnhancementId})[0]||null}
 function cpEnhancementOptions(rec){
@@ -35,8 +51,36 @@ function cpEnhancementOptions(rec){
  var out=[];(rec&&rec.units||[]).forEach(function(u){(u.profiles||[]).forEach(function(p){if(p.type!=="Abilities"||p.name.indexOf("Enhancement:")!==0)return;var raw=String((p.characteristics||{}).Description||""),base=raw,marker="(Default enhancement; may be replaced with ",at=raw.indexOf(marker),defaultName=p.name.replace(/^Enhancement:\s*/,"").replace(/\s*\(Warlord\)\s*$/,"");if(at>=0)base=raw.slice(0,at).trim();var restriction=u.name+" (Warlord)";out.push({name:defaultName,characteristics:{Restriction:restriction,Effect:base}});if(at>=0){var tail=raw.slice(at+marker.length).replace(/\)\s*$/,"").trim(),colon=tail.indexOf(":");if(colon>0){out.push({name:tail.slice(0,colon).trim(),characteristics:{Restriction:restriction,Effect:tail.slice(colon+1).trim()}})}}})});return out;
 }
 function cpNativeStratHtml(items){return (items||[]).map(function(x){return '<details class="core-strat-card"><summary><span class="core-strat-summary-main"><strong>'+esc(x.name)+'</strong><small>'+esc(x.phase||'Combat Patrol')+'</small></span><span class="core-strat-cp">'+x.cp+' CP</span><span class="core-strat-chevron">＋</span></summary><div class="core-strat-details"><div class="core-strat-field"><b>WHEN</b><p>'+esc(x.when)+'</p></div><div class="core-strat-field"><b>TARGET</b><p>'+esc(x.target)+'</p></div><div class="core-strat-field"><b>EFFECT</b><p>'+esc(x.effect)+'</p></div></div></details>'}).join('')||'<p class="empty">Nu există stratageme locale verificate pentru această patrulă.</p>'}
-function cpOpenPatrolModal(kind){var side=cpOwnSide();if(!side){alert("Doar participanții la meci pot vedea regulile propriei patrule.");return}var patrol=cpPatrolFor(side),rec=cpRecordFor(side);if(!patrol){alert("Alege mai întâi Combat Patrol-ul tău.");return}var edition=cpEditionFor(side)||"11",label=patrol.name+" · "+edition+"th Edition"+(patrol.fallback?" (fallback din 10th)":"");if(kind==="strat"){$("stratModalTitle").textContent="Stratagems · "+label;$ ("stratModalDesc").textContent="Core Stratagems eligibile + stratagemele exclusiv ale patrulei tale.";$ ("cpPatrolStratLabel").textContent="Combat Patrol propriu: "+label;var core=edition==="11"?CORE_STRATAGEMS.filter(function(x){return ["Explosives","Crushing Impact","Rapid Ingress"].indexOf(x.name)<0}):[];if(edition==="11")renderCoreStratagems($("matchCoreStratagemList"),$("matchStratQ").value,core);else $("matchCoreStratagemList").innerHTML="<p class=\"cp-status\">Biblioteca Core Stratagems 10th Edition nu este încă integrată local. Nu afișăm stratageme din ediția greșită.</p>";$ ("cpPatrolStratPanel").innerHTML='<div id="cpPatrolNativeStrats" class="match-strat-list">'+(rec&&rec.category?cpArmProfiles(rec,'Stratagem').map(function(x){var c=x.characteristics||{};return '<details class="core-strat-card"><summary><span class="core-strat-summary-main"><strong>'+esc(x.name)+'</strong><small>Combat Patrol</small></span><span class="core-strat-cp">'+esc(c.CP||'')+'</span></summary><div class="core-strat-details"><div class="core-strat-field"><b>WHEN</b><p>'+esc(c.When||'')+'</p></div><div class="core-strat-field"><b>TARGET</b><p>'+esc(c.Target||'')+'</p></div><div class="core-strat-field"><b>EFFECT</b><p>'+esc(c.Effect||'')+'</p></div></div></details>'}).join(''):cpNativeStratHtml(rec&&rec.stratagems))+'</div>'; $("cpCoreRulesFrame")&&($("cpCoreRulesFrame").hidden=true);$("cpStratTabs").hidden=false;$("cpCoreStratPanel").hidden=false;cpSetTab("core");cpModalOpen("coreStratagemModal");return}
- var modal=kind==="data"?"patrolDatasheetModal":"patrolMissionModal",title=kind==="data"?"patrolDatasheetTitle":"patrolMissionTitle",desc=kind==="data"?"patrolDatasheetDesc":"patrolMissionDesc",body=kind==="data"?"patrolDatasheetBody":"patrolMissionBody";$(title).textContent=(kind==="data"?"Datasheets & Army Rules · ":"Mission · ")+label;$(desc).textContent=kind==="data"?"Conținutul local al patrulei tale.":"Misiunea și scoring-ul propriu patrulei tale.";$(body).innerHTML=kind==="data"?cpNativeRecordHtml(rec):cpNativeMissionHtml(rec);cpModalOpen(modal)}
+function cpOpenPatrolModal(kind){
+ var side=cpOwnSide();
+ if(!side){alert("Doar participanții la meci pot vedea regulile propriei patrule.");return}
+ var patrol=cpPatrolFor(side),rec=cpRecordFor(side);
+ if(!patrol){alert("Alege mai întâi Combat Patrol-ul tău.");return}
+ var edition=cpEditionFor(side)||"11",label=patrol.name+" · "+edition+"th Edition"+(patrol.fallback?" (fallback din 10th)":"");
+ if(kind==="strat"){
+  $("stratModalTitle").textContent="Stratagems · "+label;
+  $("stratModalDesc").textContent="Stratageme Core eligibile și stratagemele proprii Combat Patrol-ului.";
+  $("cpPatrolStratLabel").textContent="Combat Patrol propriu: "+label;
+  var core=edition==="11"?CORE_STRATAGEMS.filter(function(x){return ["Explosives","Crushing Impact","Rapid Ingress"].indexOf(x.name)<0}):[];
+  if(edition==="11")renderCoreStratagems($("matchCoreStratagemList"),$("matchStratQ").value,core);
+  else $("matchCoreStratagemList").innerHTML="<p class=\"cp-status\">Biblioteca Core Stratagems 10th Edition nu este încă integrată local. Nu afișăm stratageme din ediția greșită.</p>";
+  var nativeHtml=rec&&rec.category?cpArmProfiles(rec,"Stratagem").map(function(x){
+   var c=x.characteristics||{};
+   return '<details class="core-strat-card"><summary><span class="core-strat-summary-main"><strong>'+esc(x.name)+'</strong><small>Combat Patrol</small></span><span class="core-strat-cp">'+esc(c.CP||'')+'</span><span class="core-strat-chevron">＋</span></summary><div class="core-strat-details"><div class="core-strat-field"><b>WHEN</b><p>'+esc(c.When||'—')+'</p></div><div class="core-strat-field"><b>TARGET</b><p>'+esc(c.Target||'—')+'</p></div><div class="core-strat-field"><b>EFFECT</b><p>'+esc(c.Effect||'—')+'</p></div></div></details>';
+  }).join(""):cpNativeStratHtml(rec&&rec.stratagems);
+  $("cpPatrolNativeStrats").innerHTML=nativeHtml||'<p class="empty">Nu există stratageme locale pentru această patrulă.</p>';
+  $("cpStratTabs").hidden=false;
+  $("cpCoreStratPanel").hidden=false;
+  cpSetTab("patrol");
+  cpModalOpen("coreStratagemModal");
+  return;
+ }
+ var modal=kind==="data"?"patrolDatasheetModal":"patrolMissionModal",title=kind==="data"?"patrolDatasheetTitle":"patrolMissionTitle",desc=kind==="data"?"patrolDatasheetDesc":"patrolMissionDesc",body=kind==="data"?"patrolDatasheetBody":"patrolMissionBody";
+ $(title).textContent=(kind==="data"?"Datasheets & Army Rules · ":"Mission · ")+label;
+ $(desc).textContent=kind==="data"?"Datasheets, Army Rules, Patrol Rules și Enhancements. Stratagemele sunt disponibile separat în butonul Stratagems.":"Misiunea și scoring-ul propriu patrulei tale.";
+ $(body).innerHTML=kind==="data"?cpNativeRecordHtml(rec):cpNativeMissionHtml(rec);
+ cpModalOpen(modal);
+}
 function cpProfileTable(profile){
  var labels={M:"Mișcare",T:"Rezistență",Sv:"Salvare",W:"Răni",Ld:"Leadership",OC:"Control obiective",Inv:"Salvare invulnerabilă"};
  var vals={};String(profile||"").split(/[·|,;]/).forEach(function(part){var m=part.trim().match(/^(M|T|Sv|W|Ld|OC|Inv|InSv)\s*[: ]\s*(.+)$/i);if(m){var k=m[1].toLowerCase();vals[k]=m[2].trim()}});
@@ -65,7 +109,7 @@ function cpAbilityHtml(abilities){
 function cpArmamentariumRecordHtml(r){
  if(!r)return '<p class="cp-status">Datele acestei patrule nu sunt disponibile local.</p>';
  var h='';
- (r.rules||[]).forEach(function(x){var c=x.characteristics||{},type=x.type||'Rule';h+='<article class="cp-content-card"><h3>'+esc(type)+' · '+esc(x.name)+'</h3>';
+ (r.rules||[]).filter(function(x){return x.type!=='Stratagem'}).forEach(function(x){var c=x.characteristics||{},type=x.type||'Rule';h+='<article class="cp-content-card"><h3>'+esc(type)+' · '+esc(x.name)+'</h3>';
   if(type==='Stratagem')h+='<p><b>CP:</b> '+esc(c.CP||'—')+'</p><p><b>When:</b> '+esc(c.When||'—')+'</p><p><b>Target:</b> '+esc(c.Target||'—')+'</p><p><b>Effect:</b> '+esc(c.Effect||'—')+'</p>';
   else if(type==='Secondary Objective')h+='<p><b>Type:</b> '+esc(c.Type||'—')+'</p><p>'+esc(c.Effect||'')+'</p>';
   else if(type==='Enhancement')h+='<p><b>Restriction:</b> '+esc(c.Restriction||'—')+'</p><p><b>Effect:</b> '+esc(c.Effect||'—')+'</p>';
@@ -92,8 +136,9 @@ function cpNativeRecordHtml(r){if(r&&r.units&&r.category)return cpArmamentariumR
  return h||'<p class="empty">Nu există fișe locale pentru această patrulă.</p>';
 }
 function cpNativeMissionHtml(r){
- if(!r||!r.mission)return '<p class="cp-status">Misiunea acestei patrule nu este încă disponibilă în biblioteca locală.</p>';
+ if(!r||!r.mission)return '<article class="cp-content-card cp-mission-card"><h3>Misiune neasociată în biblioteca locală</h3><p>Catalogul Armamentarium nu conține misiunea pentru această patrulă, iar aplicația nu va atribui în mod arbitrar misiunea altei facțiuni. Până la adăugarea transcrierii corecte, punctajul poate fi înregistrat manual în Match.</p><p class="cp-status">Lipsă de date sursă, nu o eroare de selecție.</p></article>';
  var m=r.mission,h='<article class="cp-content-card cp-mission-card"><h3>'+esc(m.name)+'</h3><p>'+esc(m.summary||"Descrierea misiunii nu este disponibilă.")+'</p>';
+ if(r.missionFallback)h+='<p class="cp-status">Misiune preluată ca fallback din '+esc(r.missionSourceEdition)+'th Edition · '+esc(r.missionSourceName||'aceeași facțiune')+'. Nu este prezentată ca misiune nativă a patrulei selectate.</p>';
  if(m.scoring&&m.scoring.length){h+='<h4>Condiții de punctare</h4><ol class="cp-mission-scoring">'+m.scoring.map(function(x){return'<li>'+esc(x)+'</li>'}).join('')+'</ol>'}else h+='<p class="cp-status">Condițiile de punctare nu sunt încă verificate.</p>';
  if(m.actions&&m.actions.length){h+='<h4>Acțiuni</h4>'+m.actions.map(function(x){return'<section class="cp-mission-action"><h4>'+esc(x.name)+'</h4><dl><dt>Momentul începerii</dt><dd>'+esc(x.starts||"Nespecificat")+'</dd><dt>Unitate eligibilă</dt><dd>'+esc(x.unit||"Nespecificată")+'</dd><dt>Limită</dt><dd>'+esc(x.limit||"Nespecificată")+'</dd><dt>Momentul finalizării</dt><dd>'+esc(x.completes||"Nespecificat")+'</dd><dt>Efect</dt><dd>'+esc(x.effect||"Nespecificat")+'</dd></dl></section>'}).join('')}
  h+='</article>';return h;
@@ -240,7 +285,7 @@ function cpMissionScoreButtons(record,s,enabled){
 function cpSideGameHtml(s){var ps=PS(s),pl=P(s),mine=own(s),live=M.status==="active",started=M.first!=null,ended=M.turn>=10,patrol=cpPatrolFor(s),cp=cpOf(ps,s),score=(ps.log||[]).filter(function(e){return e.k==="cpvp"}).reduce(function(a,e){return a+e.v},0),h='<section class="side"><h2>'+esc(pl.name)+(App.me===M[s]?' <small>(tu)</small>':'')+'</h2><div class="info">'+esc(patrol?patrol.name:"Combat Patrol neales")+' · '+(cpEditionFor(s)||"?")+'th Edition</div><div class="board"><div class="bt"><span>Mission VP</span><b>'+score+'</b></div><div><span>Battle Round</span><b>'+rd()+'/5</b></div></div><div class="cpbox'+(mine&&live?'':' ro')+'">'+(mine&&live?B("cp",s,"−",' data-v="-1" aria-label="Scade CP"',cp<=0):'')+'<div class="cpnum"><span>CP</span><b>'+cp+'</b></div>'+(mine&&live?B("cp",s,"+",' data-v="1" aria-label="Adaugă CP"',false):'')+'</div>';
  h+='<div class="cp-score-entry"><input type="text" maxlength="90" placeholder="Motivul punctajului (ex. Primary objective)" data-cp-reason="'+s+'" '+(!mine||!live||!started||ended?'disabled':'')+'><button type="button" data-act="cpvp" data-s="'+s+'" data-v="1" '+(!mine||!live||!started||ended?'disabled':'')+'>+1 VP</button><button type="button" class="ghost" data-act="cpvp" data-s="'+s+'" data-v="-1" '+(!mine||!live||!started||ended||score<=0?'disabled':'')+'>−1 VP</button></div>';
  h+='<div class="legend">VP din misiunea Combat Patrol. Înregistrează fiecare punctare cu o descriere pentru jurnal. CP-ul folosește aceleași controale și jurnal ca meciul normal.</div>';
- if(patrol){var rec=cpRecordFor(s),chosen=cpSelectedEnhancement(s,rec);h+='<div class="cp-mission-summary"><b>Misiune · '+esc(rec&&rec.mission?rec.mission.name:patrol.name)+'</b><p class="legend">'+esc(rec&&rec.mission&&rec.mission.summary||"Misiunea patrulei selectate.")+'</p>'+cpMissionScoreButtons(rec,s,mine&&live&&started&&!ended)+'</div>';if(patrol.fallback)h+='<p class="legend">Fallback automat: nu există date native 11th pentru această facțiune; este folosită cea mai nouă patrulă disponibilă din 10th.</p>';if(chosen)h+='<div class="cp-mission-summary"><b>Enhancement ales · '+esc(chosen.name)+'</b><p>'+esc((chosen.characteristics||{}).Restriction||'')+'</p><p>'+esc((chosen.characteristics||{}).Effect||'')+'</p></div>';}
+ if(patrol){var rec=cpRecordFor(s),chosen=cpSelectedEnhancement(s,rec);h+='<div class="cp-mission-summary"><b>Misiune · '+esc(rec&&rec.mission?rec.mission.name:'Date indisponibile')+'</b><p class="legend">'+esc(rec&&rec.mission&&rec.mission.summary||"Nu există o misiune verificată pentru această patrulă. Folosește punctajul manual până la completarea sursei.")+'</p>'+cpMissionScoreButtons(rec,s,mine&&live&&started&&!ended)+'</div>';if(patrol.fallback)h+='<p class="legend">Fallback automat: nu există date native 11th pentru această facțiune; este folosită cea mai nouă patrulă disponibilă din 10th.</p>';if(chosen)h+='<div class="cp-mission-summary"><b>Enhancement ales · '+esc(chosen.name)+'</b><p>'+esc((chosen.characteristics||{}).Restriction||'')+'</p><p>'+esc((chosen.characteristics||{}).Effect||'')+'</p></div>';}
  h+='<details><summary>Istoric ('+(ps.log.length+(M.cpAuto||[]).filter(function(e){return e.s===s}).length)+')</summary>'+(ps.log.concat((M.cpAuto||[]).filter(function(e){return e.s===s}).map(function(e){return{k:"cp",v:e.v,l:e.l,r:e.r}}))).map(function(e){return'<div class="lg">R'+e.r+' · '+(e.k==="cp"?"CP":e.k==="cpvp"?"Mission VP":"")+' '+(e.v>0?"+":"")+e.v+' · '+esc(e.l)+'</div>'}).reverse().join("")+'</details></section>';return h}
 
 function fmtT(ms){
@@ -330,7 +375,7 @@ function render(){
   if(App.isAdmin)h+='<p style="margin-top:24px">'+B("del","","Șterge meciul","",false,"ghost")+'</p>';
   $("box").innerHTML=h;
   var isCP=m.type==="combat-patrol",ownSide=cpOwnSide(),ownPatrol=ownSide&&cpPatrolFor(ownSide);
-  $("openCoreStratagems").textContent=isCP?"⚔ Stratagems":"⚔ Core Stratagems";
+  $("openCoreStratagems").textContent=isCP?"⚔ Combat Patrol Stratagems":"⚔ Core Stratagems";
   $("openPatrolDatasheets").hidden=!isCP;
   $("matchToolsHint").textContent=isCP?(ownPatrol?"Core + "+ownPatrol.name:"Alege-ți Combat Patrol-ul pentru a încărca regulile."):"Referință rapidă · fără să părăsești meciul";
   [].forEach.call(document.querySelectorAll("details[data-k]"),function(d){d.addEventListener("toggle",function(){openS[d.getAttribute("data-k")]=d.open})});

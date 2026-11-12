@@ -30,17 +30,56 @@ function cpSetTab(tab){cpModalTab=tab;var core=$("cpCoreStratPanel"),patrol=$("c
 function cpRecordFor(side){
  if(!M)return null;
  var patrol=cpPatrolFor(side),ps=PS(side),rec=patrol&&patrol.record?Object.assign({},patrol.record):null;
- if(!rec&&window.CP_CONTENT&&CP_CONTENT.patrols&&ps.cpEdition)rec=CP_CONTENT.patrols[ps.cpEdition+":"+ps.cpPatrolId]||null;
+ var armRows=cpArmRows();
+ /* Recover the full source record by stable patrol id/category. Older matches may
+    retain a selection id while the selected patrol object is rebuilt from legacy data. */
+ if(patrol&&(!rec||!rec.mission)){
+  var recovered=armRows.filter(function(x){
+   return x.id===patrol.id && (!patrol.category||x.category===patrol.category);
+  })[0];
+  if(recovered)rec=Object.assign({},recovered);
+ }
+ if(!rec&&window.CP_CONTENT&&CP_CONTENT.patrols&&ps.cpEdition){
+  rec=CP_CONTENT.patrols[ps.cpEdition+":"+ps.cpPatrolId]||null;
+ }
  if(!rec)return null;
- /* Mission lookup is deliberately independent from the Armamentarium unit/rule record.
-    Prefer the exact edition; if it has no mission, use the newest available 10e mission
-    for that faction, then the original 10e mission. Never borrow a different faction's mission. */
+ /* Mission resolution order:
+    1) exact patrol record;
+    2) exact patrol id in the Armamentarium registry;
+    3) same faction and edition in the local content registry;
+    4) latest 10e entry for that faction;
+    5) a clearly labelled community fallback so Match never silently shows no mission. */
+ if(!rec.mission){
+  var exact=armRows.filter(function(x){
+   return patrol&&x.id===patrol.id&&(!patrol.category||x.category===patrol.category)&&x.mission;
+  })[0];
+  if(exact){rec.mission=exact.mission;rec.missionFallback=true;rec.missionSourceName=exact.displayName||exact.name;}
+ }
  if(!rec.mission&&window.CP_CONTENT&&CP_CONTENT.patrols&&patrol){
-  var candidates=Object.keys(CP_CONTENT.patrols).map(function(k){return CP_CONTENT.patrols[k]}).filter(function(x){return x.sourceFaction===patrol.sourceFaction&&x.mission});
-  var exact=candidates.filter(function(x){return x.edition===patrol.sourceEdition});
-  var tenFallback=candidates.filter(function(x){return x.edition===10});
-  var pick=exact[0]||tenFallback[0]||null;
+  var candidates=Object.keys(CP_CONTENT.patrols).map(function(k){return CP_CONTENT.patrols[k]}).filter(function(x){
+   return x.mission&&String(x.sourceFaction||"").toLowerCase()===String(patrol.sourceFaction||"").toLowerCase();
+  });
+  var exactEdition=candidates.filter(function(x){return String(x.edition)===String(patrol.sourceEdition)})[0];
+  var tenFallback=candidates.filter(function(x){return String(x.edition)==="10"})[0];
+  var pick=exactEdition||tenFallback||null;
   if(pick){rec.mission=pick.mission;rec.missionFallback=true;rec.missionSourceEdition=pick.edition;rec.missionSourceName=pick.name;}
+ }
+ if(!rec.mission){
+  rec.mission={
+   id:"jh-contested-ground",
+   name:"JoiHammer – Contested Ground (misiune comunitară)",
+   status:"fan-made-fallback",
+   summary:"Misiune comunitară de rezervă. Nu este o misiune oficială Games Workshop.",
+   missionRule:"Obiective contestate: la sfârșitul fiecărei Command phase, un jucător poate marca drept contestat un obiectiv din No Man’s Land pe care îl controlează. Fiecare obiectiv poate fi marcat o singură dată pe bătălie.",
+   scoring:[
+    "Din Battle Round 2 până la Battle Round 4: la sfârșitul propriei Command phase, primești 5 VP pentru fiecare obiectiv controlat, maximum 10 VP pe tură.",
+    "În Battle Round 5: jucătorul care are al doilea tur punctează la sfârșitul turei.",
+    "La sfârșitul bătăliei: primești 5 VP pentru fiecare obiectiv contestat pe care încă îl controlezi, maximum 10 VP."
+   ],
+   deployment:"Dawn of War (44 x 30 inch), cu 5 obiective.",
+   note:"Fallback comunitar; conveniți folosirea lui cu adversarul."
+  };
+  rec.missionFallback=true;
  }
  return rec;
 }

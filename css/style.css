@@ -396,3 +396,25 @@ html.jh-auth-pending body #nav,html.jh-auth-pending body main{visibility:hidden}
 .cp-patrol-select optgroup{font-weight:900;color:var(--brass);background:var(--surface)}
 .cp-patrol-select option{font-weight:500;color:var(--text);background:var(--surface)}
 @media(max-width:520px){.cp-patrol-section{grid-template-columns:1fr auto;gap:3px 8px;padding:9px 10px}.cp-patrol-section b{grid-column:1/-1}.cp-patrol-section span{font-size:11px}.cp-patrol-section em{font-size:9px}}
+
+/* Colored custom Combat Patrol picker: Android/iOS dropdowns ignore option colors in native selects. */
+.cp-patrol-dropdown{position:relative;width:100%;margin-top:7px}
+.cp-patrol-dropdown>summary{list-style:none;cursor:pointer;min-height:48px;display:flex;align-items:center;padding:11px 42px 11px 13px;border:1px solid var(--brass);border-radius:9px;background:var(--surface);color:var(--text);font-weight:700;position:relative}
+.cp-patrol-dropdown>summary::-webkit-details-marker{display:none}
+.cp-patrol-dropdown>summary:after{content:"▾";position:absolute;right:14px;color:var(--brass);font-size:18px}
+.cp-patrol-dropdown[open]>summary:after{content:"▴"}
+.cp-patrol-options{margin-top:8px;max-height:52vh;overflow-y:auto;border:1px solid var(--brass);border-radius:10px;background:var(--surface);padding:7px}
+.cp-patrol-choice-group{border:1px solid var(--brass);border-left-width:5px;border-radius:8px;margin:5px 0 9px;overflow:hidden}
+.cp-patrol-choice-heading{font-size:11px;font-weight:900;letter-spacing:.08em;padding:9px 11px}
+.cp-patrol-choice{display:flex;align-items:center;gap:10px;padding:10px 11px;border-top:1px solid rgba(255,255,255,.09);cursor:pointer;color:var(--text);font-size:14px;line-height:1.35}
+.cp-patrol-choice input{accent-color:var(--brass);width:18px;height:18px;flex:0 0 18px}
+.cp-patrol-choice small{opacity:.78;font-size:12px}
+.cp-patrol-choice:has(input:checked){font-weight:800;background:rgba(255,255,255,.08)}
+.cp-patrol-choice-group.cp-original{border-color:#b99548;background:rgba(185,149,72,.10)}
+.cp-patrol-choice-group.cp-original .cp-patrol-choice-heading{color:#d7b66b;background:rgba(185,149,72,.14)}
+.cp-patrol-choice-group.cp-new{border-color:#55a8c8;background:rgba(85,168,200,.10)}
+.cp-patrol-choice-group.cp-new .cp-patrol-choice-heading{color:#7dc8e5;background:rgba(85,168,200,.14)}
+.cp-patrol-choice-group.cp-current{border-color:#63a77b;background:rgba(99,167,123,.10)}
+.cp-patrol-choice-group.cp-current .cp-patrol-choice-heading{color:#83d49e;background:rgba(99,167,123,.14)}
+.cp-patrol-choice-group.cp-fallback{border-color:#a78bd2;background:rgba(167,139,210,.10)}
+.cp-patrol-choice-group.cp-fallback .cp-patrol-choice-heading{color:#c2a9ef;background:rgba(167,139,210,.14)}

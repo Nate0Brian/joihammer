@@ -362,3 +362,6 @@ html.jh-auth-pending body #nav,html.jh-auth-pending body main{visibility:hidden}
 .cp-mission-awards button,.cp-mission-awards span{border:1px solid var(--brass);border-radius:5px;padding:5px 9px;color:var(--brass);font-size:11px;font-weight:800;background:transparent}
 .cp-mission-awards button{cursor:pointer}
 .cp-mission-awards button:active{transform:translateY(1px)}
+
+/* Combat Patrol stratagem timing key */
+.cp-stratagem-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.cp-stratagem{border-left-width:5px}.cp-time-pill{display:inline-block;border-radius:5px;padding:4px 8px;font-size:10px;font-weight:800;letter-spacing:.04em}.cp-time-your{border-left-color:#3986d8!important}.cp-time-your .cp-time-pill{background:rgba(57,134,216,.18);color:#69a9f2;border:1px solid #3986d8}.cp-time-opponent{border-left-color:#c94b4b!important}.cp-time-opponent .cp-time-pill{background:rgba(201,75,75,.18);color:#ef7777;border:1px solid #c94b4b}.cp-time-either{border-left-color:#299b68!important}.cp-time-either .cp-time-pill{background:rgba(41,155,104,.18);color:#55c58d;border:1px solid #299b68}.cp-mission-card{border-left-color:#b38b4e!important}

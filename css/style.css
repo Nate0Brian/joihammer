@@ -418,3 +418,17 @@ html.jh-auth-pending body #nav,html.jh-auth-pending body main{visibility:hidden}
 .cp-patrol-choice-group.cp-current .cp-patrol-choice-heading{color:#83d49e;background:rgba(99,167,123,.14)}
 .cp-patrol-choice-group.cp-fallback{border-color:#a78bd2;background:rgba(167,139,210,.10)}
 .cp-patrol-choice-group.cp-fallback .cp-patrol-choice-heading{color:#c2a9ef;background:rgba(167,139,210,.14)}
+
+/* Readable grouping for Army Rules in the Combat Patrol datasheets tab */
+.cp-rule-section{margin:14px 0 20px}
+.cp-rule-section-title{margin:0 0 10px;padding:11px 13px;border-radius:9px;font-size:13px;letter-spacing:.09em;font-weight:900;border-left:5px solid var(--brass);background:rgba(185,149,72,.14);color:#dfc17b}
+.cp-rule-card{margin:0 0 10px;padding:14px 15px;border:1px solid rgba(185,149,72,.35);border-radius:10px;background:rgba(255,255,255,.035)}
+.cp-rule-card h4{margin:0 0 12px;font-size:17px;color:var(--text)}
+.cp-rule-field{padding:9px 0;border-top:1px solid rgba(255,255,255,.10)}
+.cp-rule-field:first-of-type{border-top:0;padding-top:0}
+.cp-rule-field>b{display:block;margin-bottom:5px;color:#d8b96e;font-size:11px;letter-spacing:.07em;text-transform:uppercase}
+.cp-rule-field>p{margin:0;line-height:1.55;white-space:pre-line;color:var(--text)}
+.cp-detachment-rule-group .cp-rule-section-title{border-left-color:#63a7c8;background:rgba(99,167,200,.12);color:#8fd0eb}
+.cp-detachment-rule-group .cp-rule-field>b{color:#8fd0eb}
+.cp-enhancement-rule-group .cp-rule-section-title{border-left-color:#a78bd2;background:rgba(167,139,210,.12);color:#c7b0ed}
+.cp-enhancement-rule-group .cp-rule-field>b{color:#c7b0ed}

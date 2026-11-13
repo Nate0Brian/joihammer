@@ -39,3 +39,32 @@
 .dom-campaign-card .dom-card-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .dom-campaign-card .dom-card-actions button{margin:0}
 .dom-battle-card [data-dom-delete-battle]{margin-top:8px}
+
+/* Campaign match view – shared with the normal match engine */
+.campaign-match-panel{margin:16px 0 22px;padding:16px;border:1px solid rgba(198,161,90,.45);border-radius:14px;background:linear-gradient(145deg,rgba(42,31,23,.97),rgba(16,15,16,.98));box-shadow:0 10px 28px #0007}
+.campaign-match-title{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;border-bottom:1px solid rgba(198,161,90,.24);padding-bottom:12px}
+.campaign-match-title h2{font-family:Cinzel,Georgia,serif;color:#ead9b5;margin:5px 0}
+.campaign-match-title p,.campaign-kicker{color:#c6a15a;letter-spacing:.12em}
+.campaign-match-title>a,.dom-open-match{color:#e5c77f;font-weight:700}
+.campaign-location-lore{color:#d5c5aa;font-style:italic;line-height:1.5}
+.campaign-location-bonus{padding:10px;border-left:3px solid #c6a15a;background:#c6a15a12;margin:10px 0}
+.campaign-warzone{margin:12px 0;padding:10px;border:1px solid #c6a15a33;border-radius:9px}
+.campaign-warzone ul,.campaign-agenda ul{padding-left:20px;margin:8px 0}
+.campaign-warzone li,.campaign-agenda li{margin:6px 0;line-height:1.4}
+.campaign-briefings{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0;color:#c6a15a}
+.campaign-briefings span{padding:4px 8px;border:1px solid #c6a15a55;border-radius:20px;color:#e1d0aa}
+.campaign-players-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
+.campaign-player{min-width:0;padding:12px;border:1px solid #c6a15a33;border-radius:10px;background:#09090955}
+.campaign-player-head{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;color:#ead9b5}
+.campaign-player>small{color:#c6a15a}
+.campaign-agenda{margin-top:10px}
+.campaign-agenda h4{margin:4px 0;color:#e6d4ad;font-family:Cinzel,Georgia,serif}
+.campaign-agenda p{color:#d0c1aa}
+.campaign-achieved,.campaign-primary,.campaign-upgrades{margin-top:10px;padding-top:8px;border-top:1px solid #c6a15a2b}
+.campaign-upgrades>div{padding:7px 0;border-bottom:1px solid #c6a15a20}
+.campaign-upgrades p{font-size:.9em;color:#cbbda8;margin:4px 0}
+.campaign-achieved-check{display:flex;gap:9px;align-items:center;margin:14px 0;padding:11px;border:1px solid #c6a15a66;border-radius:9px;color:#ead9b5}
+.campaign-report-action{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.campaign-report-action small{color:#b9aa94}
+.dom-open-match{display:inline-block;margin-top:9px;padding:8px 12px;border:1px solid #c6a15a66;border-radius:8px;text-decoration:none}
+@media(max-width:650px){.campaign-match-title{display:block}.campaign-match-title>a{display:inline-block;margin-top:8px}.campaign-players-grid{grid-template-columns:1fr}}

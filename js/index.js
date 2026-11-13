@@ -3,13 +3,16 @@ var MS=[];
 function draw(ms){
   MS=ms;
   var inv=ms.filter(function(m){return m.status==="invited"});
-  var act=ms.filter(function(m){return m.status==="active"||m.status==="confirm"});
-  var done=ms.filter(function(m){return m.status==="done"}).slice(0,8);
+  var campaigns=ms.filter(function(m){return m.type==="campaign"||!!m.campaignId});
+  var regular=ms.filter(function(m){return m.type!=="campaign"&&!m.campaignId});
+  var act=regular.filter(function(m){return m.status==="active"||m.status==="confirm"});
+  var done=regular.filter(function(m){return m.status==="done"}).slice(0,8);
   $("inv").innerHTML=inv.length?inv.map(function(m){
     if(m.b===App.me)return '<div class="card"><b>'+esc(m.a)+'</b> te invită la un meci '+(m.type==='combat-patrol'?'Combat Patrol':'amical')+'.<div class="vpb"><button class="sm" data-act="acc" data-id="'+m.id+'">Acceptă</button><button class="sm ghost" data-act="dec" data-id="'+m.id+'">Refuză</button></div></div>';
     if(m.a===App.me)return '<div class="card">Invitație trimisă lui <b>'+esc(m.b)+'</b> · în așteptare.<div class="vpb"><button class="sm ghost" data-act="cancel" data-id="'+m.id+'">Anulează invitația</button></div></div>';
     return '';
   }).join(""):'<p class="empty">Nicio invitație în așteptare.</p>';
+  $("camp").innerHTML=campaigns.length?campaigns.map(App.matchRow).join(""):'<p class="empty">Niciun meci de campanie programat sau în desfășurare.</p>';
   $("act").innerHTML=act.length?act.map(App.matchRow).join(""):'<p class="empty">Niciun meci în desfășurare.</p>';
   $("done").innerHTML=done.length?done.map(App.matchRow).join(""):'<p class="empty">Încă niciun meci încheiat.</p>';
 }

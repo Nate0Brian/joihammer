@@ -35,3 +35,7 @@
 .dominatus-main .dom-agenda-grid article{position:relative;overflow:hidden}
 .dominatus-main .dom-agenda-grid article:before{content:"✠";display:block;color:#b99550;font-size:1.2rem;margin-bottom:4px;opacity:.9}
 .dominatus-main .dom-rule-grid article:before{content:"⚙";display:inline-block;color:#b99550;margin-right:7px}
+
+.dom-campaign-card .dom-card-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.dom-campaign-card .dom-card-actions button{margin:0}
+.dom-battle-card [data-dom-delete-battle]{margin-top:8px}

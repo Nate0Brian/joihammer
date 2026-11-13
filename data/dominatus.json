@@ -1,0 +1,4285 @@
+{
+  "schemaVersion": "1.8.0",
+  "project": "JoiHammer",
+  "campaign": "Dominatus",
+  "edition": 11,
+  "source": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/",
+  "sourceNote": "Structured Romanian summaries for implementation. Verify against current rules before tournament use.",
+  "status": "source_audited_ready_for_joihammer_integration_with_manual_agenda_matrix_fallback",
+  "alliances": [
+    "liberators",
+    "oppressors",
+    "raiders"
+  ],
+  "phases": [
+    {
+      "phase": 1,
+      "name": "First Encounters Phase",
+      "defaultBattlesPerPlayer": 2,
+      "defaultBattleSize": "Strike Force",
+      "battleCountConfigurable": true
+    },
+    {
+      "phase": 2,
+      "name": "Pitched Battles Phase",
+      "defaultBattlesPerPlayer": 2,
+      "defaultBattleSize": "Strike Force",
+      "battleCountConfigurable": true
+    },
+    {
+      "phase": 3,
+      "name": "Final Mission Phase",
+      "defaultBattlesPerPlayer": 1,
+      "defaultBattleSize": "Strike Force",
+      "battleCountConfigurable": false,
+      "note": "Phase 3 should remain a single climactic final mission."
+    }
+  ],
+  "campaignRules": {
+    "maxAgendaAchievedPerPlayer": 3,
+    "maxUpgradesPerBattle": 3,
+    "maxOneUpgradePerUnit": true,
+    "phase3BattleHonour": "path_to_conquest",
+    "locationControl": "Alliance with most Battle Honours gained in that phase; tie-break with campaign total, then Warmaster decision.",
+    "ascendancy": "Alliance with most Agenda Achieved cards; ties mean all tied alliances are in ascendancy.",
+    "relicAcquisition": "At end of phases 1 and 2, each player draws as many alliance Relics as their Agenda Achieved count and keeps one.",
+    "discardAgendaAchieved": "Discard previous phase Agenda Achieved cards after phase resolution.",
+    "defaultSchedule": "2 battles per player in Phase 1, 2 in Phase 2, 1 in Phase 3; Strike Force by default.",
+    "scheduleFlexibility": "Warmaster may increase battles in phases 1 and 2 and vary army sizes. Phase 3 should remain one climactic final mission.",
+    "requiredAlliances": [
+      "liberators",
+      "oppressors"
+    ],
+    "optionalAlliances": [
+      "raiders"
+    ],
+    "agendaSelection": "If both players attempt Agendas, reveal Force Dispositions and consult the active Alliance Briefing matrix. If either declines, use Chapter Approved Primary Missions; only players who declined can score from that Primary.",
+    "agendaAchievedCardModel": "There is one Agenda Achieved card identity per Alliance. Players can hold up to 3 at a time; each qualifying Agenda may award one or more copies/counters according to its conditions.",
+    "battleUpgradeDeployment": {
+      "normalLimit": 3,
+      "titangraveLimit": 4,
+      "oneUpgradePerUnit": true,
+      "duration": "Until end of battle"
+    },
+    "phaseRewards": {
+      "phase1": {
+        "victor": "Draw 1 random Battle Honour from Phase 1 deck",
+        "opponent": "Draw 1 random Battle Skill"
+      },
+      "phase2": {
+        "victor": "Draw 1 random Battle Honour from Phase 2 deck",
+        "opponent": "Draw 1 random Battle Skill"
+      },
+      "draw": {
+        "bothPlayers": "Draw 1 random Battle Skill"
+      },
+      "agendaAchievedBonusDraw": "A player who gained at least one Agenda Achieved card from that battle draws one additional card of the same type at the same time, chooses one of the drawn cards to keep, and returns the others to the relevant deck.",
+      "phase3": {
+        "victor": "Gains Path to Conquest; there is no ordinary Battle Honour/Skill draw for phase 3."
+      }
+    },
+    "locationControlTieBreak": "Compare total Battle Honours gained across the entire campaign; if still tied, Warmaster decides.",
+    "ascendancyTie": "All Alliances tied for the highest Agenda Achieved count are in ascendancy.",
+    "relicDraws": "At end of phases 1 and 2, each player draws from their own Alliance Relic deck a number equal to their Agenda Achieved cards, keeps one, and returns the rest to the deck.",
+    "phaseTransition": "Discard all Agenda Achieved cards from the phase just resolved before proceeding."
+  },
+  "agendaNames": [
+    {
+      "id": "liberators_planetfall",
+      "alliance": "liberators",
+      "phase": 1,
+      "name": "Planetfall"
+    },
+    {
+      "id": "liberators_vital_strongpoint",
+      "alliance": "liberators",
+      "phase": 1,
+      "name": "Vital Strongpoint"
+    },
+    {
+      "id": "liberators_secure_perimeter",
+      "alliance": "liberators",
+      "phase": 1,
+      "name": "Secure Perimeter"
+    },
+    {
+      "id": "liberators_rescue_survivors",
+      "alliance": "liberators",
+      "phase": 2,
+      "name": "Rescue Survivors"
+    },
+    {
+      "id": "liberators_encirclement",
+      "alliance": "liberators",
+      "phase": 2,
+      "name": "Encirclement"
+    },
+    {
+      "id": "liberators_hidden_prize",
+      "alliance": "liberators",
+      "phase": 2,
+      "name": "Hidden Prize"
+    },
+    {
+      "id": "liberators_cast_down_their_idols",
+      "alliance": "liberators",
+      "phase": 3,
+      "name": "Cast Down Their Idols"
+    },
+    {
+      "id": "liberators_reclaim_this_world",
+      "alliance": "liberators",
+      "phase": 3,
+      "name": "Reclaim This World"
+    },
+    {
+      "id": "liberators_slay_the_tyrant",
+      "alliance": "liberators",
+      "phase": 3,
+      "name": "Slay the Tyrant"
+    },
+    {
+      "id": "oppressors_dig_in",
+      "alliance": "oppressors",
+      "phase": 1,
+      "name": "Dig In"
+    },
+    {
+      "id": "oppressors_loot_and_scoot",
+      "alliance": "oppressors",
+      "phase": 1,
+      "name": "Loot and Scoot"
+    },
+    {
+      "id": "oppressors_repel_the_foe",
+      "alliance": "oppressors",
+      "phase": 1,
+      "name": "Repel the Foe"
+    },
+    {
+      "id": "oppressors_breakthrough",
+      "alliance": "oppressors",
+      "phase": 2,
+      "name": "Breakthrough"
+    },
+    {
+      "id": "oppressors_convoy_ambush",
+      "alliance": "oppressors",
+      "phase": 2,
+      "name": "Convoy Ambush"
+    },
+    {
+      "id": "oppressors_sabotage_supplies",
+      "alliance": "oppressors",
+      "phase": 2,
+      "name": "Sabotage Supplies"
+    },
+    {
+      "id": "oppressors_lead_by_example",
+      "alliance": "oppressors",
+      "phase": 3,
+      "name": "Lead by Example"
+    },
+    {
+      "id": "oppressors_ash_and_rubble",
+      "alliance": "oppressors",
+      "phase": 3,
+      "name": "Ash and Rubble"
+    },
+    {
+      "id": "oppressors_a_proper_challenge",
+      "alliance": "oppressors",
+      "phase": 3,
+      "name": "A Proper Challenge"
+    },
+    {
+      "id": "raiders_clandestine_infiltration",
+      "alliance": "raiders",
+      "phase": 1,
+      "name": "Clandestine Infiltration"
+    },
+    {
+      "id": "raiders_vanguard_recon",
+      "alliance": "raiders",
+      "phase": 1,
+      "name": "Vanguard Recon"
+    },
+    {
+      "id": "raiders_establish_contact",
+      "alliance": "raiders",
+      "phase": 1,
+      "name": "Establish Contact"
+    },
+    {
+      "id": "raiders_a_knife_in_the_dark",
+      "alliance": "raiders",
+      "phase": 2,
+      "name": "A Knife in the Dark"
+    },
+    {
+      "id": "raiders_a_thief_in_the_night",
+      "alliance": "raiders",
+      "phase": 2,
+      "name": "A Thief in the Night"
+    },
+    {
+      "id": "raiders_seeds_of_destruction",
+      "alliance": "raiders",
+      "phase": 2,
+      "name": "Seeds of Destruction"
+    },
+    {
+      "id": "raiders_erase_all_trace",
+      "alliance": "raiders",
+      "phase": 3,
+      "name": "Erase All Trace"
+    },
+    {
+      "id": "raiders_capture_trophies",
+      "alliance": "raiders",
+      "phase": 3,
+      "name": "Capture Trophies"
+    },
+    {
+      "id": "raiders_extraction",
+      "alliance": "raiders",
+      "phase": 3,
+      "name": "Extraction"
+    }
+  ],
+  "locations": [
+    {
+      "id": "the_mannheim_gap",
+      "name": "The Mannheim Gap",
+      "phase": 1,
+      "dice": [
+        1,
+        2
+      ],
+      "bonus": {
+        "name": "Battle-Tested",
+        "summary": "Când jucătorul trage Battle Skills, trage una suplimentară și alege cartea păstrată."
+      },
+      "warZoneRules": [
+        {
+          "name": "Canyon Walls",
+          "summary": "Marginile laterale sunt pereți de canion; Ingress nu poate plasa modele la 6 inch de aceștia, cu excepția FLY sau Deep Strike."
+        },
+        {
+          "name": "Rock Falls",
+          "summary": "La încheierea unei mișcări obișnuite în raza de 6 inch de un perete de canion, unitatea face Hazard Roll."
+        }
+      ],
+      "loreTextRo": "Trecătoarea Mannheim taie lanțul muntos de la vest de Hive Volcanus. Luptele nenumărate au umplut defileul cu resturi contorsionate, iar trupele se deplasează între pereți uriași de canion, sub amenințarea permanentă a unei alunecări mortale de stânci.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_ro_paraphrase",
+      "loreSourceLines": [
+        1644,
+        1658
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1644,
+        1658
+      ]
+    },
+    {
+      "id": "volcanus_archipelago",
+      "name": "Volcanus Archipelago",
+      "phase": 1,
+      "dice": [
+        3,
+        4
+      ],
+      "bonus": {
+        "name": "Munitions Vaults",
+        "summary": "Când jucătorul trage Relics, trage una suplimentară și alege cartea păstrată."
+      },
+      "warZoneRules": [
+        {
+          "name": "Landing Craft",
+          "summary": "O unitate friendly din Strategic Reserves poate face Ingress ca și cum battle round ar fi cu unu mai mare."
+        },
+        {
+          "name": "Rapid Reinforcements",
+          "summary": "O dată pe bătălie, fiecare jucător poate folosi Rapid Ingress pentru 0 CP."
+        }
+      ],
+      "loreTextRo": "La vărsarea râului Erebus, insulele arhipelagului sunt înțesate de baterii antiaeriene și instalații de artilerie navală, protejând flancul nordic al Hive Volcanus.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_ro_paraphrase",
+      "loreSourceLines": [
+        1660,
+        1674
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1660,
+        1674
+      ]
+    },
+    {
+      "id": "the_morpheon_line",
+      "name": "The Morpheon Line",
+      "phase": 1,
+      "dice": [
+        5,
+        6
+      ],
+      "bonus": {
+        "name": "To the Victor",
+        "summary": "Când jucătorul trage Battle Honours, trage una suplimentară și alege cartea păstrată."
+      },
+      "warZoneRules": [
+        {
+          "name": "Defence Networks",
+          "summary": "Cât timp o unitate beneficiază de Cover, modelele din acea unitate au Invulnerable Save 5+ împotriva atacurilor ranged.",
+          "sourceLines": [
+            1686,
+            1688
+          ]
+        },
+        {
+          "name": "Foxholes",
+          "summary": "INFANTRY care rămâne Stationary detectează Hidden Models până la 12 inch până la sfârșitul turei."
+        }
+      ],
+      "loreTextRo": "Morpheon Line este o rețea formidabilă de tranșee, fortificații joase și puncte întărite, construită inițial pentru a opri Orks care atacau Hive Tempestora.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_ro_paraphrase",
+      "loreSourceLines": [
+        1676,
+        1690
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1676,
+        1690
+      ]
+    },
+    {
+      "id": "cerbera_base",
+      "name": "Cerbera Base",
+      "phase": 2,
+      "dice": [
+        1,
+        2
+      ],
+      "bonus": {
+        "name": "Staging Post",
+        "summary": "Alianța care controlează locația alege locația fazei următoare."
+      },
+      "warZoneRules": [
+        {
+          "name": "Shrouding Smoke",
+          "summary": "Toate unitățile au keyword SMOKE. Modelele care nu se află la maximum 24 inch unele de altele nu sunt vizibile reciproc.",
+          "sourceLines": [
+            1704,
+            1707
+          ]
+        },
+        {
+          "name": "Ash Clouds",
+          "summary": "O unitate AIRCRAFT care încheie un Ingress move face Hazard Roll. O unitate FLYING care încheie o mișcare în care a folosit Take to the Skies face Hazard Roll.",
+          "sourceLines": [
+            1708,
+            1710
+          ]
+        }
+      ],
+      "loreTextRo": "Întinderea pe jumătate ruinată a bazei Cerbera este una dintre puținele poziții defensive viabile din jungla ecuatorială a Armageddonului, în mijlocul furtunilor de foc și al fumului sufocant.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_ro_paraphrase",
+      "loreSourceLines": [
+        1692,
+        1710
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1692,
+        1710
+      ]
+    },
+    {
+      "id": "victorinius_spaceport",
+      "name": "Victorinius Spaceport",
+      "phase": 2,
+      "dice": [
+        3,
+        4
+      ],
+      "bonus": {
+        "name": "Fresh Supplies",
+        "summary": "La prima preluare, fiecare jucător din alianță primește aleatoriu o Battle Skill sau Battle Honour din Phase 1."
+      },
+      "warZoneRules": [
+        {
+          "name": "Surgical Insertion",
+          "summary": "În Movement phase, selectează o unitate friendly din Strategic Reserves pentru Surgical Deep Strike. Dacă are Deep Strike, modelele pot fi plasate oriunde pe battlefield la peste 6 inch orizontal de toate unitățile inamice; dacă nu, primește Deep Strike pentru această Ingress. După plasare, unitatea face Battle-shock Roll și Hazard Rolls egale cu jumătate din numărul modelelor, rotunjit în sus.",
+          "sourceLines": [
+            1724,
+            1728
+          ]
+        }
+      ],
+      "loreTextRo": "Victorinius Spaceport este una dintre cele mai importante poziții pentru forțele imperiale aflate în dificultate. Portul oferă acces la sprijin aerian pentru majoritatea teatrelor de operațiuni ale lumii-hive.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_ro_paraphrase",
+      "loreSourceLines": [
+        1712,
+        1728
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1712,
+        1728
+      ]
+    },
+    {
+      "id": "blackfire_death_pits",
+      "name": "Blackfire Death Pits",
+      "phase": 2,
+      "dice": [
+        5,
+        6
+      ],
+      "bonus": {
+        "name": "Test of Mettle",
+        "summary": "La prima preluare, fiecare jucător poate schimba o Battle Honour și/sau Battle Skill cu altă carte de același tip."
+      },
+      "warZoneRules": [
+        {
+          "name": "Treacherous Terrain",
+          "summary": "Când o unitate este selectată să rămână Stationary sau să facă Advance, efectuează Hazard Roll. Când declară Charge, dacă una sau mai multe ținte sunt într-o terrain area, scade 1 din Charge Roll.",
+          "sourceLines": [
+            1740,
+            1744
+          ]
+        },
+        {
+          "name": "Veteran Fighters",
+          "summary": "Unitățile BATTLELINE pot începe o Action într-o tură în care au făcut Advance sau Fall Back.",
+          "sourceLines": [
+            1745,
+            1746
+          ]
+        }
+      ],
+      "loreTextRo": "Aici pământul solid se transformă în smoală clocotită și gheizere de promethium arzător. Drumurile care se prăbușesc și posturile de observație suspendate fac deplasarea extrem de periculoasă.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_ro_paraphrase",
+      "loreSourceLines": [
+        1730,
+        1746
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1730,
+        1746
+      ]
+    },
+    {
+      "id": "eyes_of_the_emperor_observatory",
+      "name": "Eyes of the Emperor Observatory",
+      "phase": 3,
+      "dice": [
+        1,
+        2
+      ],
+      "bonus": {
+        "name": "Auspicious Augury",
+        "summary": "La prima preluare, jucătorii cu sub 3 Agenda Achieved trag primele 4 Secondary Missions; fiecare Fixed Mission extrasă acordă o Agenda Achieved."
+      },
+      "warZoneRules": [
+        {
+          "name": "Second Wave",
+          "summary": "O dată pe bătălie, la începutul Command phase, alege fie o unitate MONSTER/VEHICLE distrusă, fie trei unități BATTLELINE distruse, fie oricare două alte unități distruse (fără EPIC HERO/WARLORD). Adaugă în armata ta același număr de unități noi identice, în Strategic Reserves.",
+          "sourceLines": [
+            1759,
+            1764
+          ]
+        },
+        {
+          "name": "Orbital Lance Bombardment",
+          "summary": "La sfârșitul fiecărui battle round, selectează aleatoriu un obiectiv. Pentru fiecare unitate aflată în range-ul lui, aruncă D6; la 4+, unitatea suferă D3 Mortal Wounds.",
+          "sourceLines": [
+            1765,
+            1766
+          ]
+        }
+      ],
+      "loreTextRo": "Observatorul se ridică din lanțurile muntoase de la nord de Hive Death Mire și oferă un avantaj tactic considerabil. Valoarea sa este atât de mare încât comandanții trimit întăriri fără ezitare pentru a-l captura.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_ro_paraphrase",
+      "loreSourceLines": [
+        1748,
+        1766
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1748,
+        1766
+      ]
+    },
+    {
+      "id": "titangrave",
+      "name": "Titangrave",
+      "phase": 3,
+      "dice": [
+        3,
+        4
+      ],
+      "bonus": {
+        "name": "The Spoils of War",
+        "summary": "La prima preluare, fiecare jucător cu cel puțin 4 Battle Honours primește o Agenda Achieved."
+      },
+      "warZoneRules": [
+        {
+          "name": "Vermillion Sanction",
+          "summary": "Permite atribuirea unui upgrade suplimentar: maximum 4."
+        },
+        {
+          "name": "Shielded Mek Shops",
+          "summary": "Modelele plasate printr-un move type în range de obiectiv fac Hazard Roll; dacă cel puțin unul eșuează, unitatea face Battle-shock."
+        },
+        {
+          "name": "Titan Clash",
+          "summary": "Atacurile unui model MONSTER/VEHICLE împotriva unei unități MONSTER/VEHICLE primesc +1 la Hit Roll. Atacurile unui model TITANIC împotriva unei unități TITANIC primesc +1 la Wound Roll.",
+          "sourceLines": [
+            1783,
+            1785
+          ]
+        }
+      ],
+      "loreTextRo": "Fostă zonă de pregătire a Legio Magna, ruinele contorsionate și iradiate ale Titangrave găzduiesc acum hoarde de Orks, ateliere Mekboy și efigii de război neterminate. Cei care luptă aici trebuie să-și folosească cele mai puternice arme și echipamente.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_ro_paraphrase",
+      "loreSourceLines": [
+        1768,
+        1785
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1768,
+        1785
+      ]
+    },
+    {
+      "id": "hive_acheron_subsprawl",
+      "name": "Hive Acheron Subsprawl",
+      "phase": 3,
+      "dice": [
+        5,
+        6
+      ],
+      "bonus": {
+        "name": "A Hard-Fought Victory",
+        "summary": "La prima preluare, fiecare jucător cu cel puțin 3 Battle Skills primește o Agenda Achieved."
+      },
+      "warZoneRules": [
+        {
+          "name": "Tunnel Fighters",
+          "summary": "În Declare Battle Formations, fiecare jucător poate selecta până la trei unități INFANTRY friendly din Strategic Reserves. Până la sfârșitul bătăliei, acestea primesc Deep Strike și pot re-arunca Charge Roll dacă declară Charge în tura în care au făcut Ingress.",
+          "sourceLines": [
+            1799,
+            1802
+          ]
+        },
+        {
+          "name": "One Shall Stand, One Shall Fall",
+          "summary": "O dată pe battle round, Epic Challenge costă 0 CP pentru fiecare jucător."
+        },
+        {
+          "name": "Lead from the Front",
+          "summary": "Fiecare WARLORD primește aura Front-line Hero: unitățile friendly aflate la 6 inch de model pot re-arunca Battle-shock Rolls.",
+          "sourceLines": [
+            1805,
+            1807
+          ]
+        }
+      ],
+      "loreTextRo": "Rețeaua subterană de caverne, arsenale, cazărmi și structuri de suport a Hive Acheron a devenit refugiu pentru supraviețuitorii umani și, totodată, locul unor lupte aprige între campioni și warlordii rivali.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_ro_paraphrase",
+      "loreSourceLines": [
+        1787,
+        1807
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1787,
+        1807
+      ]
+    }
+  ],
+  "battleHonours": [
+    {
+      "id": "shadow_stalker",
+      "name": "Shadow Stalker",
+      "phase": 1,
+      "who": "One CHARACTER model",
+      "effect": "Unitatea modelului primește Stealth.",
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          1833,
+          1842
+        ],
+        "timing": "Permanent unit rule",
+        "rulesSummaryRo": "Unitatea modelului primește Stealth.",
+        "limitations": "Fără efect bonus suplimentar indicat pe carte."
+      },
+      "loreTextRo": "Războinicul a învățat să se deplaseze nevăzut, urmărindu-și prada prin ruine întunecate și folosind fumul și praful luptei pentru a evita detectarea.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        1833,
+        1842
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "Unitatea modelului primește Stealth.",
+      "bonusEffectRo": null
+    },
+    {
+      "id": "undying_duty",
+      "name": "Undying Duty",
+      "phase": 1,
+      "who": "One CHARACTER model",
+      "effect": "În Fight phase, după ce o unitate inamică ce a țintit această unitate și-a rezolvat atacurile, aruncă un D6 pentru fiecare model din unitate distrus ca rezultat al acelor atacuri. La fiecare 5+, unitatea atacatoare suferă 1 Mortal Wound.",
+      "bonus": {
+        "MONSTER": "Atacatorul primește D3 Mortal Wounds pentru fiecare 5+."
+      },
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          1844,
+          1855
+        ],
+        "timing": "After enemy attacks in the Fight phase",
+        "rulesSummaryRo": "În Fight phase, după ce o unitate inamică ce a țintit această unitate și-a rezolvat atacurile, aruncă un D6 pentru fiecare model din unitate distrus ca rezultat al acelor atacuri. La fiecare 5+, unitatea atacatoare suferă 1 Mortal Wound.",
+        "limitations": "MONSTER: fiecare rezultat de 5+ provoacă D3 Mortal Wounds în loc de 1."
+      },
+      "loreTextRo": "Campionul și războinicii săi refuză să se oprească atât timp cât datoria nu este împlinită; chiar și după ce cad camarazi, izbucnesc într-un ultim contraatac.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        1844,
+        1855
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "În Fight phase, după ce o unitate inamică ce a țintit această unitate și-a rezolvat atacurile, aruncă un D6 pentru fiecare model din unitate distrus ca rezultat al acelor atacuri. La fiecare 5+, unitatea atacatoare suferă 1 Mortal Wound.",
+      "bonusEffectRo": "MONSTER: fiecare rezultat de 5+ provoacă D3 Mortal Wounds în loc de 1."
+    },
+    {
+      "id": "grim_veterans",
+      "name": "Grim Veterans",
+      "phase": 1,
+      "who": "One CHARACTER model",
+      "effect": "Cât timp unitatea nu este Battle-shocked, primește +1 OC.",
+      "bonus": {
+        "INFANTRY": "Unitatea poate re-roll Leadership Rolls."
+      },
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          1857,
+          1869
+        ],
+        "timing": "While the unit is not Battle-shocked",
+        "rulesSummaryRo": "Cât timp unitatea nu este Battle-shocked, primește +1 OC.",
+        "limitations": "INFANTRY: poți re-arunca Leadership Rolls pentru unitate."
+      },
+      "loreTextRo": "Acest conducător își inspiră veteranii prin experiența comună a celor mai brutale teatre de război și prin disciplină tactică neclintită.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        1857,
+        1869
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "Cât timp unitatea nu este Battle-shocked, primește +1 OC.",
+      "bonusEffectRo": "INFANTRY: poți re-arunca Leadership Rolls pentru unitate."
+    },
+    {
+      "id": "kingslayer",
+      "name": "Kingslayer",
+      "phase": 1,
+      "who": "One CHARACTER model",
+      "effect": "Armele melee ale modelului primesc Precision. Când modelul face atacuri care țintesc o unitate CHARACTER, poți re-arunca Hit Rolls.",
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          1871,
+          1879
+        ],
+        "timing": "Permanent weapon rules",
+        "rulesSummaryRo": "Armele melee ale modelului primesc Precision. Când modelul face atacuri care țintesc o unitate CHARACTER, poți re-arunca Hit Rolls.",
+        "limitations": "Fără efect bonus suplimentar indicat pe carte."
+      },
+      "loreTextRo": "Numeroși campioni au încercat să-l înfrunte, dar toți au căzut în fața măiestriei sale marțiale.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        1871,
+        1879
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "Armele melee ale modelului primesc Precision. Când modelul face atacuri care țintesc o unitate CHARACTER, poți re-arunca Hit Rolls.",
+      "bonusEffectRo": null
+    },
+    {
+      "id": "fire_and_fury",
+      "name": "Fire and Fury",
+      "phase": 1,
+      "who": "One CHARACTER model",
+      "effect": "Armele ranged ale unității primesc Assault și Heavy.",
+      "bonus": {
+        "MONSTER/VEHICLE": "Re-roll Hit de 1 cu arme Blast."
+      },
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          1881,
+          1893
+        ],
+        "timing": "Permanent weapon rules",
+        "rulesSummaryRo": "Armele ranged ale unității primesc Assault și Heavy.",
+        "limitations": "MONSTER/VEHICLE: când modelul atacă cu arme Blast, poți re-arunca Hit Rolls de 1."
+      },
+      "loreTextRo": "Fie că atacă în viteză de la mică distanță, fie că execută salve precise de la distanță, acest războinic preferă forța de foc copleșitoare.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        1881,
+        1893
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "Armele ranged ale unității primesc Assault și Heavy.",
+      "bonusEffectRo": "MONSTER/VEHICLE: când modelul atacă cu arme Blast, poți re-arunca Hit Rolls de 1."
+    },
+    {
+      "id": "wraith_of_ruin",
+      "name": "Wraith of Ruin",
+      "phase": 2,
+      "who": "One CHARACTER model",
+      "effect": "Unitatea nu este vizibilă pentru modelele inamice decât dacă acestea se află la maximum 18 inch de ea.",
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          1895,
+          1903
+        ],
+        "timing": "Permanent visibility restriction",
+        "rulesSummaryRo": "Unitatea nu este vizibilă pentru modelele inamice decât dacă acestea se află la maximum 18 inch de ea.",
+        "limitations": "Fără efect bonus suplimentar indicat pe carte."
+      },
+      "loreTextRo": "Războinicul folosește peisajele devastate ale Armageddonului pentru a-și ascunde înaintarea până când el și oamenii săi sunt pregătiți să lovească.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        1895,
+        1903
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "Unitatea nu este vizibilă pentru modelele inamice decât dacă acestea se află la maximum 18 inch de ea.",
+      "bonusEffectRo": null
+    },
+    {
+      "id": "swift_as_the_wind",
+      "name": "Swift as the Wind",
+      "phase": 2,
+      "who": "One CHARACTER model",
+      "effect": "Unitatea primește +2 inch la Move characteristic.",
+      "bonus": {
+        "MONSTER/VEHICLE": "+3 inch Movement în loc de +2."
+      },
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          1905,
+          1917
+        ],
+        "timing": "Permanent characteristic modifier",
+        "rulesSummaryRo": "Unitatea primește +2 inch la Move characteristic.",
+        "limitations": "MONSTER/VEHICLE: primește +3 inch la Move în loc de +2."
+      },
+      "loreTextRo": "Campionul și războinicii săi se deplasează cu o viteză nefirească și o hotărâre care îi poartă rapid prin câmpul de luptă.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        1905,
+        1917
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "Unitatea primește +2 inch la Move characteristic.",
+      "bonusEffectRo": "MONSTER/VEHICLE: primește +3 inch la Move în loc de +2."
+    },
+    {
+      "id": "battle_hungry",
+      "name": "Battle Hungry",
+      "phase": 2,
+      "who": "One CHARACTER model",
+      "effect": "Poți re-arunca Charge Rolls pentru unitate.",
+      "bonus": {
+        "MOUNTED": "Re-roll Advance Rolls."
+      },
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          1919,
+          1930
+        ],
+        "timing": "Charge and Advance rolls",
+        "rulesSummaryRo": "Poți re-arunca Charge Rolls pentru unitate.",
+        "limitations": "MOUNTED: poți re-arunca și Advance Rolls pentru unitate."
+      },
+      "loreTextRo": "Acest războinic trăiește pentru confruntarea corp la corp; nimic nu-i poate opri elanul, iar furia sa îi atrage și pe ceilalți în atac.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        1919,
+        1930
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "Poți re-arunca Charge Rolls pentru unitate.",
+      "bonusEffectRo": "MOUNTED: poți re-arunca și Advance Rolls pentru unitate."
+    },
+    {
+      "id": "ferocious_combatant",
+      "name": "Ferocious Combatant",
+      "phase": 2,
+      "who": "One CHARACTER model",
+      "effect": "Armele melee ale unității primesc Sustained Hits 1.",
+      "bonus": {
+        "MONSTER/VEHICLE": "Armele melee ale modelului au Cleave 1."
+      },
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          1932,
+          1944
+        ],
+        "timing": "Permanent weapon rule",
+        "rulesSummaryRo": "Armele melee ale unității primesc Sustained Hits 1.",
+        "limitations": "MONSTER/VEHICLE: armele melee ale modelului primesc Cleave 1."
+      },
+      "loreTextRo": "Campionul își împinge adepții spre o ferocitate tot mai mare, conducându-i într-o înaintare sângeroasă prin rândurile inamice.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        1932,
+        1944
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "Armele melee ale unității primesc Sustained Hits 1.",
+      "bonusEffectRo": "MONSTER/VEHICLE: armele melee ale modelului primesc Cleave 1."
+    },
+    {
+      "id": "breach_and_burn",
+      "name": "Breach and Burn",
+      "phase": 2,
+      "who": "One CHARACTER model",
+      "effect": "În Shooting phase, armele unității care țintesc o unitate inamică aflată la maximum 18 inch primesc Ignores Cover.",
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          1946,
+          1954
+        ],
+        "timing": "Your Shooting phase",
+        "rulesSummaryRo": "În Shooting phase, armele unității care țintesc o unitate inamică aflată la maximum 18 inch primesc Ignores Cover.",
+        "limitations": "Fără efect bonus suplimentar indicat pe carte."
+      },
+      "loreTextRo": "Veteran al luptelor urbane, comandantul își instruiește trupele să scoată inamicul din adăposturi cu foc concentrat, flăcări și proiectile explozive.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        1946,
+        1954
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "În Shooting phase, armele unității care țintesc o unitate inamică aflată la maximum 18 inch primesc Ignores Cover.",
+      "bonusEffectRo": null
+    },
+    {
+      "id": "path_to_conquest",
+      "name": "Path to Conquest",
+      "phase": 3,
+      "who": "Campaign card",
+      "effect": "La sfârșitul Campaign Phase 3, Alianța cu cele mai multe Battle Honours din Phase 3 controlează locația finală. Aceasta este Battle Honour-ul unic al fazei 3.",
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          1956,
+          1963
+        ],
+        "timing": "End of campaign phase 3",
+        "rulesSummaryRo": "La sfârșitul Campaign Phase 3, Alianța cu cele mai multe Battle Honours din Phase 3 controlează locația finală. Aceasta este Battle Honour-ul unic al fazei 3.",
+        "limitations": "Fără efect bonus suplimentar indicat pe carte."
+      },
+      "loreTextRo": "Cerul este acoperit de cenușă, iar câmpul de luptă este presărat cu ruine și morți. Victoria este importantă, dar numai rezultatul campaniei va arăta dacă ea a schimbat soarta războiului.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        1956,
+        1963
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "La sfârșitul Campaign Phase 3, Alianța cu cele mai multe Battle Honours din Phase 3 controlează locația finală. Aceasta este Battle Honour-ul unic al fazei 3.",
+      "bonusEffectRo": null
+    }
+  ],
+  "battleSkills": [
+    {
+      "id": "front_line_champion",
+      "name": "Front-line Champion",
+      "who": "One CHARACTER model",
+      "effect": "Când unitatea atacă cu arme care țintesc o unitate aflată la maximum 9 inch, poate re-arunca Hit Rolls.",
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          1966,
+          1973
+        ],
+        "timing": "When making attacks with this unit",
+        "rulesSummaryRo": "Când unitatea atacă cu arme care țintesc o unitate aflată la maximum 9 inch, poate re-arunca Hit Rolls.",
+        "limitations": "Fără efect bonus suplimentar indicat pe carte."
+      },
+      "loreTextRo": "Acest războinic se află mereu acolo unde lupta este cea mai aprigă, folosindu-și experiența pentru a îmbunătăți ținta și loviturile trupelor sale.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        1966,
+        1973
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "Când unitatea atacă cu arme care țintesc o unitate aflată la maximum 9 inch, poate re-arunca Hit Rolls.",
+      "bonusEffectRo": null
+    },
+    {
+      "id": "fortunes_favoured",
+      "name": "Fortune's Favoured",
+      "who": "One CHARACTER model",
+      "effect": "O dată pe bătălie, când atacurile unei unități țintesc această unitate, modelul poate activa relicva; unitatea primește Invulnerable Save 4+ până când acele atacuri sunt rezolvate.",
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          1975,
+          1981
+        ],
+        "timing": "Once per battle, when this unit is targeted by attacks",
+        "rulesSummaryRo": "O dată pe bătălie, când atacurile unei unități țintesc această unitate, modelul poate activa relicva; unitatea primește Invulnerable Save 4+ până când acele atacuri sunt rezolvate.",
+        "limitations": "Fără efect bonus suplimentar indicat pe carte."
+      },
+      "loreTextRo": "Uneori experiența nu este suficientă. Supraviețuirea cere curaj, noroc și poate chiar intervenția zeilor sorții.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        1975,
+        1981
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "O dată pe bătălie, când atacurile unei unități țintesc această unitate, modelul poate activa relicva; unitatea primește Invulnerable Save 4+ până când acele atacuri sunt rezolvate.",
+      "bonusEffectRo": null
+    },
+    {
+      "id": "lead_from_the_front",
+      "name": "Lead from the Front",
+      "who": "One CHARACTER model",
+      "effect": "Unitatea primește Scouts 6 inch.",
+      "bonus": {
+        "MOUNTED": "Scouts 9 inch."
+      },
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          1983,
+          1993
+        ],
+        "timing": "Permanent ability",
+        "rulesSummaryRo": "Unitatea primește Scouts 6 inch.",
+        "limitations": "MOUNTED: unitatea primește Scouts 9 inch în loc de 6."
+      },
+      "loreTextRo": "În oroarea și confuzia războiului de pe Armageddon, un lider dinamic poate schimba decisiv cursul luptei.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        1983,
+        1993
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "Unitatea primește Scouts 6 inch.",
+      "bonusEffectRo": "MOUNTED: unitatea primește Scouts 9 inch în loc de 6."
+    },
+    {
+      "id": "born_survivor",
+      "name": "Born Survivor",
+      "who": "One CHARACTER model",
+      "effect": "Modelul primește Feel No Pain 6+.",
+      "bonus": {
+        "INFANTRY/MOUNTED": "Feel No Pain 5+."
+      },
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          1995,
+          2006
+        ],
+        "timing": "Permanent model ability",
+        "rulesSummaryRo": "Modelul primește Feel No Pain 6+.",
+        "limitations": "INFANTRY/MOUNTED: modelul primește Feel No Pain 5+ în loc de 6+."
+      },
+      "loreTextRo": "Veteranul poartă cicatricile unei campanii nemiloase și a devenit un combatant aproape imposibil de doborât.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        1995,
+        2006
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "Modelul primește Feel No Pain 6+.",
+      "bonusEffectRo": "INFANTRY/MOUNTED: modelul primește Feel No Pain 5+ în loc de 6+."
+    },
+    {
+      "id": "natural_leader",
+      "name": "Natural Leader",
+      "who": "One CHARACTER model",
+      "effect": "Aura Inspiring Presence: unitățile friendly aflate la 9 inch de acest model (cu excepția unităților sub half-strength) reușesc automat Battle-shock Rolls.",
+      "bonus": {
+        "WARLORD": "Unitățile friendly din aura au +1 Leadership."
+      },
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          2008,
+          2019
+        ],
+        "timing": "Permanent 9-inch Aura",
+        "rulesSummaryRo": "Aura Inspiring Presence: unitățile friendly aflate la 9 inch de acest model (cu excepția unităților sub half-strength) reușesc automat Battle-shock Rolls.",
+        "limitations": "WARLORD: unitățile friendly aflate la 9 inch primesc și +1 Leadership."
+      },
+      "loreTextRo": "Autoritatea și prezența acestui războinic îi inspiră sau îi domină pe cei din jur, împingându-i să depășească limitele.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        2008,
+        2019
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "Aura Inspiring Presence: unitățile friendly aflate la 9 inch de acest model (cu excepția unităților sub half-strength) reușesc automat Battle-shock Rolls.",
+      "bonusEffectRo": "WARLORD: unitățile friendly aflate la 9 inch primesc și +1 Leadership."
+    },
+    {
+      "id": "high_strategy",
+      "name": "High Strategy",
+      "who": "One CHARACTER model",
+      "effect": "Începi bătălia cu 1 CP suplimentar.",
+      "bonus": {
+        "WARLORD": "Începi bătălia cu 2 CP în loc de 1."
+      },
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          2020,
+          2031
+        ],
+        "timing": "Battle start",
+        "rulesSummaryRo": "Începi bătălia cu 1 CP suplimentar.",
+        "limitations": "WARLORD: începi bătălia cu 2 CP în loc de 1."
+      },
+      "loreTextRo": "Planurile bine construite și înțelegerea obiectivelor strategice pot compensa inferioritatea numerică și de putere de foc.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        2020,
+        2031
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "Începi bătălia cu 1 CP suplimentar.",
+      "bonusEffectRo": "WARLORD: începi bătălia cu 2 CP în loc de 1."
+    },
+    {
+      "id": "tempered_in_battle",
+      "name": "Tempered in Battle",
+      "who": "One CHARACTER model",
+      "effect": "Unitatea poate trage și poate declara Charge într-o tură în care a făcut Fall Back.",
+      "bonus": {
+        "INFANTRY": "Poate începe Actions în tura în care a făcut Fall Back."
+      },
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          2033,
+          2043
+        ],
+        "timing": "Turn in which the unit Fell Back",
+        "rulesSummaryRo": "Unitatea poate trage și poate declara Charge într-o tură în care a făcut Fall Back.",
+        "limitations": "INFANTRY: unitatea poate începe și o Action în acea tură."
+      },
+      "loreTextRo": "Instinctele ascuțite și tacticile testate în luptă au transformat acest lider într-un maestru al manevrei și al contraatacului.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        2033,
+        2043
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "Unitatea poate trage și poate declara Charge într-o tură în care a făcut Fall Back.",
+      "bonusEffectRo": "INFANTRY: unitatea poate începe și o Action în acea tură."
+    },
+    {
+      "id": "tactical_redeployment",
+      "name": "Tactical Redeployment",
+      "who": "One CHARACTER model",
+      "effect": "În Redeploy Units step, selectează până la trei unități friendly pentru redeploy sau pentru a fi plasate în Strategic Reserves. Aceste unități nu contează la limita Strategic Reserves.",
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          2045,
+          2051
+        ],
+        "timing": "Redeploy Units step",
+        "rulesSummaryRo": "În Redeploy Units step, selectează până la trei unități friendly pentru redeploy sau pentru a fi plasate în Strategic Reserves. Aceste unități nu contează la limita Strategic Reserves.",
+        "limitations": "Fără efect bonus suplimentar indicat pe carte."
+      },
+      "loreTextRo": "Comandanții calculați folosesc înțelegerea tactică pentru a-și repoziționa trupele și a crea avantajul înainte ca lupta să înceapă.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        2045,
+        2051
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "În Redeploy Units step, selectează până la trei unități friendly pentru redeploy sau pentru a fi plasate în Strategic Reserves. Aceste unități nu contează la limita Strategic Reserves.",
+      "bonusEffectRo": null
+    },
+    {
+      "id": "terrifying_presence",
+      "name": "Terrifying Presence",
+      "who": "One CHARACTER model",
+      "effect": "La începutul Fight phase, selectează o unitate inamică engaged cu această unitate; adversarul trebuie să facă un Battle-shock Roll pentru ea.",
+      "bonus": {
+        "MONSTER/VEHICLE": "Scade 1 din rezultatul Battle-shock Roll."
+      },
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          2053,
+          2063
+        ],
+        "timing": "Start of the Fight phase",
+        "rulesSummaryRo": "La începutul Fight phase, selectează o unitate inamică engaged cu această unitate; adversarul trebuie să facă un Battle-shock Roll pentru ea.",
+        "limitations": "MONSTER/VEHICLE: scade 1 din rezultatul Battle-shock Roll efectuat ca urmare a acestei abilități."
+      },
+      "loreTextRo": "Anii petrecuți în medii îngrozitoare au lăsat asupra acestui războinic o aură înfricoșătoare care zdruncină curajul adversarilor.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        2053,
+        2063
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "La începutul Fight phase, selectează o unitate inamică engaged cu această unitate; adversarul trebuie să facă un Battle-shock Roll pentru ea.",
+      "bonusEffectRo": "MONSTER/VEHICLE: scade 1 din rezultatul Battle-shock Roll efectuat ca urmare a acestei abilități."
+    }
+  ],
+  "relics": [
+    {
+      "id": "blade_of_sacrifice",
+      "name": "Blade of Sacrifice",
+      "alliance": "liberators",
+      "who": "One CHARACTER model, excluding EPIC HERO",
+      "effect": "Când unitatea este selectată să lupte, modelul poate canaliza sufletul și poate pierde 1, 2 sau 3 Wounds (nu mai multe decât Wounds rămase). Până la sfârșitul fazei, pentru fiecare Wound pierdut astfel, armele melee ale modelului primesc +1 Attack, Strength și AP.",
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          2066,
+          2072
+        ],
+        "timing": "When the bearer's unit is selected to fight",
+        "rulesSummaryRo": "Când unitatea este selectată să lupte, modelul poate canaliza sufletul și poate pierde 1, 2 sau 3 Wounds (nu mai multe decât Wounds rămase). Până la sfârșitul fazei, pentru fiecare Wound pierdut astfel, armele melee ale modelului primesc +1 Attack, Strength și AP.",
+        "limitations": "Fără efect bonus suplimentar indicat pe carte."
+      },
+      "loreTextRo": "Sabia a fost purtată de generații de martiri. În momentele disperate strălucește și consumă sufletul purtătorului, oferindu-i puterea de a doborî chiar și cei mai puternici adversari.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        2066,
+        2072
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "Când unitatea este selectată să lupte, modelul poate canaliza sufletul și poate pierde 1, 2 sau 3 Wounds (nu mai multe decât Wounds rămase). Până la sfârșitul fazei, pentru fiecare Wound pierdut astfel, armele melee ale modelului primesc +1 Attack, Strength și AP.",
+      "bonusEffectRo": null
+    },
+    {
+      "id": "strategic_laurels",
+      "name": "Strategic Laurels",
+      "alliance": "liberators",
+      "who": "One CHARACTER model",
+      "effect": "În Command phase, dacă unitatea controlează un obiectiv, fă un Leadership Roll pentru unitate. Dacă reușește, câștigi 1 CP.",
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          2074,
+          2080
+        ],
+        "timing": "Your Command phase",
+        "rulesSummaryRo": "În Command phase, dacă unitatea controlează un obiectiv, fă un Leadership Roll pentru unitate. Dacă reușește, câștigi 1 CP.",
+        "limitations": "Fără efect bonus suplimentar indicat pe carte."
+      },
+      "loreTextRo": "Decorațiile ascund circuite tactice și o rețea de senzori care amplifică instinctul strategic și capacitatea purtătorului de a coordona războiul.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        2074,
+        2080
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "În Command phase, dacă unitatea controlează un obiectiv, fă un Leadership Roll pentru unitate. Dacă reușește, câștigi 1 CP.",
+      "bonusEffectRo": null
+    },
+    {
+      "id": "the_emperors_tarot",
+      "name": "The Emperor's Tarot",
+      "alliance": "liberators",
+      "who": "One CHARACTER model",
+      "effect": "La începutul primei Command phase: dacă folosești Fixed Missions, poți înlocui una dintre misiunile tale Fixed cu o altă Fixed Mission la alegere; dacă folosești Tactical Missions, privește primele 3 cărți din pachet și pune-le înapoi cu fața în jos în ordinea dorită.",
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          2082,
+          2090
+        ],
+        "timing": "Start of your first Command phase",
+        "rulesSummaryRo": "La începutul primei Command phase: dacă folosești Fixed Missions, poți înlocui una dintre misiunile tale Fixed cu o altă Fixed Mission la alegere; dacă folosești Tactical Missions, privește primele 3 cărți din pachet și pune-le înapoi cu fața în jos în ordinea dorită.",
+        "limitations": "Fără efect bonus suplimentar indicat pe carte."
+      },
+      "loreTextRo": "Purtătorul deține un pachet al Tarotului Împăratului, despre care se spune că a fost binecuvântat de trei ori de Sebastian Thor. Citirea cărților îi poate ghida pe credincioși chiar și în cele mai întunecate momente.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        2082,
+        2090
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "La începutul primei Command phase: dacă folosești Fixed Missions, poți înlocui una dintre misiunile tale Fixed cu o altă Fixed Mission la alegere; dacă folosești Tactical Missions, privește primele 3 cărți din pachet și pune-le înapoi cu fața în jos în ordinea dorită.",
+      "bonusEffectRo": null
+    },
+    {
+      "id": "vortex_grenade",
+      "name": "Vortex Grenade",
+      "alliance": "liberators",
+      "who": "One CHARACTER model",
+      "effect": "O dată pe bătălie, în Shooting phase când unitatea este selectată să tragă, selectează o unitate inamică neangajată la maximum 8 inch de model. Aruncă 3D6; pentru fiecare rezultat de 2+, ținta suferă D3 Mortal Wounds. Apoi unitatea purtătorului face un Hazard Roll.",
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          2092,
+          2101
+        ],
+        "timing": "Once per battle, your Shooting phase when the unit is selected to shoot",
+        "rulesSummaryRo": "O dată pe bătălie, în Shooting phase când unitatea este selectată să tragă, selectează o unitate inamică neangajată la maximum 8 inch de model. Aruncă 3D6; pentru fiecare rezultat de 2+, ținta suferă D3 Mortal Wounds. Apoi unitatea purtătorului face un Hazard Roll.",
+        "limitations": "Fără efect bonus suplimentar indicat pe carte."
+      },
+      "loreTextRo": "În interiorul sferei se află o tehnologie interzisă, capabilă să rupă vălul realității și să deschidă o mică ruptură warp care înghite tot ce se află în apropiere.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        2092,
+        2101
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "O dată pe bătălie, în Shooting phase când unitatea este selectată să tragă, selectează o unitate inamică neangajată la maximum 8 inch de model. Aruncă 3D6; pentru fiecare rezultat de 2+, ținta suferă D3 Mortal Wounds. Apoi unitatea purtătorului face un Hazard Roll.",
+      "bonusEffectRo": null
+    },
+    {
+      "id": "master_crafted_armour",
+      "name": "Master-Crafted Armour",
+      "alliance": "liberators",
+      "who": "One CHARACTER model, excluding EPIC HERO",
+      "effect": "Modelul primește Invulnerable Save 4+ și +1 Toughness, +1 Save și +1 Wound.",
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          2103,
+          2112
+        ],
+        "timing": "Permanent defensive/stat modifiers",
+        "rulesSummaryRo": "Modelul primește Invulnerable Save 4+ și +1 Toughness, +1 Save și +1 Wound.",
+        "limitations": "Fără efect bonus suplimentar indicat pe carte."
+      },
+      "loreTextRo": "Armura a fost făurită de un meșter excepțional și este concepută să reziste celor mai letale arme și celor mai cumplite creaturi ale mileniului 41.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        2103,
+        2112
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "Modelul primește Invulnerable Save 4+ și +1 Toughness, +1 Save și +1 Wound.",
+      "bonusEffectRo": null
+    },
+    {
+      "id": "powerfield_projector",
+      "name": "Powerfield Projector",
+      "alliance": "oppressors",
+      "who": "One CHARACTER model, excluding EPIC HERO",
+      "effect": "Unitatea primește Invulnerable Save 5+ împotriva atacurilor ranged. Cât timp unitatea este ținta atacurilor ranged, pentru fiecare unmodified Save Roll de 6, unitatea atacatoare suferă 1 Mortal Wound după ce și-a rezolvat atacurile.",
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          2114,
+          2122
+        ],
+        "timing": "When targeted by ranged attacks",
+        "rulesSummaryRo": "Unitatea primește Invulnerable Save 5+ împotriva atacurilor ranged. Cât timp unitatea este ținta atacurilor ranged, pentru fiecare unmodified Save Roll de 6, unitatea atacatoare suferă 1 Mortal Wound după ce și-a rezolvat atacurile.",
+        "limitations": "Fără efect bonus suplimentar indicat pe carte."
+      },
+      "loreTextRo": "Generatorul creează un câmp energetic elastic în jurul purtătorului și poate ricoșa focul inamic asupra celor care au tras.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        2114,
+        2122
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "Unitatea primește Invulnerable Save 5+ împotriva atacurilor ranged. Cât timp unitatea este ținta atacurilor ranged, pentru fiecare unmodified Save Roll de 6, unitatea atacatoare suferă 1 Mortal Wound după ce și-a rezolvat atacurile.",
+      "bonusEffectRo": null
+    },
+    {
+      "id": "ruinator",
+      "name": "Ruinator",
+      "alliance": "oppressors",
+      "who": "One CHARACTER model, excluding EPIC HERO",
+      "effect": "O dată pe bătălie, când unitatea este selectată să lupte, modelul poate selecta una dintre armele sale melee. Până la sfârșitul fazei, arma primește Devastating Wounds și Hazardous și adaugă jumătate din numărul battle round-ului curent (rotunjit în sus) la Attack și Strength.",
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          2124,
+          2132
+        ],
+        "timing": "Once per battle, when the unit is selected to fight",
+        "rulesSummaryRo": "O dată pe bătălie, când unitatea este selectată să lupte, modelul poate selecta una dintre armele sale melee. Până la sfârșitul fazei, arma primește Devastating Wounds și Hazardous și adaugă jumătate din numărul battle round-ului curent (rotunjit în sus) la Attack și Strength.",
+        "limitations": "Fără efect bonus suplimentar indicat pe carte."
+      },
+      "loreTextRo": "Arma emană o lumină purpurie sinistră și pare însetată de violență. Se spune că lasă ruina în urmă și se hrănește cu forța vitală a celor doborâți.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        2124,
+        2132
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "O dată pe bătălie, când unitatea este selectată să lupte, modelul poate selecta una dintre armele sale melee. Până la sfârșitul fazei, arma primește Devastating Wounds și Hazardous și adaugă jumătate din numărul battle round-ului curent (rotunjit în sus) la Attack și Strength.",
+      "bonusEffectRo": null
+    },
+    {
+      "id": "temporal_talisman",
+      "name": "Temporal Talisman",
+      "alliance": "oppressors",
+      "who": "One CHARACTER model, excluding EPIC HERO",
+      "effect": "Unitatea primește Fights First.",
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          2134,
+          2140
+        ],
+        "timing": "Permanent ability",
+        "rulesSummaryRo": "Unitatea primește Fights First.",
+        "limitations": "Fără efect bonus suplimentar indicat pe carte."
+      },
+      "loreTextRo": "Cele trei sfere au aparținut cândva toiagului Weirdboy-ului Mukknog, care pretindea că le-a primit de la Mork. Câmpul lor de stază încetinește timpul în jurul purtătorului.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        2134,
+        2140
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "Unitatea primește Fights First.",
+      "bonusEffectRo": null
+    },
+    {
+      "id": "personal_teleporter",
+      "name": "Personal Teleporter",
+      "alliance": "oppressors",
+      "who": "One CHARACTER model",
+      "effect": "Unitatea primește Deep Strike. O dată pe bătălie, poți ținti această unitate cu Rapid Ingress pentru 0 CP.",
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          2142,
+          2151
+        ],
+        "timing": "Permanent and once-per-battle effects",
+        "rulesSummaryRo": "Unitatea primește Deep Strike. O dată pe bătălie, poți ținti această unitate cu Rapid Ingress pentru 0 CP.",
+        "limitations": "Fără efect bonus suplimentar indicat pe carte."
+      },
+      "loreTextRo": "Dispozitivul a fost recuperat dintr-un ansamblu tellyporta Ork avariat. Tehnologia instabilă permite războinicilor să apară brusc în mijlocul luptei, în fulgere verzi.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        2142,
+        2151
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "Unitatea primește Deep Strike. O dată pe bătălie, poți ținti această unitate cu Rapid Ingress pentru 0 CP.",
+      "bonusEffectRo": null
+    },
+    {
+      "id": "enhanced_bionics",
+      "name": "Enhanced Bionics",
+      "alliance": "oppressors",
+      "who": "One CHARACTER model",
+      "effect": "În Command phase, modelul recuperează până la D3 Wounds pierdute. Prima dată când modelul este distrus, nu îl elimina definitiv: la sfârșitul fazei aruncă D6 (adaugă 2 dacă modelul are INFANTRY sau MOUNTED); la 4+, repune-l cât mai aproape de locul distrugerii, neangajat, cu 3 Wounds rămase.",
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          2153,
+          2161
+        ],
+        "timing": "Your Command phase; first time the model is destroyed",
+        "rulesSummaryRo": "În Command phase, modelul recuperează până la D3 Wounds pierdute. Prima dată când modelul este distrus, nu îl elimina definitiv: la sfârșitul fazei aruncă D6 (adaugă 2 dacă modelul are INFANTRY sau MOUNTED); la 4+, repune-l cât mai aproape de locul distrugerii, neangajat, cu 3 Wounds rămase.",
+        "limitations": "Fără efect bonus suplimentar indicat pe carte."
+      },
+      "loreTextRo": "Operațiile extinse au înlocuit aproape toată carnea purtătorului cu metal rezistent și cogitatoare capabile să se repare singure.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        2153,
+        2161
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "În Command phase, modelul recuperează până la D3 Wounds pierdute. Prima dată când modelul este distrus, nu îl elimina definitiv: la sfârșitul fazei aruncă D6 (adaugă 2 dacă modelul are INFANTRY sau MOUNTED); la 4+, repune-l cât mai aproape de locul distrugerii, neangajat, cu 3 Wounds rămase.",
+      "bonusEffectRo": null
+    },
+    {
+      "id": "maelstrom_clarion",
+      "name": "Maelstrom Clarion",
+      "alliance": "raiders",
+      "who": "One CHARACTER model",
+      "effect": "Unitățile inamice care fac un Ingress move nu pot fi plasate la maximum 12 inch de acest model.",
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          2163,
+          2169
+        ],
+        "timing": "Enemy ingress moves",
+        "rulesSummaryRo": "Unitățile inamice care fac un Ingress move nu pot fi plasate la maximum 12 inch de acest model.",
+        "limitations": "Fără efect bonus suplimentar indicat pe carte."
+      },
+      "loreTextRo": "Talismanele emit serii suprapuse de date perturbatoare, bruind sistemele de teleportare și balizele de ghidare dintr-o zonă largă.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        2163,
+        2169
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "Unitățile inamice care fac un Ingress move nu pot fi plasate la maximum 12 inch de acest model.",
+      "bonusEffectRo": null
+    },
+    {
+      "id": "displacer_field",
+      "name": "Displacer Field",
+      "alliance": "raiders",
+      "who": "One CHARACTER model",
+      "effect": "O dată pe bătălie, la sfârșitul Shooting phase a adversarului, dacă unitatea nu este engaged și a fost țintită de unul sau mai multe atacuri în acea fază, o poți scoate de pe battlefield și plasa în Strategic Reserves. La următorul Ingress move al unității, aceasta are Deep Strike până la sfârșitul acelei mișcări.",
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          2171,
+          2177
+        ],
+        "timing": "Once per battle, at the end of your opponent's Shooting phase",
+        "rulesSummaryRo": "O dată pe bătălie, la sfârșitul Shooting phase a adversarului, dacă unitatea nu este engaged și a fost țintită de unul sau mai multe atacuri în acea fază, o poți scoate de pe battlefield și plasa în Strategic Reserves. La următorul Ingress move al unității, aceasta are Deep Strike până la sfârșitul acelei mișcări.",
+        "limitations": "Fără efect bonus suplimentar indicat pe carte."
+      },
+      "loreTextRo": "Tehnologia câmpului dislocator mută pentru o clipă purtătorul în afara realității, ferindu-l de pericol înainte de a-l readuce în apropiere.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        2171,
+        2177
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "O dată pe bătălie, la sfârșitul Shooting phase a adversarului, dacă unitatea nu este engaged și a fost țintită de unul sau mai multe atacuri în acea fază, o poți scoate de pe battlefield și plasa în Strategic Reserves. La următorul Ingress move al unității, aceasta are Deep Strike până la sfârșitul acelei mișcări.",
+      "bonusEffectRo": null
+    },
+    {
+      "id": "disruption_orb",
+      "name": "Disruption Orb",
+      "alliance": "raiders",
+      "who": "One CHARACTER model",
+      "effect": "Aura Agent of Discord: când o Stratagemă a adversarului țintește o unitate inamică aflată la maximum 12 inch de acest model, costul acelei utilizări crește cu 1 CP.",
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          2179,
+          2186
+        ],
+        "timing": "Permanent 12-inch Aura",
+        "rulesSummaryRo": "Aura Agent of Discord: când o Stratagemă a adversarului țintește o unitate inamică aflată la maximum 12 inch de acest model, costul acelei utilizări crește cu 1 CP.",
+        "limitations": "Fără efect bonus suplimentar indicat pe carte."
+      },
+      "loreTextRo": "Dispozitivul emite unde sonore care bruiază comunicațiile și provoacă un disconfort extrem inamicilor, perturbându-le concentrarea și planurile.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        2179,
+        2186
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "Aura Agent of Discord: când o Stratagemă a adversarului țintește o unitate inamică aflată la maximum 12 inch de acest model, costul acelei utilizări crește cu 1 CP.",
+      "bonusEffectRo": null
+    },
+    {
+      "id": "fate_forged_weapon",
+      "name": "Fate-Forged Weapon",
+      "alliance": "raiders",
+      "who": "One CHARACTER model, excluding EPIC HERO",
+      "effect": "Armele melee ale modelului primesc +1 AP și +1 Damage. În Fight phase, modelul poate re-arunca Wound Rolls.",
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          2187,
+          2197
+        ],
+        "timing": "Permanent weapon modifiers; Fight phase",
+        "rulesSummaryRo": "Armele melee ale modelului primesc +1 AP și +1 Damage. În Fight phase, modelul poate re-arunca Wound Rolls.",
+        "limitations": "Fără efect bonus suplimentar indicat pe carte."
+      },
+      "loreTextRo": "O armă remarcabilă, cu o istorie infamă, care a doborât eroi, monștri, soldați obișnuiți și campioni legendari.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        2187,
+        2197
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "Armele melee ale modelului primesc +1 AP și +1 Damage. În Fight phase, modelul poate re-arunca Wound Rolls.",
+      "bonusEffectRo": null
+    },
+    {
+      "id": "cloak_of_shadows",
+      "name": "Cloak of Shadows",
+      "alliance": "raiders",
+      "who": "One CHARACTER model, excluding EPIC HERO",
+      "effect": "Unitatea primește Infiltrators.",
+      "audit": {
+        "status": "checked_against_source",
+        "source": "Wahapedia Dominatus, Upgrade Cards",
+        "sourceUrl": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+        "sourceLines": [
+          2199,
+          2205
+        ],
+        "timing": "Permanent ability",
+        "rulesSummaryRo": "Unitatea primește Infiltrators.",
+        "limitations": "Fără efect bonus suplimentar indicat pe carte."
+      },
+      "loreTextRo": "Mantia a fost descoperită în pustiurile atinse de Warp ale Armageddonului. Originea sa este necunoscută, dar poate ascunde purtătorul de simțurile fizice, tehnologice și psihice.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Upgrade deck",
+      "loreSourceLines": [
+        2199,
+        2205
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "effectRo": "Unitatea primește Infiltrators.",
+      "bonusEffectRo": null
+    }
+  ],
+  "agendaDetails": [
+    {
+      "id": "liberators_planetfall",
+      "alliance": "liberators",
+      "phase": 1,
+      "name": "Planetfall",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP scored from this Agenda Primary Mission",
+            "Control at least half of all battlefield objectives"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "scoring": [
+          {
+            "when": "End of your turn",
+            "condition": "One or more friendly units made an Ingress move this turn and were set up within range of an objective other than your home objective",
+            "vp": 3
+          },
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Control your home objective",
+            "vp": 3
+          },
+          {
+            "when": "Same timing",
+            "condition": "Control one or more objectives in your territory, excluding home objective",
+            "vp": 5
+          },
+          {
+            "when": "Same timing",
+            "condition": "Control one or more other objectives",
+            "vp": 7
+          }
+        ]
+      },
+      "loreTextRo": "Mai multe zone de lansare cu valoare strategică au fost identificate. Forțele trebuie să intre direct în luptă și să le ocupe pentru a crea primul punct solid de sprijin în teatrul de război.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        725,
+        750
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        725,
+        751
+      ]
+    },
+    {
+      "id": "liberators_vital_strongpoint",
+      "alliance": "liberators",
+      "phase": 1,
+      "name": "Vital Strongpoint",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP from this Agenda Primary Mission",
+            "Control opponent's home objective",
+            "Opponent controls no objectives wholly within their territory"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "scoring": [
+          {
+            "when": "End of your turn",
+            "condition": "Control one or more objectives that opponent controlled at start of your turn",
+            "vp": 5
+          },
+          {
+            "when": "End of your turn",
+            "condition": "Control opponent's home objective",
+            "vp": 10
+          },
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "For each objective controlled within opponent's territory",
+            "vp": 5
+          }
+        ]
+      },
+      "loreTextRo": "Departe de haosul frontului se află o poziție fortificată esențială. Capturarea ei și a avanposturilor din jur ar împiedica inamicul să organizeze o contraofensivă coordonată.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        752,
+        776
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        752,
+        777
+      ]
+    },
+    {
+      "id": "liberators_secure_perimeter",
+      "alliance": "liberators",
+      "phase": 1,
+      "name": "Secure Perimeter",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP from this Agenda Primary Mission",
+            "No enemy units within your territory"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "scoring": [
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Control two or more objectives, excluding home objective",
+            "vp": 5
+          },
+          {
+            "when": "End of your turn",
+            "condition": "Opponent controls no objectives within your territory",
+            "vp": 5
+          },
+          {
+            "when": "End of your turn",
+            "condition": "No enemy units (excluding AIRCRAFT and Battle-shocked units) within your deployment zone",
+            "vp": 3
+          }
+        ]
+      },
+      "loreTextRo": "Capul de pod planetar trebuie securizat prin alungarea trupelor locale și ocuparea teritoriului lor. Numai un perimetru sigur poate permite următoarelor valuri de întăriri să aterizeze.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        778,
+        800
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        778,
+        800
+      ]
+    },
+    {
+      "id": "liberators_rescue_survivors",
+      "alliance": "liberators",
+      "phase": 2,
+      "name": "Rescue Survivors",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP din această Primary Mission",
+            "Cel puțin trei terrain areas în afara deployment zone au unități friendly eligibile și nicio unitate inamică"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "scoring": [
+          {
+            "when": "End of your turn",
+            "condition": "Pentru fiecare terrain area în afara deployment zone cu una sau mai multe unități friendly (fără AIRCRAFT/Battle-shocked) și fără unități inamice",
+            "vp": 1,
+            "per": "terrain area"
+          },
+          {
+            "when": "End of your turn",
+            "condition": "Una sau mai multe unități inamice care au început tura într-o terrain area au fost distruse în această tură",
+            "vp": 3
+          },
+          {
+            "when": "End of your turn",
+            "condition": "Opponent controls no objectives within your territory",
+            "vp": 3
+          },
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Control one or more objectives, excluding home objective",
+            "vp": 4
+          }
+        ]
+      },
+      "sourceLineRange": [
+        801,
+        830
+      ],
+      "loreTextRo": "Se crede că detașamente aliate izolate s-au ascuns în regiune. Trebuie găsite înaintea inamicului, iar înaintarea acestuia trebuie întârziată pentru ca supraviețuitorii să poată fi recuperați.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        801,
+        830
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        801,
+        831
+      ]
+    },
+    {
+      "id": "liberators_encirclement",
+      "alliance": "liberators",
+      "phase": 2,
+      "name": "Encirclement",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP from this Agenda Primary Mission",
+            "Have presence on three or more battlefield edges"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "definition": "Presence on an edge: one or more friendly units (excluding AIRCRAFT and Battle-shocked units) wholly within 6 inches of a battlefield edge and more than 9 inches from any battlefield corner.",
+        "scoring": [
+          {
+            "when": "End of your turn",
+            "condition": "Presence on three or more battlefield edges",
+            "vp": 5
+          },
+          {
+            "when": "End of your turn",
+            "condition": "Opponent controls no objectives within your territory",
+            "vp": 5
+          },
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Control one or more objectives",
+            "vp": 5
+          }
+        ]
+      },
+      "sourceLineRange": [
+        871,
+        896
+      ],
+      "loreTextRo": "Haosul luptelor oferă șansa de a închide un contingent inamic într-un cerc de foc. Dacă încercuirea reușește, forța prinsă va putea fi nimicită.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        831,
+        897
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        871,
+        897
+      ]
+    },
+    {
+      "id": "liberators_hidden_prize",
+      "alliance": "liberators",
+      "phase": 2,
+      "name": "Hidden Prize",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP from this Agenda Primary Mission",
+            "Discover the cache and control the objective it is in"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "actions": [
+          {
+            "name": "SEARCH",
+            "starts": "Shooting phase",
+            "units": "One unit within a terrain area outside your deployment zone that has not been searched",
+            "limit": "Twice per turn; units starting this action in a phase must be in different terrain areas",
+            "completes": "End of your turn",
+            "effect": "Terrain area is searched. If cache undiscovered, roll D6 adding 1 for every other terrain area searched; on 5+ discover cache, make that terrain area an objective if needed and place an operation marker. Cannot start again after discovery."
+          }
+        ],
+        "scoring": [
+          {
+            "when": "End of your turn",
+            "condition": "Each terrain area searched this turn",
+            "vp": 5
+          },
+          {
+            "when": "End of your turn",
+            "condition": "Discover the cache this turn",
+            "vp": 10
+          },
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Control one or more objectives, excluding home objective",
+            "vp": 5
+          },
+          {
+            "when": "Same timing",
+            "condition": "Control the objective with your operation marker",
+            "vp": 10
+          }
+        ]
+      },
+      "sourceLineRange": [
+        832,
+        869
+      ],
+      "loreTextRo": "Informațiile indică existența unei ascunzători cu un obiectiv valoros. Forțele trebuie să caute prin ruine și să recupereze prada înainte ca adversarul să o găsească.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        831,
+        875
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        832,
+        870
+      ]
+    },
+    {
+      "id": "liberators_cast_down_their_idols",
+      "alliance": "liberators",
+      "phase": 3,
+      "name": "Cast Down Their Idols",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP from this Agenda Primary Mission",
+            "Opponent controls no objectives within their territory"
+          ]
+        },
+        {
+          "count": 1,
+          "any": [
+            "Opponent's army included one or more TITANIC units and one or more are destroyed",
+            "Three or more of your Idol Targets are destroyed"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "setup": "In your Command phase, select one enemy model on battlefield with highest (or equal highest) Wounds; it is your Idol Target.",
+        "scoring": [
+          {
+            "when": "End of a turn",
+            "condition": "One or more enemy units that started the turn within range of an objective were destroyed this turn",
+            "vp": 5
+          },
+          {
+            "when": "End of a turn",
+            "condition": "Your Idol Target was destroyed this turn",
+            "vp": 5
+          },
+          {
+            "when": "End of a turn",
+            "condition": "Idol Target was TITANIC and destroyed this turn",
+            "vp": 5,
+            "cumulative": true
+          },
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Opponent controls no objectives wholly within your territory",
+            "vp": 5
+          },
+          {
+            "when": "Same timing",
+            "condition": "Control more objectives than opponent",
+            "vp": 5
+          }
+        ]
+      },
+      "loreTextRo": "Inamicul s-a retras în fortificații și își desfășoară cele mai mari mașini de război. Distrugerea acestor simboluri ale puterii și eliminarea apărătorilor va frânge rezistența adversă.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        898,
+        932
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        898,
+        932
+      ]
+    },
+    {
+      "id": "liberators_reclaim_this_world",
+      "alliance": "liberators",
+      "phase": 3,
+      "name": "Reclaim This World",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP from this Agenda Primary Mission",
+            "Raise a banner on three or more objectives"
+          ]
+        },
+        {
+          "count": 1,
+          "any": [
+            "Raise a banner on every objective"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "actions": [
+          {
+            "name": "RAISE BANNER",
+            "starts": "Shooting phase",
+            "units": "O unitate în range-ul unui obiectiv",
+            "limit": "Nelimitat; fiecare unitate care începe acțiunea în aceeași fază trebuie să fie în range-ul unui obiectiv diferit.",
+            "completes": "End of your turn",
+            "effect": "Alege un obiectiv controlat de unitate care nu are deja operation marker al tău; plasează markerul pentru a reprezenta bannerul."
+          }
+        ],
+        "scoring": [
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Controlezi home objective",
+            "vp": 1,
+            "bannerMultiplier": 2
+          },
+          {
+            "when": "Same timing",
+            "condition": "Controlezi home objective adversarului",
+            "vp": 6,
+            "bannerMultiplier": 2
+          },
+          {
+            "when": "Same timing",
+            "condition": "Pentru fiecare alt obiectiv controlat",
+            "vp": 4,
+            "per": "objective",
+            "bannerMultiplier": 2
+          }
+        ],
+        "scoringNote": "Dacă ai ridicat banner pe obiectivul respectiv, dublezi VP-ul aferent acelui obiectiv."
+      },
+      "sourceLineRange": [
+        933,
+        969
+      ],
+      "loreTextRo": "A venit vremea alungării ocupanților și revendicării planetei. Bannerele trebuie ridicate pe ziduri și bastioane pentru a anunța că înfrângerea inamicului este aproape.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        933,
+        970
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        933,
+        970
+      ]
+    },
+    {
+      "id": "liberators_slay_the_tyrant",
+      "alliance": "liberators",
+      "phase": 3,
+      "name": "Slay the Tyrant",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP from this Agenda Primary Mission",
+            "Enemy WARLORD destroyed"
+          ]
+        },
+        {
+          "count": 1,
+          "all": [
+            "All enemy CHARACTER models destroyed or in Strategic Reserves"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "scoring": [
+          {
+            "when": "End of your turn",
+            "condition": "One or more enemy units destroyed this turn",
+            "vp": 5
+          },
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Control one or more objectives, excluding home objective",
+            "vp": 5
+          },
+          {
+            "when": "End of your turn",
+            "condition": "More enemy units than friendly units destroyed this battle round",
+            "vp": 5
+          },
+          {
+            "when": "End of battle",
+            "condition": "Enemy WARLORD destroyed",
+            "vp": 5
+          }
+        ]
+      },
+      "loreTextRo": "Marele conducător al inamicului se află în fața armatei. Eliminarea lui ar răzbuna nenumărate victime și ar putea decapita întreaga structură de comandă adversă.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        971,
+        1004
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        971,
+        1004
+      ]
+    },
+    {
+      "id": "oppressors_dig_in",
+      "alliance": "oppressors",
+      "phase": 1,
+      "name": "Dig In",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP from this Agenda Primary Mission",
+            "Control every objective within your territory"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "scoring": [
+          {
+            "when": "End of your turn",
+            "condition": "One or more enemy units destroyed this turn",
+            "vp": 3
+          },
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Control one or more objectives within opponent's territory",
+            "vp": 5
+          },
+          {
+            "when": "Same timing",
+            "condition": "Control every objective within your territory",
+            "vp": 3
+          },
+          {
+            "when": "End of battle",
+            "condition": "Controlezi home objective",
+            "vp": 10
+          }
+        ]
+      },
+      "sourceLineRange": [
+        1040,
+        1067
+      ],
+      "loreTextRo": "Invadatorii au aterizat în număr mare și câștigă teren. Trupele trebuie să reziste, să apere fiecare poziție și să-i facă pe atacatori să plătească în sânge pentru fiecare pas.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        1040,
+        1068
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1040,
+        1068
+      ]
+    },
+    {
+      "id": "oppressors_loot_and_scoot",
+      "alliance": "oppressors",
+      "phase": 1,
+      "name": "Loot and Scoot",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP from this Agenda Primary Mission",
+            "Loot three or more objectives, excluding home objective"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "actions": [
+          {
+            "name": "LOOT",
+            "starts": "Shooting phase",
+            "units": "One unit within range of an objective you control without your operation marker",
+            "limit": "Up to twice per turn; each unit starting the action in a phase must be within range of a different objective",
+            "completes": "Immediately",
+            "effect": "Objective is looted; place operation marker on objective and on unit that completed action. Remove unit marker if unit is destroyed."
+          }
+        ],
+        "scoring": [
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Control one or more objectives, excluding home objective",
+            "vp": 5
+          },
+          {
+            "when": "End of battle",
+            "condition": "Each objective looted by your army",
+            "vp": 7,
+            "per": "objective"
+          },
+          {
+            "when": "End of battle",
+            "condition": "Each of your operation markers on a friendly unit",
+            "vp": 3,
+            "per": "marker"
+          }
+        ]
+      },
+      "loreTextRo": "Pe măsură ce invadatorii ies din zonele de aterizare, caută depozite locale de provizii. Acestea trebuie jefuite rapid, înainte ca adversarul să le poată folosi.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        1005,
+        1039
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1005,
+        1039
+      ]
+    },
+    {
+      "id": "oppressors_repel_the_foe",
+      "alliance": "oppressors",
+      "phase": 1,
+      "name": "Repel the Foe",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP from this Agenda Primary Mission",
+            "Control two or more objectives within opponent's territory"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "scoring": [
+          {
+            "when": "End of your turn",
+            "condition": "Control one or more objectives opponent controlled at start of your turn",
+            "vp": 5
+          },
+          {
+            "when": "End of your turn",
+            "condition": "One or more friendly units (excluding AIRCRAFT and Battle-shocked) wholly within opponent deployment zone",
+            "vp": 5
+          },
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Each objective you control",
+            "vp": 2,
+            "per": "objective"
+          },
+          {
+            "when": "Same timing",
+            "condition": "Each objective you control within opponent territory",
+            "vp": 3,
+            "per": "objective",
+            "cumulative": true
+          }
+        ]
+      },
+      "loreTextRo": "Prezența invadatorilor pe planetă este încă fragilă. Opressorii trebuie să profite de acest moment și să-i alunge din zonele de debarcare înainte să-și consolideze capetele de pod.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        1069,
+        1095
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1069,
+        1095
+      ]
+    },
+    {
+      "id": "oppressors_breakthrough",
+      "alliance": "oppressors",
+      "phase": 2,
+      "name": "Breakthrough",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP from this Agenda Primary Mission",
+            "Two or more friendly units punched through"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "actions": [
+          {
+            "name": "PUNCH THROUGH",
+            "starts": "Shooting phase",
+            "units": "One unit that did not make an Ingress move this turn and is wholly within 6 inches of opponent battlefield edge",
+            "limit": "Once per turn",
+            "completes": "End of your turn",
+            "effect": "Unit is removed from battlefield; units embarked within a TRANSPORT that punched through also punch through."
+          }
+        ],
+        "scoring": [
+          {
+            "when": "End of your turn",
+            "condition": "One or more friendly units (excluding AIRCRAFT and Battle-shocked) within 6 inches of opponent battlefield edge",
+            "vp": 5
+          },
+          {
+            "when": "End of your turn",
+            "condition": "One or more units punched through this turn",
+            "vp": 10
+          },
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Control one or more objectives, excluding home objective",
+            "vp": 5
+          },
+          {
+            "when": "Same timing",
+            "condition": "Control one or more objectives within opponent territory",
+            "vp": 5
+          }
+        ]
+      },
+      "loreTextRo": "O contraofensivă decisivă trebuie să spargă linia de întârziere a inamicului. Odată deschis culoarul, trupele pot pătrunde în spatele frontului și pot provoca haos.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        1096,
+        1135
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1096,
+        1135
+      ]
+    },
+    {
+      "id": "oppressors_convoy_ambush",
+      "alliance": "oppressors",
+      "phase": 2,
+      "name": "Convoy Ambush",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP from this Agenda Primary Mission",
+            "Opponent had TRANSPORT units and all are destroyed",
+            "Three or more Prime Targets destroyed"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "setup": "In your Command phase select one enemy unit on battlefield; it must be MONSTER/VEHICLE if possible. It is Prime Target until start of your next Command phase.",
+        "scoring": [
+          {
+            "when": "End of a turn",
+            "condition": "Prime Target destroyed this turn",
+            "vp": 8
+          },
+          {
+            "when": "End of a turn",
+            "condition": "Prime Target was a TRANSPORT and destroyed this turn",
+            "vp": 2,
+            "cumulative": true
+          },
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Control one or more objectives, excluding home objective",
+            "vp": 5
+          },
+          {
+            "when": "Same timing",
+            "condition": "Control more objectives than opponent",
+            "vp": 5
+          }
+        ]
+      },
+      "loreTextRo": "Inamicul transportă provizii și personal pentru a-și întări liniile. Orice transport sau țintă logistică trebuie identificată și transformată într-o epavă fumegândă.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        1136,
+        1165
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1136,
+        1165
+      ]
+    },
+    {
+      "id": "oppressors_sabotage_supplies",
+      "alliance": "oppressors",
+      "phase": 2,
+      "name": "Sabotage Supplies",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP from this Agenda Primary Mission",
+            "Opponent home objective sabotaged"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "actions": [
+          {
+            "name": "SABOTAGE",
+            "starts": "Shooting phase",
+            "units": "One unit within range of an objective, excluding home objective, without your operation marker",
+            "limit": "Once per turn",
+            "completes": "End of your turn",
+            "effect": "If unit remains within range of an objective you control, sabotage it and place operation marker."
+          }
+        ],
+        "scoring": [
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Each objective you control",
+            "vp": 4,
+            "per": "objective"
+          },
+          {
+            "when": "End of battle",
+            "condition": "Each objective sabotaged",
+            "vp": 5,
+            "per": "objective"
+          },
+          {
+            "when": "End of battle",
+            "condition": "Each sabotaged objective in opponent territory",
+            "vp": 5,
+            "per": "objective",
+            "cumulative": true
+          }
+        ]
+      },
+      "loreTextRo": "Adversarul adună proviziile capturate pentru o ofensivă majoră. Distrugerea acestor stocuri îi poate opri planul înainte ca atacul să înceapă.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        1166,
+        1202
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1166,
+        1202
+      ]
+    },
+    {
+      "id": "oppressors_lead_by_example",
+      "alliance": "oppressors",
+      "phase": 3,
+      "name": "Lead by Example",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP from this Agenda Primary Mission",
+            "Champion unit controls an objective in opponent territory and destroyed one or more enemy units"
+          ]
+        },
+        {
+          "count": 1,
+          "all": [
+            "WARLORD unit controls an objective in opponent territory and destroyed one or more enemy units"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "setup": "In Command phase select one friendly CHARACTER as Champion; must be WARLORD if not destroyed.",
+        "scoring": [
+          {
+            "when": "End of your turn",
+            "condition": "Champion unit destroyed one or more enemy units this turn",
+            "vp": 5
+          },
+          {
+            "when": "End of your turn",
+            "condition": "Champion unit controls one objective, excluding home objective",
+            "vp": 4
+          },
+          {
+            "when": "End of your turn",
+            "condition": "Champion unit wholly within opponent territory",
+            "vp": 6
+          },
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Each objective you control",
+            "vp": 4,
+            "per": "objective"
+          }
+        ]
+      },
+      "loreTextRo": "Warlordul trebuie să-și demonstreze supremația în fața propriilor războinici. Forțele alese îl urmează în luptă, iar victoria trebuie obținută printr-un exemplu brutal și vizibil.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        1203,
+        1233
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1203,
+        1233
+      ]
+    },
+    {
+      "id": "oppressors_ash_and_rubble",
+      "alliance": "oppressors",
+      "phase": 3,
+      "name": "Ash and Rubble",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP from this Agenda Primary Mission",
+            "Two or more objectives razed"
+          ]
+        },
+        {
+          "count": 1,
+          "all": [
+            "Every objective in your territory razed"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "actions": [
+          {
+            "name": "RAZE",
+            "starts": "Shooting phase",
+            "units": "O unitate în range-ul unui obiectiv; home objective este exclus, cu excepția battle round 5.",
+            "limit": "O dată pe tură; după trei obiective razed nu mai poate fi începută acțiunea.",
+            "completes": "End of opponent's turn sau end of battle, oricare survine prima.",
+            "effect": "Alege un obiectiv controlat de unitate; elimină obiectivul și marker-ele asociate. Devine terrain area normală pentru restul bătăliei."
+          }
+        ],
+        "scoring": [
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Controlezi home objective",
+            "vp": 3
+          },
+          {
+            "when": "Same timing",
+            "condition": "Pentru fiecare obiectiv controlat",
+            "vp": 5,
+            "per": "objective"
+          },
+          {
+            "when": "End of battle",
+            "condition": "Pentru fiecare obiectiv razed",
+            "vp": 10,
+            "per": "objective"
+          }
+        ]
+      },
+      "sourceLineRange": [
+        1234,
+        1271
+      ],
+      "loreTextRo": "Există riscul ca inamicul să câștige războiul. Opressorii primesc ordinul de a transforma obiectivele și teritoriul în ruine, astfel încât victoria adversarului să nu mai aibă valoare.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        1234,
+        1272
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1234,
+        1272
+      ]
+    },
+    {
+      "id": "oppressors_a_proper_challenge",
+      "alliance": "oppressors",
+      "phase": 3,
+      "name": "A Proper Challenge",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP from this Agenda Primary Mission",
+            "At end of any battle round kill tally 2+ and at least double opponent tally"
+          ]
+        },
+        {
+          "count": 1,
+          "all": [
+            "At end of any battle round kill tally 3+ and at least triple opponent tally"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "setup": "Fiecare jucător ține un kill tally per battle round. +1 pentru fiecare unitate inamică distrusă; MONSTER/VEHICLE/CHARACTER valorează 2, iar TITANIC valorează 3. Tally se resetează la începutul fiecărui battle round.",
+        "scoring": [
+          {
+            "when": "End of battle round",
+            "condition": "Kill tally propriu este cel puțin 1",
+            "vp": 5
+          },
+          {
+            "when": "End of battle round",
+            "condition": "Kill tally propriu este mai mare decât cel al adversarului",
+            "vp": 5
+          },
+          {
+            "when": "End of battle round",
+            "condition": "Kill tally propriu este cel puțin 2 și mai mult decât dublul tally-ului adversarului",
+            "vp": 5,
+            "cumulative": true
+          },
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Controlezi unul sau mai multe obiective, exceptând home objective",
+            "vp": 5
+          }
+        ]
+      },
+      "sourceLineRange": [
+        1273,
+        1303
+      ],
+      "loreTextRo": "Inamicul și-a adus întreaga putere pentru o victorie aparent decisivă. Opressorii trebuie să transforme această amenințare într-o provocare pe măsura lor și să dovedească superioritatea în luptă.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        1273,
+        1304
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1273,
+        1304
+      ]
+    },
+    {
+      "id": "raiders_clandestine_infiltration",
+      "alliance": "raiders",
+      "phase": 1,
+      "name": "Clandestine Infiltration",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP din această Primary Mission",
+            "Cel puțin o unitate BATTLELINE a fost exfiltrată",
+            "Cel puțin două unități non-BATTLELINE au fost exfiltrate"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "actions": [
+          {
+            "name": "EXFILTRATE",
+            "starts": "Shooting phase",
+            "units": "O unitate non-TRANSPORT care nu a făcut Ingress în această tură și este complet la maximum 6 inch de marginea battlefield-ului adversarului.",
+            "limit": "O dată pe tură",
+            "completes": "End of your turn",
+            "effect": "Unitatea este exfiltrată și eliminată de pe battlefield."
+          }
+        ],
+        "scoring": [
+          {
+            "when": "End of your turn",
+            "condition": "Una sau mai multe unități inamice care au început tura în teritoriul adversarului au fost distruse în această tură",
+            "vp": 5
+          },
+          {
+            "when": "End of your turn",
+            "condition": "Controlezi unul sau mai multe obiective din teritoriul adversarului",
+            "vp": 5
+          },
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Controlezi unul sau mai multe obiective, exceptând home objective",
+            "vp": 5
+          },
+          {
+            "when": "Same timing",
+            "condition": "Controlezi mai multe obiective decât adversarul",
+            "vp": 5
+          },
+          {
+            "when": "End of battle",
+            "condition": "Una sau mai multe unități friendly au fost exfiltrate",
+            "vp": 10
+          }
+        ]
+      },
+      "sourceLineRange": [
+        1305,
+        1347
+      ],
+      "loreTextRo": "Sub acoperirea conflictului, trupele trebuie să treacă neobservate prin liniile inamice. Odată ajunse în spatele frontului, vor putea lansa raiduri rapide în mijlocul confuziei.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        1305,
+        1348
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1305,
+        1348
+      ]
+    },
+    {
+      "id": "raiders_vanguard_recon",
+      "alliance": "raiders",
+      "phase": 1,
+      "name": "Vanguard Recon",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP from this Agenda Primary Mission",
+            "Three or more enemy units and three or more objectives scanned"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "actions": [
+          {
+            "name": "SCAN TARGET",
+            "starts": "Shooting phase",
+            "units": "One unit",
+            "limit": "Twice per turn",
+            "completes": "End of your turn",
+            "effect": "Select enemy unit or objective within 12 inches and visible, without your operation marker; place marker on scanned target."
+          }
+        ],
+        "scoring": [
+          {
+            "when": "End of your turn",
+            "condition": "One or more enemy units scanned this turn",
+            "vp": 5
+          },
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Control one or more objectives",
+            "vp": 5
+          },
+          {
+            "when": "End of battle",
+            "condition": "Each objective scanned, excluding home objective",
+            "vp": 4,
+            "per": "objective"
+          }
+        ]
+      },
+      "sourceLineRange": [
+        1349,
+        1391
+      ],
+      "loreTextRo": "Conflictul se extinde rapid, iar oportunitățile apar doar pentru cei care cunosc terenul. Raiders trebuie să cartografieze pozițiile, unitățile și obiectivele relevante.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        1349,
+        1392
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1349,
+        1392
+      ]
+    },
+    {
+      "id": "raiders_establish_contact",
+      "alliance": "raiders",
+      "phase": 1,
+      "name": "Establish Contact",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP from this Agenda Primary Mission",
+            "Recover the agent"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "actions": [
+          {
+            "name": "CONTACT AGENT",
+            "starts": "Shooting phase; declare silence or recover",
+            "units": "One unit within range of a central objective",
+            "limit": "Once per turn; cannot start again after completion",
+            "completes": "End of your turn if silencing; end of opponent turn if recovering",
+            "effect": "If unit remains within range of a central objective you control, agent is silenced or recovered."
+          }
+        ],
+        "scoring": [
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Each objective controlled",
+            "vp": 4,
+            "per": "objective"
+          },
+          {
+            "when": "End of battle",
+            "condition": "Agent silenced",
+            "vp": 8
+          },
+          {
+            "when": "End of battle",
+            "condition": "Agent recovered",
+            "vp": 15
+          }
+        ]
+      },
+      "sourceLineRange": [
+        1393,
+        1427
+      ],
+      "loreTextRo": "Un agent care deține informații vitale a fost izolat de forțele inamice. Raiders trebuie să-l localizeze, să extragă informațiile și apoi să-l recupereze sau să-l reducă la tăcere.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        1393,
+        1428
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1393,
+        1428
+      ]
+    },
+    {
+      "id": "raiders_a_knife_in_the_dark",
+      "alliance": "raiders",
+      "phase": 2,
+      "name": "A Knife in the Dark",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP from this Agenda Primary Mission",
+            "Elimination Target destroyed"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "setup": "In Resolve Pre-battle Abilities, select one enemy CHARACTER model as Elimination Target.",
+        "scoring": [
+          {
+            "when": "End of your turn",
+            "condition": "One or more enemy units destroyed this turn",
+            "vp": 3
+          },
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Each objective controlled",
+            "vp": 4,
+            "per": "objective"
+          },
+          {
+            "when": "End of battle",
+            "condition": "Elimination Target destroyed",
+            "vp": 10
+          },
+          {
+            "when": "End of battle",
+            "condition": "Elimination Target was opponent WARLORD and destroyed",
+            "vp": 5,
+            "cumulative": true
+          }
+        ]
+      },
+      "sourceLineRange": [
+        1429,
+        1459
+      ],
+      "loreTextRo": "Un lider inamic important trebuie eliminat. Moartea sa va destabiliza comanda adversă și va răspândi haos pe care Raiders îl pot exploata.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        1429,
+        1460
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1429,
+        1460
+      ]
+    },
+    {
+      "id": "raiders_a_thief_in_the_night",
+      "alliance": "raiders",
+      "phase": 2,
+      "name": "A Thief in the Night",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP din această Primary Mission",
+            "WARLORD's unit controlează obiectivul artefact",
+            "WARLORD's unit a controlat obiectivul artefact la finalul a trei ture consecutive"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "setup": "În Resolve Pre-battle Abilities, adversarul selectează un obiectiv care nu se află în deployment zone-ul său; acesta devine artefact. Plasează un operation marker pe el.",
+        "scoring": [
+          {
+            "when": "End of your turn",
+            "condition": "Controlezi obiectivul artefact",
+            "vp": 8
+          },
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Control one or more objectives, excluding home objective",
+            "vp": 5
+          },
+          {
+            "when": "Same timing",
+            "condition": "Controlezi mai multe obiective decât adversarul",
+            "vp": 5
+          },
+          {
+            "when": "End of battle",
+            "condition": "Controlezi obiectivul artefact",
+            "vp": 5
+          },
+          {
+            "when": "End of battle",
+            "condition": "WARLORD's unit controlează obiectivul artefact",
+            "vp": 5,
+            "cumulative": true
+          }
+        ]
+      },
+      "sourceLineRange": [
+        1461,
+        1494
+      ],
+      "loreTextRo": "Agenții au localizat un artefact de mare valoare. Raiders trebuie să treacă prin forțele care îl păzesc, să le elimine și să recupereze personal relicva.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        1461,
+        1498
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1461,
+        1498
+      ]
+    },
+    {
+      "id": "raiders_seeds_of_destruction",
+      "alliance": "raiders",
+      "phase": 2,
+      "name": "Seeds of Destruction",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP from this Agenda Primary Mission",
+            "Your WARLORD completed a ritual during battle"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "actions": [
+          {
+            "name": "SOW THE SEEDS",
+            "starts": "Shooting phase",
+            "units": "One unit wholly within 6 inches of battlefield centre",
+            "limit": "Once per turn",
+            "completes": "End of opponent turn or end of battle, whichever first",
+            "effect": "If unit remains wholly within 6 inches of centre, it completes a ritual."
+          }
+        ],
+        "scoring": [
+          {
+            "when": "End of your turn",
+            "condition": "One or more enemy units destroyed this turn",
+            "vp": 5
+          },
+          {
+            "when": "End of a turn",
+            "condition": "Friendly unit completed a ritual this turn",
+            "vp": 10
+          },
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Control one or more objectives, excluding home objective",
+            "vp": 5
+          },
+          {
+            "when": "Same timing",
+            "condition": "Opponent controls no central objectives",
+            "vp": 5
+          }
+        ]
+      },
+      "sourceLineRange": [
+        1496,
+        1536
+      ],
+      "loreTextRo": "Raiders au ocazia să planteze cauza unei catastrofe viitoare: un ritual întunecat, o manipulare a sorții sau un agent biologic cu efect întârziat, ale cărui consecințe se vor manifesta peste ani.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        1499,
+        1537
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1499,
+        1537
+      ]
+    },
+    {
+      "id": "raiders_erase_all_trace",
+      "alliance": "raiders",
+      "phase": 3,
+      "name": "Erase All Trace",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP from this Agenda Primary Mission",
+            "Presence on three or more table quarters"
+          ]
+        },
+        {
+          "count": 1,
+          "any": [
+            "No enemy units on battlefield",
+            "All enemy units (excluding AIRCRAFT and Battle-shocked) within same table quarter"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "definition": "Presence in a table quarter: one or more friendly units (excluding AIRCRAFT and Battle-shocked) wholly within a table quarter and more than 6 inches from battlefield centre.",
+        "scoring": [
+          {
+            "when": "End of your turn",
+            "condition": "One or more enemy units destroyed this turn",
+            "vp": 4
+          },
+          {
+            "when": "End of your turn",
+            "condition": "Presence in three or more table quarters",
+            "vp": 3
+          },
+          {
+            "when": "End of your turn",
+            "condition": "Presence in all four table quarters",
+            "vp": 2,
+            "cumulative": true
+          },
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Control one or more objectives, excluding home objective",
+            "vp": 5
+          }
+        ]
+      },
+      "sourceLineRange": [
+        1538,
+        1568
+      ],
+      "loreTextRo": "Înainte de plecare, Raiders trebuie să șteargă orice urmă a operațiunii. Pot elimina martorii sau îi pot captura pentru un scop mult mai sinistru.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        1538,
+        1570
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1538,
+        1570
+      ]
+    },
+    {
+      "id": "raiders_capture_trophies",
+      "alliance": "raiders",
+      "phase": 3,
+      "name": "Capture Trophies",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP from this Agenda Primary Mission",
+            "Recover three or more operation markers"
+          ]
+        },
+        {
+          "count": 1,
+          "all": [
+            "Enemy WARLORD destroyed and resulting operation marker recovered"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "definition": "When an enemy CHARACTER is destroyed, place an operation marker touching its base before removing it. When a friendly unit ends a move, recover each of your markers within 1 inch of that unit.",
+        "scoring": [
+          {
+            "when": "End of battle round",
+            "condition": "One or more enemy units destroyed this battle round",
+            "vp": 3
+          },
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Each objective controlled",
+            "vp": 4,
+            "per": "objective"
+          },
+          {
+            "when": "End of battle",
+            "condition": "Each operation marker recovered",
+            "vp": 6,
+            "per": "marker"
+          }
+        ]
+      },
+      "sourceLineRange": [
+        1611,
+        1641
+      ],
+      "loreTextRo": "În timp ce războiul se apropie de final, Raiders jefuiesc obiective securizate și vânează campionii inamici. Nu vor părăsi planeta fără să obțină o pradă pe măsura riscului.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        1611,
+        1641
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1611,
+        1641
+      ]
+    },
+    {
+      "id": "raiders_extraction",
+      "alliance": "raiders",
+      "phase": 3,
+      "name": "Extraction",
+      "status": "verified_rules_summary",
+      "agendaAchieved": [
+        {
+          "count": 1,
+          "any": [
+            "35+ VP from this Agenda Primary Mission",
+            "Two or more friendly units extracted spoils"
+          ]
+        },
+        {
+          "count": 1,
+          "all": [
+            "Three or more friendly units extracted spoils"
+          ]
+        }
+      ],
+      "primaryMission": {
+        "actions": [
+          {
+            "name": "EXTRACTION",
+            "starts": "Shooting phase",
+            "units": "One non-TRANSPORT unit",
+            "limit": "Once per turn; each unit cannot extract spoils more than once per battle",
+            "completes": "End of your turn",
+            "effect": "If unit is within 3 inches of battlefield centre, it extracts spoils."
+          }
+        ],
+        "scoring": [
+          {
+            "when": "End of your turn",
+            "condition": "No enemy units (excluding AIRCRAFT and Battle-shocked) within 6 inches of battlefield centre",
+            "vp": 3
+          },
+          {
+            "when": "End of your turn",
+            "condition": "A friendly unit extracted spoils this turn",
+            "vp": 3
+          },
+          {
+            "when": "End of Command phase, from battle round 2 (or end of turn in battle round 5)",
+            "condition": "Control one or more objectives, excluding home objective",
+            "vp": 5
+          }
+        ]
+      },
+      "sourceLineRange": [
+        1570,
+        1609
+      ],
+      "loreTextRo": "Raiders trebuie să-și recupereze bunurile și să părăsească planeta înainte ca una dintre tabere să obțină supremația și să-și îndrepte întreaga atenție asupra lor.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_paraphrase",
+      "loreSource": "Wahapedia Dominatus / Agenda deck",
+      "loreSourceLines": [
+        1570,
+        1610
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        1571,
+        1610
+      ]
+    }
+  ],
+  "validation": {
+    "agendaCount": 27,
+    "locationsCount": 9,
+    "briefingsCount": 9,
+    "battleHonoursCount": 11,
+    "battleSkillsCount": 9,
+    "relicsCount": 15,
+    "agendaAchievedCardIdentities": 3,
+    "forceDispositionMatricesTranscribed": 0,
+    "status": "all_card_content_and_campaign_rules_audited_matrix_requires_manual_fallback",
+    "note": "Primary mission conditions/actions and scoring have been enriched. Briefing Force Disposition matrices remain untranscribed because the source presents them visually.",
+    "agendasWithDetailedRules": 27,
+    "agendaPrimaryMissionsWithScoringOrAction": 27,
+    "sourceLineRangesAdded": true,
+    "upgradeCardsAudited": 35,
+    "upgradeCardsWithSourceRanges": 35,
+    "forceDispositionCount": 5,
+    "briefingMatrices": 9,
+    "briefingMatrixCells": 225,
+    "briefingMatrixResolvedCells": 0,
+    "agendaLoreCount": 27,
+    "briefingLoreCount": 9,
+    "locationLoreCount": 9,
+    "upgradeLoreCount": 35,
+    "agendaSourceRangesCorrected": 27,
+    "briefingSourceRangesAdded": 9,
+    "locationSourceRangesAdded": 9,
+    "upgradeEffectsWithBonusAudited": 35
+  },
+  "campaignSetup": {
+    "requiredAlliances": [
+      "liberators",
+      "oppressors"
+    ],
+    "optionalAlliances": [
+      "raiders"
+    ],
+    "defaultBattleSchedule": [
+      {
+        "phase": 1,
+        "battlesPerPlayer": 2,
+        "battleSize": "Strike Force"
+      },
+      {
+        "phase": 2,
+        "battlesPerPlayer": 2,
+        "battleSize": "Strike Force"
+      },
+      {
+        "phase": 3,
+        "battlesPerPlayer": 1,
+        "battleSize": "Strike Force"
+      }
+    ],
+    "factionContinuity": "Players should use the same faction throughout the campaign by default; Warmaster may modify this.",
+    "armySizeAndBattleCount": "Warmaster may change battle size and increase battles in phases 1 and 2. Phase 3 remains one final mission."
+  },
+  "sourceVersionNote": "v1.8: final live-source audit pass. Corrected Agenda/Briefing/Location source ranges, corrected Second Wave and several War Zone rule summaries, made all Upgrade effects fully explicit in Romanian including bonus effects and eligibility, and expanded campaign award/phase-end logic. Briefing matrix remains a manual-selection integration item because cell coordinates are not preserved by text extraction.",
+  "briefings": [
+    {
+      "id": "liberators_briefing_phase_1",
+      "alliance": "liberators",
+      "phase": 1,
+      "narrativeSummary": "The first Imperial wave must establish landing zones and beachheads.",
+      "strategicObjective": "Secure the initial foothold for the liberation.",
+      "agendaIds": [
+        "liberators_planetfall",
+        "liberators_vital_strongpoint",
+        "liberators_secure_perimeter"
+      ],
+      "forceDispositionMatrix": {
+        "take_and_hold": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "disruption": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "purge_the_foe": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "priority_assets": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "reconnaissance": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        }
+      },
+      "matrixStatus": "source_chart_present_cell_coordinates_not_reliably_extracted",
+      "agendaSelectionMode": "force_disposition_pair",
+      "narrativeOutcome": {
+        "narrativePointRule": {
+          "locationControl": 1,
+          "ascendancy": 1
+        },
+        "outcomes": {
+          "0": "Debarcarea inițială a eșuat în mare parte; capetele de pod sunt fragile și greu de menținut.",
+          "1": "A fost stabilit un cap de pod, dar cu pierderi mari; eliberarea trebuie să continue.",
+          "2": "Forțele au stabilit și întărit un cap de pod solid, respingând inamicul."
+        }
+      },
+      "source": "wahapedia",
+      "isCustom": false,
+      "matrixSourceLabels": [
+        "liberators_planetfall",
+        "liberators_vital_strongpoint",
+        "liberators_secure_perimeter"
+      ],
+      "matrixNotes": "Wahapedia displays the full Briefing chart. The current machine-readable text view does not preserve which Agenda belongs to each Force Disposition pair. JoiHammer should offer manual Agenda selection/override until the cell mapping is verified.",
+      "loreTextRo": "Flota imperial a încercuit Armageddonul. Prima undă trebuie să coboare imediat, să securizeze zonele de aterizare și să creeze capete de pod solide pentru sosirea întăririlor.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_ro_paraphrase",
+      "loreSourceLines": [
+        368,
+        406
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        368,
+        406
+      ]
+    },
+    {
+      "id": "liberators_briefing_phase_2",
+      "alliance": "liberators",
+      "phase": 2,
+      "narrativeSummary": "Maintain pressure, protect landing zones, and gather supplies and intelligence.",
+      "strategicObjective": "Prepare the final advance.",
+      "agendaIds": [
+        "liberators_rescue_survivors",
+        "liberators_encirclement",
+        "liberators_hidden_prize"
+      ],
+      "forceDispositionMatrix": {
+        "take_and_hold": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "disruption": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "purge_the_foe": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "priority_assets": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "reconnaissance": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        }
+      },
+      "matrixStatus": "source_chart_present_cell_coordinates_not_reliably_extracted",
+      "agendaSelectionMode": "force_disposition_pair",
+      "narrativeOutcome": {
+        "narrativePointRule": {
+          "locationControl": 1,
+          "ascendancy": 1
+        },
+        "outcomes": {
+          "0": "Avansul a stagnat, aprovizionarea este slabă și capetele de pod sunt amenințate.",
+          "1": "Avansul continuă, iar câteva poziții strategice sunt în mâinile alianței.",
+          "2": "Forțele au avansat puternic, au cucerit fortificații și sunt pregătite pentru atacul final."
+        }
+      },
+      "source": "wahapedia",
+      "isCustom": false,
+      "matrixSourceLabels": [
+        "liberators_rescue_survivors",
+        "liberators_encirclement",
+        "liberators_hidden_prize"
+      ],
+      "matrixNotes": "Wahapedia displays the full Briefing chart. The current machine-readable text view does not preserve which Agenda belongs to each Force Disposition pair. JoiHammer should offer manual Agenda selection/override until the cell mapping is verified.",
+      "loreTextRo": "Prima etapă a eliberării s-a încheiat, dar presiunea trebuie menținută. Forțele imperiale trebuie să apere zonele de debarcare, să obțină provizii și să găsească supraviețuitorii ascunși de-a lungul frontului.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_ro_paraphrase",
+      "loreSourceLines": [
+        408,
+        444
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        408,
+        444
+      ]
+    },
+    {
+      "id": "liberators_briefing_phase_3",
+      "alliance": "liberators",
+      "phase": 3,
+      "narrativeSummary": "The final assault must destroy enemy command and war engines and raise Imperial banners.",
+      "strategicObjective": "Liberate Armageddon decisively.",
+      "agendaIds": [
+        "liberators_cast_down_their_idols",
+        "liberators_reclaim_this_world",
+        "liberators_slay_the_tyrant"
+      ],
+      "forceDispositionMatrix": {
+        "take_and_hold": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "disruption": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "purge_the_foe": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "priority_assets": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "reconnaissance": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        }
+      },
+      "matrixStatus": "source_chart_present_cell_coordinates_not_reliably_extracted",
+      "agendaSelectionMode": "force_disposition_pair",
+      "narrativeOutcome": {
+        "narrativePointRule": {
+          "locationControl": 2,
+          "ascendancy": 1
+        },
+        "outcomes": {
+          "0": "Înfrângere totală; supraviețuitorii se retrag, iar Armageddon este pierdut.",
+          "1": "Atacul final a eșuat, dar au fost obținute victorii strategice care pot permite revenirea.",
+          "2": "O mare parte din Armageddon a fost eliberată, dar inamicul nu a fost eliminat complet.",
+          "3": "Victorie completă: planeta este eliberată, iar forțele adverse sunt distruse decisiv."
+        }
+      },
+      "source": "wahapedia",
+      "isCustom": false,
+      "matrixSourceLabels": [
+        "liberators_cast_down_their_idols",
+        "liberators_reclaim_this_world",
+        "liberators_slay_the_tyrant"
+      ],
+      "matrixNotes": "Wahapedia displays the full Briefing chart. The current machine-readable text view does not preserve which Agenda belongs to each Force Disposition pair. JoiHammer should offer manual Agenda selection/override until the cell mapping is verified.",
+      "loreTextRo": "A sosit confruntarea decisivă pentru eliberarea planetei. Comandanții trebuie să distrugă conducerea inamică, să doboare cele mai puternice mașini de război și să zdrobească moralul adversarului.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_ro_paraphrase",
+      "loreSourceLines": [
+        446,
+        486
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        446,
+        486
+      ]
+    },
+    {
+      "id": "oppressors_briefing_phase_1",
+      "alliance": "oppressors",
+      "phase": 1,
+      "narrativeSummary": "Defend the conquered hives and repel invaders from the planet.",
+      "strategicObjective": "Hold the existing territory.",
+      "agendaIds": [
+        "oppressors_dig_in",
+        "oppressors_loot_and_scoot",
+        "oppressors_repel_the_foe"
+      ],
+      "forceDispositionMatrix": {
+        "take_and_hold": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "disruption": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "purge_the_foe": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "priority_assets": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "reconnaissance": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        }
+      },
+      "matrixStatus": "source_chart_present_cell_coordinates_not_reliably_extracted",
+      "agendaSelectionMode": "force_disposition_pair",
+      "narrativeOutcome": {
+        "narrativePointRule": {
+          "locationControl": 1,
+          "ascendancy": 1
+        },
+        "outcomes": {
+          "0": "Invadatorii au străpuns apărarea, iar forțele Oppressors sunt în retragere.",
+          "1": "Invazia a fost ținută sub control cu pierderi importante; se pregătește contraatacul.",
+          "2": "Aproape toate forțele de debarcare au fost respinse, iar pozițiile sunt menținute."
+        }
+      },
+      "source": "wahapedia",
+      "isCustom": false,
+      "matrixSourceLabels": [
+        "oppressors_dig_in",
+        "oppressors_loot_and_scoot",
+        "oppressors_repel_the_foe"
+      ],
+      "matrixNotes": "Wahapedia displays the full Briefing chart. The current machine-readable text view does not preserve which Agenda belongs to each Force Disposition pair. JoiHammer should offer manual Agenda selection/override until the cell mapping is verified.",
+      "loreTextRo": "Armageddonul este deja sub stăpânirea ocupanților. Ei trebuie să-și apere hive-urile și pustiurile cenușii, să respingă invadatorii și să pârjolească tot ce nu pot păstra.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_ro_paraphrase",
+      "loreSourceLines": [
+        488,
+        524
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        488,
+        524
+      ]
+    },
+    {
+      "id": "oppressors_briefing_phase_2",
+      "alliance": "oppressors",
+      "phase": 2,
+      "narrativeSummary": "Slow the enemy advance, disrupt supply lines, and destroy caches if necessary.",
+      "strategicObjective": "Prepare the counteroffensive.",
+      "agendaIds": [
+        "oppressors_breakthrough",
+        "oppressors_convoy_ambush",
+        "oppressors_sabotage_supplies"
+      ],
+      "forceDispositionMatrix": {
+        "take_and_hold": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "disruption": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "purge_the_foe": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "priority_assets": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "reconnaissance": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        }
+      },
+      "matrixStatus": "source_chart_present_cell_coordinates_not_reliably_extracted",
+      "agendaSelectionMode": "force_disposition_pair",
+      "narrativeOutcome": {
+        "narrativePointRule": {
+          "locationControl": 1,
+          "ascendancy": 1
+        },
+        "outcomes": {
+          "0": "Încercările de încetinire a inamicului au eșuat; forțele se retrag spre ultimele poziții defensive.",
+          "1": "Raidurile și sabotajele au încetinit avansul; rezervele se pregătesc.",
+          "2": "Aprovizionarea inamică a fost afectată, iar Oppressors se află într-o poziție favorabilă pentru lovitura finală."
+        }
+      },
+      "source": "wahapedia",
+      "isCustom": false,
+      "matrixSourceLabels": [
+        "oppressors_breakthrough",
+        "oppressors_convoy_ambush",
+        "oppressors_sabotage_supplies"
+      ],
+      "matrixNotes": "Wahapedia displays the full Briefing chart. The current machine-readable text view does not preserve which Agenda belongs to each Force Disposition pair. JoiHammer should offer manual Agenda selection/override until the cell mapping is verified.",
+      "loreTextRo": "Invadatorii continuă ofensiva și amenință să încercuiască forțele locale. Opressorii trebuie să încetinească înaintarea, să rupă liniile de aprovizionare și să distrugă depozitele pe care nu le pot salva.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_ro_paraphrase",
+      "loreSourceLines": [
+        526,
+        562
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        526,
+        562
+      ]
+    },
+    {
+      "id": "oppressors_briefing_phase_3",
+      "alliance": "oppressors",
+      "phase": 3,
+      "narrativeSummary": "Launch a final counteroffensive with warlords leading from the front.",
+      "strategicObjective": "Reclaim Armageddon.",
+      "agendaIds": [
+        "oppressors_lead_by_example",
+        "oppressors_ash_and_rubble",
+        "oppressors_a_proper_challenge"
+      ],
+      "forceDispositionMatrix": {
+        "take_and_hold": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "disruption": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "purge_the_foe": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "priority_assets": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "reconnaissance": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        }
+      },
+      "matrixStatus": "source_chart_present_cell_coordinates_not_reliably_extracted",
+      "agendaSelectionMode": "force_disposition_pair",
+      "narrativeOutcome": {
+        "narrativePointRule": {
+          "locationControl": 2,
+          "ascendancy": 1
+        },
+        "outcomes": {
+          "0": "Înfrângere decisivă; armata se destramă și războiul pentru Armageddon este pierdut.",
+          "1": "Contraatacul a eșuat, dar retragerea a fost acoperită de câteva victorii.",
+          "2": "Contraofensiva a împins inamicul în retragere, dar supremația strategică nu este completă.",
+          "3": "Victorie decisivă; inamicii sunt distruși, iar controlul asupra planetei este consolidat."
+        }
+      },
+      "source": "wahapedia",
+      "isCustom": false,
+      "matrixSourceLabels": [
+        "oppressors_lead_by_example",
+        "oppressors_ash_and_rubble",
+        "oppressors_a_proper_challenge"
+      ],
+      "matrixNotes": "Wahapedia displays the full Briefing chart. The current machine-readable text view does not preserve which Agenda belongs to each Force Disposition pair. JoiHammer should offer manual Agenda selection/override until the cell mapping is verified.",
+      "loreTextRo": "După un război lung și sângeros, Opressorii pregătesc contraofensiva finală. Warlordii trebuie să conducă din prima linie, iar trupele să accepte orice sacrificiu pentru a recuceri Armageddonul.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_ro_paraphrase",
+      "loreSourceLines": [
+        564,
+        604
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        564,
+        604
+      ]
+    },
+    {
+      "id": "raiders_briefing_phase_1",
+      "alliance": "raiders",
+      "phase": 1,
+      "narrativeSummary": "Exploit the wider conflict, contact assets, gather intelligence, and infiltrate enemy lines.",
+      "strategicObjective": "Prepare covert operations.",
+      "agendaIds": [
+        "raiders_clandestine_infiltration",
+        "raiders_vanguard_recon",
+        "raiders_establish_contact"
+      ],
+      "forceDispositionMatrix": {
+        "take_and_hold": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "disruption": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "purge_the_foe": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "priority_assets": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "reconnaissance": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        }
+      },
+      "matrixStatus": "source_chart_present_cell_coordinates_not_reliably_extracted",
+      "agendaSelectionMode": "force_disposition_pair",
+      "narrativeOutcome": {
+        "narrativePointRule": {
+          "locationControl": 1,
+          "ascendancy": 1
+        },
+        "outcomes": {
+          "0": "Operațiunile discrete au fost compromise, iar forțele Raiders au fost detectate sau decimate.",
+          "1": "Operațiunile au avut costuri, dar au fost obținute informații și poziții pentru următoarea etapă.",
+          "2": "Raiders au exploatat conflictul și sunt bine poziționați pentru a-și urmări propriile obiective."
+        }
+      },
+      "source": "wahapedia",
+      "isCustom": false,
+      "matrixSourceLabels": [
+        "raiders_clandestine_infiltration",
+        "raiders_vanguard_recon",
+        "raiders_establish_contact"
+      ],
+      "matrixNotes": "Wahapedia displays the full Briefing chart. The current machine-readable text view does not preserve which Agenda belongs to each Force Disposition pair. JoiHammer should offer manual Agenda selection/override until the cell mapping is verified.",
+      "loreTextRo": "Raiders profită de haosul războiului pentru a-și urmări propriile scopuri fără să atragă atenția. Mai întâi trebuie să contacteze agenții de pe planetă, să adune informații și să infiltreze forțe în spatele liniilor inamice.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_ro_paraphrase",
+      "loreSourceLines": [
+        606,
+        642
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        606,
+        642
+      ]
+    },
+    {
+      "id": "raiders_briefing_phase_2",
+      "alliance": "raiders",
+      "phase": 2,
+      "narrativeSummary": "Strike quickly to seize assets and lay groundwork while avoiding detection.",
+      "strategicObjective": "Secure prizes and prepare extraction.",
+      "agendaIds": [
+        "raiders_a_knife_in_the_dark",
+        "raiders_a_thief_in_the_night",
+        "raiders_seeds_of_destruction"
+      ],
+      "forceDispositionMatrix": {
+        "take_and_hold": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "disruption": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "purge_the_foe": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "priority_assets": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "reconnaissance": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        }
+      },
+      "matrixStatus": "source_chart_present_cell_coordinates_not_reliably_extracted",
+      "agendaSelectionMode": "force_disposition_pair",
+      "narrativeOutcome": {
+        "narrativePointRule": {
+          "locationControl": 1,
+          "ascendancy": 1
+        },
+        "outcomes": {
+          "0": "Oportunitatea a fost irosită, iar resursele au fost pierdute sau compromise.",
+          "1": "Au fost capturate resurse importante, dar extragerea rămâne riscantă.",
+          "2": "Obiectivele au fost îndeplinite, iar Raiders sunt pregătiți să se retragă."
+        }
+      },
+      "source": "wahapedia",
+      "isCustom": false,
+      "matrixSourceLabels": [
+        "raiders_a_knife_in_the_dark",
+        "raiders_a_thief_in_the_night",
+        "raiders_seeds_of_destruction"
+      ],
+      "matrixNotes": "Wahapedia displays the full Briefing chart. The current machine-readable text view does not preserve which Agenda belongs to each Force Disposition pair. JoiHammer should offer manual Agenda selection/override until the cell mapping is verified.",
+      "loreTextRo": "Forțele sunt deja poziționate, iar fereastra de oportunitate se închide. Raiders trebuie să lovească rapid, să captureze ceea ce au venit să obțină și să pregătească următoarea etapă fără să-și dezvăluie planurile.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_ro_paraphrase",
+      "loreSourceLines": [
+        644,
+        680
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        644,
+        680
+      ]
+    },
+    {
+      "id": "raiders_briefing_phase_3",
+      "alliance": "raiders",
+      "phase": 3,
+      "narrativeSummary": "Extract prizes, erase traces, and escape before either major alliance can focus on the Raiders.",
+      "strategicObjective": "Leave Armageddon with strategic gains.",
+      "agendaIds": [
+        "raiders_erase_all_trace",
+        "raiders_capture_trophies",
+        "raiders_extraction"
+      ],
+      "forceDispositionMatrix": {
+        "take_and_hold": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "disruption": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "purge_the_foe": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "priority_assets": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        },
+        "reconnaissance": {
+          "take_and_hold": null,
+          "disruption": null,
+          "purge_the_foe": null,
+          "priority_assets": null,
+          "reconnaissance": null
+        }
+      },
+      "matrixStatus": "source_chart_present_cell_coordinates_not_reliably_extracted",
+      "agendaSelectionMode": "force_disposition_pair",
+      "narrativeOutcome": {
+        "narrativePointRule": {
+          "locationControl": 2,
+          "ascendancy": 1
+        },
+        "outcomes": {
+          "0": "Forțele sunt încercuite și nu mai au șanse reale de scăpare.",
+          "1": "Înfrângere aparentă, dar unele operațiuni ascunse pot produce efecte în viitor.",
+          "2": "Raiders părăsesc Armageddon ca învingători, cu trofee și victorii tactice.",
+          "3": "Raiders îi eclipsează pe ceilalți și ies din conflict cu avantaje strategice majore."
+        }
+      },
+      "source": "wahapedia",
+      "isCustom": false,
+      "matrixSourceLabels": [
+        "raiders_erase_all_trace",
+        "raiders_capture_trophies",
+        "raiders_extraction"
+      ],
+      "matrixNotes": "Wahapedia displays the full Briefing chart. The current machine-readable text view does not preserve which Agenda belongs to each Force Disposition pair. JoiHammer should offer manual Agenda selection/override until the cell mapping is verified.",
+      "loreTextRo": "Misiunea Raiders pe Armageddon se apropie de sfârșit. Înainte ca una dintre tabere să-și poată concentra toate forțele împotriva lor, trebuie să-și recupereze prada, să șteargă urmele operațiunii și să evadeze în spațiu.",
+      "loreLanguage": "ro",
+      "loreType": "faithful_ro_paraphrase",
+      "loreSourceLines": [
+        682,
+        722
+      ],
+      "sourceAuditStatus": "checked_against_live_wahapedia_2026_11_13",
+      "sourceLines": [
+        682,
+        722
+      ]
+    }
+  ],
+  "agendaAchievedCardDefinitions": [
+    {
+      "id": "liberators_agenda_achieved",
+      "alliance": "liberators",
+      "name": "Agenda Achieved",
+      "maxHeldPerPlayer": 3
+    },
+    {
+      "id": "oppressors_agenda_achieved",
+      "alliance": "oppressors",
+      "name": "Agenda Achieved",
+      "maxHeldPerPlayer": 3
+    },
+    {
+      "id": "raiders_agenda_achieved",
+      "alliance": "raiders",
+      "name": "Agenda Achieved",
+      "maxHeldPerPlayer": 3
+    }
+  ],
+  "implementationNotes": [
+    "Use agendaDetails[].primaryMission.scoring as independently evaluated scoring entries; respect each timing and cumulative marker.",
+    "Objective Actions need persistent operation-marker state, per-turn use limits, eligible unit filters and completion timing.",
+    "Evaluate Agenda Achieved award groups separately: `any` means one listed condition is sufficient; separate groups can award additional cards.",
+    "Agenda Achieved cards are Alliance-specific identities tracked as quantities; max 3 held by a player at a time.",
+    "If a player declines an Agenda, only that player may score the Chapter Approved Primary Mission; the player attempting an Agenda scores only their Agenda Primary Mission.",
+    "Briefing chart selection must use the player's own Alliance Briefing and the ordered pair (own Force Disposition, opponent Force Disposition). The two players may receive different Agendas.",
+    "Until chart cell coordinates are machine-verified, provide a manual Agenda selector and Warmaster override; never infer a missing cell.",
+    "At end of phases 1 and 2, award victor Battle Honour and opponent Battle Skill; on a draw both receive Battle Skill. Apply the additional draw if the player earned an Agenda Achieved card.",
+    "At phase end, determine location control from that phase's Battle Honours; tie-break with total campaign Battle Honours, then Warmaster. Determine ascendancy from Agenda Achieved totals, with all tied Alliances in ascendancy.",
+    "Relic draws occur at end of phases 1 and 2 and use each player's Agenda Achieved count; keep one drawn Relic and return the others.",
+    "Campaign schedule defaults to 2/2/1 battles per player at Strike Force size; Warmaster may modify phases 1 and 2 but Phase 3 remains one climactic final mission."
+  ],
+  "upgradeRules": {
+    "noDuplicateUpgradeCards": true,
+    "battleDeploymentLimit": 3,
+    "oneUpgradePerFriendlyUnit": true,
+    "upgradesLastUntilEndOfBattle": true,
+    "titangraveDeploymentLimit": 4,
+    "battleHonours": {
+      "phase1": 5,
+      "phase2": 5,
+      "phase3": 1,
+      "phase3CardId": "path_to_conquest"
+    },
+    "battleSkills": "Awarded to the opponent of the battle victor in campaign phases 1 and 2; both players receive one on a draw.",
+    "relics": {
+      "uniquePerAlliance": 5,
+      "drawCount": "Number of Agenda Achieved cards held by that player at the end of campaign phase 1 or 2.",
+      "selection": "Select one of the drawn relics to keep; return the others to the Alliance relic deck."
+    },
+    "source": "Wahapedia Dominatus, lines 87-94, 158-164, 179-181, 202-204 and 2064-2205.",
+    "agendaAchievedExtraDraw": "If a player gains one or more Agenda Achieved cards from a battle, they draw one additional card of the same type at the same time, choose one card to keep, and return the others to the deck.",
+    "phase3": "The victor receives Path to Conquest; this is the only Phase 3 Battle Honour and determines control of the Phase 3 location."
+  },
+  "forceDispositions": [
+    {
+      "id": "take_and_hold",
+      "nameEn": "Take and Hold",
+      "nameRo": "Cucerire și menținere"
+    },
+    {
+      "id": "disruption",
+      "nameEn": "Disruption",
+      "nameRo": "Perturbare"
+    },
+    {
+      "id": "purge_the_foe",
+      "nameEn": "Purge the Foe",
+      "nameRo": "Eliminarea inamicului"
+    },
+    {
+      "id": "priority_assets",
+      "nameEn": "Priority Assets",
+      "nameRo": "Obiective prioritare"
+    },
+    {
+      "id": "reconnaissance",
+      "nameEn": "Reconnaissance",
+      "nameRo": "Recunoaștere"
+    }
+  ],
+  "agendaSelectionRules": {
+    "matrixDimensions": [
+      5,
+      5
+    ],
+    "rows": "playerForceDisposition",
+    "columns": "opponentForceDisposition",
+    "lookup": "Fiecare jucător folosește Briefing-ul propriei Alianțe și caută propria Force Disposition în raport cu Force Disposition a adversarului.",
+    "asymmetric": true,
+    "bothAttemptAgenda": "Folosește Agenda determinată de matricea Briefing-ului propriu pentru fiecare jucător; cei doi pot primi Agende diferite.",
+    "oneOrBothDecline": {
+      "primaryMissionSource": "Chapter Approved mission deck, determinată de perechea Force Disposition",
+      "scoringPermission": "Doar jucătorul/jucătorii care au refuzat Agenda pot puncta din Primary Mission standard.",
+      "agendaPlayer": "Jucătorul care a acceptat Agenda punctează numai Primary Mission de pe propria Agenda."
+    },
+    "matrixCellValue": "agendaId",
+    "unresolvedCellBehavior": "Nu selecta automat o Agenda când celula este null; cere selecție manuală/consultarea cardului fizic.",
+    "source": "Wahapedia Dominatus, Briefing Cards and Play Battles; Warhammer Community, Force Dispositions.",
+    "matrixFallback": {
+      "enabled": true,
+      "mode": "manual_agenda_selection",
+      "reason": "The published briefing charts are present, but text extraction does not preserve the visual row/column cell mapping.",
+      "neverGuess": true,
+      "allowWarmasterOverride": true
+    }
+  },
+  "sourceAudit": {
+    "url": "https://wahapedia.ru/wh40k11ed/the-rules/dominatus/#Briefing-deck",
+    "checkedAt": "2026-11-13",
+    "scope": [
+      "campaign rules",
+      "9 Briefings and narrative outcomes",
+      "27 Agendas, Agenda Achieved conditions, actions and Primary Mission scoring",
+      "9 Locations, location bonuses and War Zone rules",
+      "35 Upgrade Cards including WHO, effects, bonus effects and lore"
+    ],
+    "method": "Live-page comparison and structural validation. Lore is faithful Romanian paraphrase, not verbatim transcription.",
+    "knownLimitation": "Briefing chart cells are visible in the source page, but the current text extraction does not retain the exact visual row/column mapping. Manual Agenda selection is the safe integration fallback."
+  }
+}

@@ -307,21 +307,7 @@ function dRenderArmageddonMap(c){
  return '<section class="dom-panel arm-map-section"><div class="dom-section-head"><div><span class="dom-kicker">THEATRE COMMAND · ARMAGEDDON PRIME & SECUNDUS</span><h3>Strategic War Map</h3></div><span class="arm-map-scale">SCHEMATIC · NOT TO SCALE</span></div>'+
  '<p class="arm-map-intro">Urmărește teatrele de operațiuni, locația fazei curente și controlul câștigat la încheierea fiecărei faze.</p>'+
  '<div class="arm-map-legend"><span><i class="pin-current"></i> Locație activă</span><span><i class="pin-imperium"></i> Liberators</span><span><i class="pin-orks"></i> Oppressors</span><span><i class="pin-raiders"></i> Raiders</span><span><i class="pin-neutral"></i> Nealocat</span></div>'+
- '<div class="arm-map-canvas"><svg class="arm-map-art" viewBox="0 0 1000 650" role="img" aria-label="Hartă schematică a teatrelor de război de pe Armageddon">'+
- '<defs><linearGradient id="armLand" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6b5940"/><stop offset=".55" stop-color="#3b342b"/><stop offset="1" stop-color="#201f1d"/></linearGradient><pattern id="armGrid" width="42" height="42" patternUnits="userSpaceOnUse"><path d="M42 0H0V42" fill="none" stroke="#c6a15a" stroke-opacity=".12" stroke-width="1"/></pattern><filter id="armGlow"><feGaussianBlur stdDeviation="5"/></filter></defs>'+
- '<rect width="1000" height="650" fill="#11191a"/><rect width="1000" height="650" fill="url(#armGrid)"/>'+
- '<path d="M70 92 L165 58 260 74 330 45 430 72 505 42 590 73 682 62 752 100 843 87 916 144 891 220 932 284 894 356 921 435 856 506 793 562 692 580 612 613 514 578 432 608 346 568 259 584 176 532 104 473 80 388 48 312 79 234Z" fill="url(#armLand)" stroke="#b59a66" stroke-width="4"/>'+
- '<path d="M75 95Q250 170 365 105T650 115T910 155M55 310Q220 245 370 300T650 265T920 325M115 500Q290 420 445 475T760 445T895 490" fill="none" stroke="#d2bd8d" stroke-opacity=".15" stroke-width="3"/>'+
- '<path d="M220 120Q260 180 240 240T310 350Q390 410 450 470" fill="none" stroke="#9bafb0" stroke-opacity=".5" stroke-width="13"/><path d="M220 120Q260 180 240 240T310 350Q390 410 450 470" fill="none" stroke="#3d6970" stroke-width="5"/>'+
- '<path d="M100 180L170 130 255 150 320 115 380 145 430 125 490 160" fill="none" stroke="#b4a27e" stroke-opacity=".7" stroke-width="18" stroke-dasharray="5 8"/>'+
- '<path d="M580 165Q660 115 755 165L820 210 770 270Q680 260 600 230Z" fill="#293d2c" stroke="#66805a" stroke-width="2" opacity=".9"/>'+
- '<path d="M365 400Q480 355 600 410T810 390" fill="none" stroke="#a77e43" stroke-width="2" stroke-dasharray="10 9" opacity=".7"/>'+
- '<g fill="#c6a15a" font-family="Georgia,serif" font-size="23" letter-spacing="4" opacity=".8"><text x="110" y="80">ARMAGEDDON PRIME</text><text x="620" y="550">ARMAGEDDON SECUNDUS</text></g>'+
- '<g fill="#d9c7a2" font-family="Arial,sans-serif" font-size="16" opacity=".78"><text x="300" y="205">VOLCANUS MOUNTAINS</text><text x="610" y="305">ASH WASTES</text><text x="400" y="520">EQUATORIAL JUNGLE</text><text x="710" y="105">DEATH MIRE HIGHLANDS</text></g>'+
- '<g fill="#c6a15a" stroke="#171310" stroke-width="3"><circle cx="360" cy="205" r="10"/><circle cx="650" cy="365" r="10"/><circle cx="810" cy="455" r="10"/><circle cx="500" cy="470" r="10"/></g>'+
- '<g fill="#ead9b5" font-family="Georgia,serif" font-size="19"><text x="375" y="210">HIVE VOLCANUS</text><text x="665" y="370">HIVE DEATH MIRE</text><text x="825" y="460">HIVE ACHERON</text><text x="515" y="475">HIVE TEMPESTORA</text></g>'+
- '<g fill="none" stroke="#c6a15a" stroke-opacity=".4" stroke-width="2"><path d="M30 30h70M30 30v70M970 30h-70M970 30v70M30 620h70M30 620v-70M970 620h-70M970 620v-70"/></g>'+
- '</svg>'+pins+'</div>'+
+ '<div class="arm-map-canvas"><img class="arm-map-art" src="images/armageddon-dominatus-map.jpg" alt="Hartă geografică Armageddon fără marcaje de campanie" loading="lazy">'+pins+'</div>'+
  '<div class="arm-map-detail" id="armMapDetail">'+dMapLocationDetail(c,selected)+'</div>'+
  '<div class="arm-map-phase-history">'+timeline+'</div>'+
  '<p class="arm-map-footnote">Pozițiile pinurilor sunt orientative, pentru navigarea în campanie; harta este o schemă strategică originală, nu o reproducere cartografică oficială Games Workshop.</p></section>';

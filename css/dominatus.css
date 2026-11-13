@@ -1,0 +1,37 @@
+
+/* DOMINATUS · Grimdark campaign visual layer */
+.dominatus-main{--dom-gold:#c6a15a;--dom-gold-bright:#ead19a;--dom-red:#7f2528;--dom-ink:#100f10}
+.dominatus-main .command-heading{position:relative;overflow:hidden;border:1px solid rgba(198,161,90,.35);border-radius:16px;padding:26px 20px;background:linear-gradient(90deg,rgba(10,9,9,.97),rgba(12,10,10,.65)),url('../assets/dominatus-battlefield.jpg') center 48%/cover no-repeat;box-shadow:0 12px 35px #0008}
+.dominatus-main .command-heading:after{content:"";position:absolute;inset:auto 0 0;height:3px;background:linear-gradient(90deg,transparent,var(--dom-gold),#7c2829,var(--dom-gold),transparent)}
+.dominatus-main .command-heading h1,.dominatus-main .dom-hero h2,.dominatus-main .dom-panel h3{font-family:Cinzel,Georgia,serif;letter-spacing:.055em;color:#ead9b5;text-shadow:0 2px 12px #000}
+.dominatus-main .command-heading p{color:#d4c5aa}
+.dominatus-main .dom-hero{position:relative;overflow:hidden;border:1px solid rgba(198,161,90,.42);background:linear-gradient(105deg,rgba(12,10,10,.96) 0%,rgba(20,15,14,.88) 55%,rgba(32,15,15,.68)),url('../assets/dominatus-battlefield.jpg') center/cover no-repeat;box-shadow:0 12px 30px #0008}
+.dominatus-main .dom-hero:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(0deg,rgba(0,0,0,.28),transparent 50%);border-radius:inherit}
+.dominatus-main .dom-hero>*{position:relative}
+.dominatus-main .dom-panel,.dominatus-main .dom-location,.dominatus-main .dom-campaign-card,.dominatus-main .dom-battle-card{border-color:rgba(198,161,90,.28);background:linear-gradient(145deg,rgba(35,29,25,.96),rgba(17,16,17,.98));box-shadow:inset 0 1px rgba(255,230,180,.04),0 8px 24px #0005}
+.dominatus-main .dom-panel{border-radius:13px}
+.dominatus-main .dom-location{position:relative;overflow:hidden;border:1px solid rgba(198,161,90,.4);border-radius:14px;padding:17px;margin:14px 0;background:linear-gradient(90deg,rgba(14,13,13,.96),rgba(17,14,13,.82)),url('../assets/dominatus-battlefield.jpg') center/cover}
+.dominatus-main .dom-kicker,.dominatus-main .command-eyebrow{color:#c6a15a;letter-spacing:.2em}
+.dominatus-main .dom-status{border-color:rgba(198,161,90,.5);color:#d9c18c}
+.dominatus-main .dom-status.is-active{border-color:#66835b;color:#b8d2a4}
+.dominatus-main .dom-campaign-card{overflow:hidden;border-radius:13px}
+.dominatus-main .dom-campaign-card:before{content:"";display:block;height:5px;background:linear-gradient(90deg,#5f1c20,#c6a15a,#4b3324)}
+.dominatus-main .dom-briefing{border:1px solid rgba(198,161,90,.3);border-radius:10px;background:linear-gradient(135deg,#251e18,#171516);padding:12px;margin:10px 0}
+.dominatus-main .dom-briefing summary{color:#e5d2a7}
+.dominatus-main .dom-agenda-grid article,.dominatus-main .dom-rule-grid article{border:1px solid rgba(198,161,90,.25);background:linear-gradient(145deg,rgba(67,49,33,.35),rgba(17,16,16,.9));border-radius:9px}
+.dominatus-main .dom-reward-card{border:1px solid rgba(198,161,90,.45);border-radius:10px;background:linear-gradient(145deg,rgba(63,43,27,.42),rgba(16,15,16,.98));position:relative;overflow:hidden}
+.dominatus-main .dom-reward-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(#d6b36b,#6f2024)}
+.dominatus-main .dom-random-panel{border:1px solid rgba(218,173,91,.7);background:linear-gradient(145deg,rgba(63,44,25,.5),rgba(17,15,15,.98))}
+.dom-random-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:12px 0}
+.dom-random-row{display:grid;gap:6px;padding:10px;border:1px solid rgba(198,161,90,.23);border-radius:8px;background:#09090955}
+.dom-random-row span{font-weight:700;color:#e2cfaa}
+.dom-random-panel select{width:100%;min-width:0}
+.dominatus-main .primary{background:linear-gradient(180deg,#d0ad68,#9d7738);border-color:#e4c47d;color:#17120b;font-weight:800}
+.dominatus-main .ghost{border-color:rgba(198,161,90,.45)}
+@media(max-width:650px){.dominatus-main .command-heading{padding:22px 16px;background-position:58% center}.dom-random-grid{grid-template-columns:1fr}}
+
+.dominatus-main .dom-location{background:linear-gradient(90deg,rgba(14,13,13,.97),rgba(17,14,13,.72)),url('../assets/dominatus-location-card.jpg') right center/auto 100% no-repeat}
+.dominatus-main .dom-briefing{background-image:linear-gradient(90deg,rgba(24,19,16,.96),rgba(24,19,16,.84)),url('../assets/dominatus-briefing-card.jpg');background-size:cover;background-position:center}
+.dominatus-main .dom-agenda-grid article{position:relative;overflow:hidden}
+.dominatus-main .dom-agenda-grid article:before{content:"✠";display:block;color:#b99550;font-size:1.2rem;margin-bottom:4px;opacity:.9}
+.dominatus-main .dom-rule-grid article:before{content:"⚙";display:inline-block;color:#b99550;margin-right:7px}

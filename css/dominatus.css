@@ -68,3 +68,7 @@
 .campaign-report-action small{color:#b9aa94}
 .dom-open-match{display:inline-block;margin-top:9px;padding:8px 12px;border:1px solid #c6a15a66;border-radius:8px;text-decoration:none}
 @media(max-width:650px){.campaign-match-title{display:block}.campaign-match-title>a{display:inline-block;margin-top:8px}.campaign-players-grid{grid-template-columns:1fr}}
+
+/* Campaign match briefing cards and Agenda primary scoring */
+.campaign-briefings{display:block!important;margin:14px 0}.campaign-briefings>b{display:block;color:#c6a15a;margin-bottom:9px}.campaign-briefing-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.campaign-briefing-card{padding:12px;border:1px solid #c6a15a44;border-radius:10px;background:#09090955;min-width:0}.campaign-briefing-card>b{display:block;color:#ead9b5}.campaign-briefing-card>span{display:block;color:#c6a15a;font-size:.8em;margin-top:3px}.campaign-briefing-card p{color:#d2c2a8;line-height:1.45;margin:8px 0}.campaign-briefing-card small{color:#bfb098;line-height:1.4}.campaign-primary-score li{margin:9px 0;line-height:1.45}.campaign-primary-score .vpb{margin:6px 0}.campaign-primary-lore{color:#d0c1aa;font-style:italic}.dom-open-match{display:inline-block;margin-top:9px;padding:8px 12px;border:1px solid #c6a15a66;border-radius:8px;text-decoration:none;color:#e5c77f;font-weight:700}
+@media(max-width:650px){.campaign-briefing-grid{grid-template-columns:1fr}}

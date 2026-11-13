@@ -447,3 +447,95 @@ html.jh-auth-pending body #nav,html.jh-auth-pending body main{visibility:hidden}
 .army-mode-switch button{flex:1;min-height:52px;font-weight:800;font-size:15px;border:1px solid var(--brass);border-radius:10px;background:rgba(185,149,72,.07);color:var(--text)}
 .army-mode-switch button.on{background:rgba(185,149,72,.24);border:2px solid var(--brass);color:#f0d28a;box-shadow:0 0 0 1px rgba(185,149,72,.15)}
 @media(max-width:520px){.army-mode-switch button{font-size:14px;min-height:50px;padding:9px 6px}}
+
+/* DOMINATUS CAMPAIGN */
+.dominatus-main{max-width:1180px}
+.dom-section-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:22px 0 14px}
+.dom-section-head h2,.dom-section-head h3{margin:3px 0}
+.dom-section-head p{margin:3px 0;color:var(--muted,#aaa)}
+.dom-kicker{display:block;font-size:.68rem;letter-spacing:.16em;color:#b99a68;font-weight:700}
+.dom-campaign-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px;margin-top:18px}
+.dom-campaign-card,.dom-panel,.dom-location,.dom-hero{border:1px solid var(--line,#34343a);border-radius:14px;background:var(--panel,#19191e);padding:18px;margin:14px 0}
+.dom-card-top,.dom-hero-top,.dom-battle-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.dom-campaign-card h2{margin:10px 0}
+.dom-status{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;border:1px solid #555;padding:4px 8px;border-radius:20px;color:#aaa}
+.dom-status.is-active{color:#a9d6a8;border-color:#47744a}
+.dom-meta{display:flex;flex-wrap:wrap;gap:8px;color:var(--muted,#aaa);font-size:.83rem}
+.dom-card-actions{margin-top:16px}
+.dom-card-actions a{display:inline-flex;text-decoration:none}
+.dom-back{display:inline-block;color:#c9aa76;text-decoration:none;margin:4px 0 12px}
+.dom-hero{background:linear-gradient(135deg,#242126,#17171b);padding:22px}
+.dom-hero h2{font-family:Cinzel,serif;font-size:clamp(1.55rem,4vw,2.4rem);margin:12px 0}
+.dom-hero-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:18px}
+.dom-hero-stats>div{padding:12px;background:#ffffff08;border:1px solid #ffffff12;border-radius:10px;min-width:0}
+.dom-hero-stats small,.dom-hero-stats span{display:block;color:#aaa;font-size:.72rem}
+.dom-hero-stats b{display:block;font-size:1.1rem;margin:5px 0;overflow-wrap:anywhere}
+.dom-admin-mark,.dom-dice{font-size:.72rem;letter-spacing:.12em;border:1px solid #8c714a;color:#d9b77d;padding:5px 9px;border-radius:20px}
+.dom-admin-actions,.dom-actions{display:flex;flex-wrap:wrap;gap:9px;margin:12px 0}
+.dom-muted{font-size:.84rem;color:var(--muted,#aaa)}
+.dom-player-picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:8px;margin:12px 0}
+.dom-player-pick{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px;border:1px solid var(--line,#333);border-radius:9px}
+.dom-player-pick span{min-width:0}
+.dom-player-pick small{display:block;color:var(--muted,#aaa);font-size:.75rem}
+.dom-player-pick select{max-width:130px}
+.dom-lore{font-size:1rem;line-height:1.55;color:#ddd}
+.dom-bonus{display:flex;flex-direction:column;gap:5px;border-left:3px solid #b99a68;background:#ffffff08;padding:11px 14px;margin:12px 0}
+.dom-bonus span{color:#ccc}
+.dom-rule-grid,.dom-agenda-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.dom-rule-grid article,.dom-agenda-grid article{border:1px solid var(--line,#333);border-radius:10px;padding:12px;background:#ffffff05}
+.dom-rule-grid p,.dom-agenda-grid p{font-size:.86rem;color:#ccc;line-height:1.45}
+.dom-briefing{border:1px solid var(--line,#333);border-radius:10px;padding:12px;margin:10px 0}
+.dom-briefing>summary{cursor:pointer;display:flex;justify-content:space-between;gap:10px}
+.dom-briefing>summary span{font-size:.78rem;color:#aaa}
+.dom-agenda-grid h4{margin:5px 0}
+.dom-agenda-grid ul{padding-left:18px;font-size:.82rem;color:#ccc}
+.dom-agenda-grid details{margin-top:8px;font-size:.82rem}
+.dom-matrix-note{border:1px dashed #8c714a;padding:10px;border-radius:8px;font-size:.8rem;color:#d9c39f}
+.dom-battle-form{padding:14px;background:#ffffff08;border:1px solid var(--line,#333);border-radius:10px;margin:12px 0}
+.dom-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.dom-battle-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.dom-battle-card,.dom-report-card{padding:13px;border:1px solid var(--line,#333);border-radius:10px;background:#ffffff05}
+.dom-versus{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:13px 0}
+.dom-versus span{font-size:.7rem;color:#b99a68}
+.dom-battle-agendas{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.78rem;color:#bbb}
+.dom-battle-agendas span{padding:7px;background:#ffffff08;border-radius:6px}
+.dom-roster{display:grid;gap:7px}
+.dom-roster article{display:grid;grid-template-columns:minmax(100px,1fr) auto auto auto;align-items:center;gap:10px;padding:10px;border-bottom:1px solid var(--line,#333)}
+.dom-roster small{display:block;color:#aaa;font-size:.74rem}
+.dom-alliance{font-size:.72rem;padding:4px 7px;border-radius:12px;background:#ffffff12}
+.dom-alliance.liberators{color:#9bc4e9}.dom-alliance.oppressors{color:#e4a0a0}.dom-alliance.raiders{color:#d8c18c}
+.dom-count{font-size:.76rem;color:#bbb}
+.dom-upgrade-player{padding:10px 0;border-bottom:1px solid var(--line,#333)}
+.dom-upgrade-player>div{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
+.dom-upgrade-chip{font-size:.8rem;border:1px solid #8c714a;border-radius:8px;padding:6px 8px;color:#e0c99e}
+.dom-upgrade-chip small{color:#aaa}
+.dom-check{display:flex;align-items:center;gap:8px;margin:12px 0}
+.dom-success{padding:12px;border:1px solid #47744a;border-radius:8px;color:#a9d6a8}
+.dom-report-card{margin:8px 0}
+.dom-report-card p{margin:6px 0}
+.dom-report-card button{margin-top:6px}
+@media(max-width:650px){
+ .dom-section-head{align-items:flex-start;flex-direction:column}
+ .dom-hero-stats{grid-template-columns:1fr}
+ .dom-form-grid{grid-template-columns:1fr}
+ .dom-roster article{grid-template-columns:1fr auto}
+ .dom-roster article>*:nth-child(3),.dom-roster article>*:nth-child(4){grid-column:auto}
+ .dom-player-pick{align-items:flex-start;flex-direction:column}
+ .dom-player-pick select{max-width:none;width:100%}
+}
+
+.dom-standings{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px}
+.dom-standings article{display:flex;flex-direction:column;gap:5px;padding:12px;border:1px solid var(--line,#333);border-radius:9px;background:#ffffff05}
+.dom-standings article span{font-size:.8rem;color:#bbb}
+
+/* Dominatus automated campaign-deck rewards */
+.dom-reward-card{background:rgba(255,255,255,.025);border:1px solid var(--line,rgba(255,255,255,.1));border-radius:12px;padding:14px;margin:10px 0}
+.dom-reward-choice{display:grid;gap:10px;margin-top:10px}
+.dom-reward-choice .opt{display:grid;gap:6px}
+.dom-reward-choice input,.dom-reward-choice select{width:100%;min-width:0}
+.dom-reward-card .dom-success{margin:10px 0 4px;color:#9bd6a7}
+.dom-reward-card p{line-height:1.45}
+.dom-reward-card .dom-battle-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.dom-reward-card .dom-status{white-space:nowrap}
+.dom-report-achievements{display:grid;gap:6px;margin:12px 0;padding:10px;border:1px solid var(--line,rgba(255,255,255,.1));border-radius:10px}
+.dom-report-achievements .dom-check{display:flex;align-items:center;gap:8px}

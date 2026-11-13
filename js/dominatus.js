@@ -264,10 +264,94 @@ async function dDeleteScheduledBattle(c,battleId){
  if(target.matchId){try{await App.db.collection("matches").doc(target.matchId).delete()}catch(e){console.warn("Campaign match cleanup:",e)}}
  await dUpdateCampaign(c,{battles:battles});
 }
+var DOM_ARMAGEDDON_LAYOUT={
+ the_mannheim_gap:{x:24,y:29,short:"Mannheim Gap"},
+ volcanus_archipelago:{x:49,y:17,short:"Volcanus Archipelago"},
+ the_morpheon_line:{x:75,y:34,short:"Morpheon Line"},
+ cerbera_base:{x:48,y:62,short:"Cerbera Base"},
+ victorinius_spaceport:{x:19,y:54,short:"Victorinius"},
+ blackfire_death_pits:{x:82,y:67,short:"Blackfire Pits"},
+ eyes_of_the_emperor_observatory:{x:67,y:18,short:"Eyes of the Emperor"},
+ titangrave:{x:76,y:83,short:"Titangrave"},
+ hive_acheron_subsprawl:{x:36,y:82,short:"Acheron Subsprawl"}
+};
+function dMapPhaseRecord(c,phase){
+ return (c.phaseHistory||[]).filter(function(x){return Number(x.phase)===Number(phase)})[0]||null;
+}
+function dMapLocationRecord(c,locationId){
+ return (c.phaseHistory||[]).filter(function(x){return x.locationId===locationId})[0]||null;
+}
+function dMapControlLabel(alliance){
+ return alliance?dAllianceName(alliance):"În dispută";
+}
+function dMapLocationDetail(c,loc){
+ if(!loc)return '<p class="arm-map-empty">Selectează un punct strategic de pe hartă.</p>';
+ var rec=dMapLocationRecord(c,loc.id),isCurrent=loc.id===c.locationId,phase=Number(loc.phase||0);
+ var control=rec?rec.controlAlliance:(isCurrent?"":null);
+ var status=rec?("Controlat de "+dMapControlLabel(control)):(isCurrent?"Teatru activ · control în dispută":"Nu a fost selectat în această campanie");
+ return '<div class="arm-map-detail-head"><div><span class="dom-kicker">PHASE '+dEsc(phase)+' · STRATEGIC LOCATION</span><h3>'+dEsc(loc.name)+'</h3></div><span class="arm-map-control '+(control?'alliance-'+dEsc(control):isCurrent?'is-contested':'is-neutral')+'">'+dEsc(status)+'</span></div>'+
+ '<p>'+dEsc(loc.loreTextRo||"")+'</p>'+
+ '<div class="arm-map-bonus"><b>'+dEsc(loc.bonus&&loc.bonus.name||"Location Bonus")+'</b><span>'+dEsc(loc.bonus&&loc.bonus.summary||"")+'</span></div>'+
+ '<div class="arm-map-rules"><b>War Zone Rules</b><ul>'+(loc.warZoneRules||[]).map(function(r){return '<li><strong>'+dEsc(r.name)+'</strong> — '+dEsc(r.summary)+'</li>'}).join("")+'</ul></div>'+
+ (rec?'<small class="arm-map-history">Faza încheiată · '+dEsc(rec.controlMethod||"Control stabilit la finalul fazei")+'</small>':isCurrent?'<small class="arm-map-history">Locația curentă a campaniei · D6 '+dEsc(c.locationRoll||"—")+'</small>':'');
+}
+function dRenderArmageddonMap(c){
+ var locations=DOM_DATA.locations||[],used=(c.phaseHistory||[]).map(function(x){return x.locationId}),current=c.locationId;
+ var pins=locations.map(function(loc){
+  var xy=DOM_ARMAGEDDON_LAYOUT[loc.id]||{x:50,y:50},rec=dMapLocationRecord(c,loc.id),isCurrent=loc.id===current,owner=rec&&rec.controlAlliance;
+  var cls=owner?"is-controlled alliance-"+owner:isCurrent?"is-current":"is-available";
+  return '<button type="button" class="arm-map-pin '+cls+'" data-arm-location="'+dEsc(loc.id)+'" style="left:'+xy.x+'%;top:'+xy.y+'%" aria-label="'+dEsc(loc.name)+'"><span class="arm-map-pin-dot"></span><span class="arm-map-pin-label">'+dEsc(DOM_ARMAGEDDON_LAYOUT[loc.id].short)+'</span></button>';
+ }).join("");
+ var selected=dById(locations,current)||locations[0];
+ var timeline=[1,2,3].map(function(ph){var rec=dMapPhaseRecord(c,ph),loc=rec?dById(locations,rec.locationId):null;return '<div class="arm-map-phase '+(Number(c.phase)===ph?'is-current':'')+'"><span>PHASE '+ph+'</span><b>'+(loc?dEsc(loc.name):"Awaiting theatre")+'</b><small>'+(rec?"Control: "+dEsc(dMapControlLabel(rec.controlAlliance)):(Number(c.phase)===ph?"Active · contested":"Not reached"))+'</small></div>'}).join("");
+ return '<section class="dom-panel arm-map-section"><div class="dom-section-head"><div><span class="dom-kicker">THEATRE COMMAND · ARMAGEDDON PRIME & SECUNDUS</span><h3>Strategic War Map</h3></div><span class="arm-map-scale">SCHEMATIC · NOT TO SCALE</span></div>'+
+ '<p class="arm-map-intro">Urmărește teatrele de operațiuni, locația fazei curente și controlul câștigat la încheierea fiecărei faze.</p>'+
+ '<div class="arm-map-legend"><span><i class="pin-current"></i> Locație activă</span><span><i class="pin-imperium"></i> Liberators</span><span><i class="pin-orks"></i> Oppressors</span><span><i class="pin-raiders"></i> Raiders</span><span><i class="pin-neutral"></i> Nealocat</span></div>'+
+ '<div class="arm-map-canvas"><svg class="arm-map-art" viewBox="0 0 1000 650" role="img" aria-label="Hartă schematică a teatrelor de război de pe Armageddon">'+
+ '<defs><linearGradient id="armLand" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6b5940"/><stop offset=".55" stop-color="#3b342b"/><stop offset="1" stop-color="#201f1d"/></linearGradient><pattern id="armGrid" width="42" height="42" patternUnits="userSpaceOnUse"><path d="M42 0H0V42" fill="none" stroke="#c6a15a" stroke-opacity=".12" stroke-width="1"/></pattern><filter id="armGlow"><feGaussianBlur stdDeviation="5"/></filter></defs>'+
+ '<rect width="1000" height="650" fill="#11191a"/><rect width="1000" height="650" fill="url(#armGrid)"/>'+
+ '<path d="M70 92 L165 58 260 74 330 45 430 72 505 42 590 73 682 62 752 100 843 87 916 144 891 220 932 284 894 356 921 435 856 506 793 562 692 580 612 613 514 578 432 608 346 568 259 584 176 532 104 473 80 388 48 312 79 234Z" fill="url(#armLand)" stroke="#b59a66" stroke-width="4"/>'+
+ '<path d="M75 95Q250 170 365 105T650 115T910 155M55 310Q220 245 370 300T650 265T920 325M115 500Q290 420 445 475T760 445T895 490" fill="none" stroke="#d2bd8d" stroke-opacity=".15" stroke-width="3"/>'+
+ '<path d="M220 120Q260 180 240 240T310 350Q390 410 450 470" fill="none" stroke="#9bafb0" stroke-opacity=".5" stroke-width="13"/><path d="M220 120Q260 180 240 240T310 350Q390 410 450 470" fill="none" stroke="#3d6970" stroke-width="5"/>'+
+ '<path d="M100 180L170 130 255 150 320 115 380 145 430 125 490 160" fill="none" stroke="#b4a27e" stroke-opacity=".7" stroke-width="18" stroke-dasharray="5 8"/>'+
+ '<path d="M580 165Q660 115 755 165L820 210 770 270Q680 260 600 230Z" fill="#293d2c" stroke="#66805a" stroke-width="2" opacity=".9"/>'+
+ '<path d="M365 400Q480 355 600 410T810 390" fill="none" stroke="#a77e43" stroke-width="2" stroke-dasharray="10 9" opacity=".7"/>'+
+ '<g fill="#c6a15a" font-family="Georgia,serif" font-size="23" letter-spacing="4" opacity=".8"><text x="110" y="80">ARMAGEDDON PRIME</text><text x="620" y="550">ARMAGEDDON SECUNDUS</text></g>'+
+ '<g fill="#d9c7a2" font-family="Arial,sans-serif" font-size="16" opacity=".78"><text x="300" y="205">VOLCANUS MOUNTAINS</text><text x="610" y="305">ASH WASTES</text><text x="400" y="520">EQUATORIAL JUNGLE</text><text x="710" y="105">DEATH MIRE HIGHLANDS</text></g>'+
+ '<g fill="#c6a15a" stroke="#171310" stroke-width="3"><circle cx="360" cy="205" r="10"/><circle cx="650" cy="365" r="10"/><circle cx="810" cy="455" r="10"/><circle cx="500" cy="470" r="10"/></g>'+
+ '<g fill="#ead9b5" font-family="Georgia,serif" font-size="19"><text x="375" y="210">HIVE VOLCANUS</text><text x="665" y="370">HIVE DEATH MIRE</text><text x="825" y="460">HIVE ACHERON</text><text x="515" y="475">HIVE TEMPESTORA</text></g>'+
+ '<g fill="none" stroke="#c6a15a" stroke-opacity=".4" stroke-width="2"><path d="M30 30h70M30 30v70M970 30h-70M970 30v70M30 620h70M30 620v-70M970 620h-70M970 620v-70"/></g>'+
+ '</svg>'+pins+'</div>'+
+ '<div class="arm-map-detail" id="armMapDetail">'+dMapLocationDetail(c,selected)+'</div>'+
+ '<div class="arm-map-phase-history">'+timeline+'</div>'+
+ '<p class="arm-map-footnote">Pozițiile pinurilor sunt orientative, pentru navigarea în campanie; harta este o schemă strategică originală, nu o reproducere cartografică oficială Games Workshop.</p></section>';
+}
+async function dResolvePhaseControl(c,phase){
+ var snap=await App.db.collection(DOM_COLL).doc(c.id).collection("rewards").get(),allRows=snap.docs.map(function(x){return x.data()}),pending=allRows.filter(function(x){return x.category==="Battle Honour"&&Number(x.phase)===Number(phase)&&x.status==="pending"}),rows=allRows.filter(function(x){return x.category==="Battle Honour"&&x.status==="selected"});
+ if(pending.length){alert("Nu poți încheia faza: există "+pending.length+" Battle Honour draw(s) care nu au fost încă selectate de jucători.");return null}
+ var tally={},total={};
+ (c.players||[]).forEach(function(p){tally[p.alliance]=tally[p.alliance]||0;total[p.alliance]=total[p.alliance]||0});
+ var seen={};
+ rows.forEach(function(r){var a=dPlayer(c,r.playerId).alliance;if(!a)return;var key=r.playerId+"|"+r.selectedCardId;if(seen[key])return;seen[key]=true;total[a]=(total[a]||0)+1;if(Number(r.phase)===Number(phase))tally[a]=(tally[a]||0)+1});
+ Object.keys(c.upgrades||{}).forEach(function(pid){var a=dPlayer(c,pid).alliance;(c.upgrades[pid]||[]).filter(function(u){return u.type==="Battle Honour"}).forEach(function(u){var key=pid+"|"+u.id;if(seen[key])return;seen[key]=true;total[a]=(total[a]||0)+1;if(Number(u.phase||1)===Number(phase))tally[a]=(tally[a]||0)+1})});
+ var max=Math.max.apply(null,Object.keys(tally).map(function(a){return tally[a]}).concat([0])),leaders=Object.keys(tally).filter(function(a){return tally[a]===max});
+ var method="Cele mai multe Battle Honours în Phase "+phase;
+ if(leaders.length>1){
+  var maxTotal=Math.max.apply(null,leaders.map(function(a){return total[a]||0}));leaders=leaders.filter(function(a){return (total[a]||0)===maxTotal});
+  if(leaders.length===1)method+=" · departajare după totalul campaniei";
+  else{
+   var choice=prompt("Egalitate și după totalul Battle Honours. Warmaster, alege alianța care controlează locația:\\n"+leaders.join(", "));
+   if(!choice||leaders.indexOf(choice.trim().toLowerCase())<0){alert("Nu ai selectat o alianță validă. Faza nu poate fi închisă.");return null}
+   leaders=[choice.trim().toLowerCase()];method+=" · decizie Warmaster";
+  }
+ }
+ return {controlAlliance:leaders[0]||"",controlMethod:method,controlBattleHonours:tally,totalBattleHonours:total};
+}
 function dRenderDetail(c){
  var el=document.getElementById("domApp"),isAdmin=App.isAdmin,mine=(c.players||[]).filter(function(p){return p.id===App.me})[0],loc=dLocation(c);
  if(!isAdmin&&!mine){el.innerHTML='<p class="err">Nu faci parte din această campanie.</p>';return}
  var h='<a class="dom-back" href="dominatus.html">← Campaign Archive</a><section class="dom-hero"><div class="dom-hero-top"><span class="dom-kicker">WAR FOR THE IMPERIUM · DOMINATUS</span><span class="dom-status '+(c.status==="active"?"is-active":"")+'">'+dStatus(c.status)+'</span></div><h2>'+dEsc(c.name)+'</h2><div class="dom-hero-stats"><div><small>CAMPAIGN PHASE</small><b>'+dEsc(c.phase||1)+' / 3</b><span>'+dEsc(dPhaseName(c.phase||1))+'</span></div><div><small>THEATRE OF WAR</small><b>'+(loc?dEsc(loc.name):"Not selected")+'</b><span>'+(c.locationRoll?"D6 roll: "+dEsc(c.locationRoll):"Awaiting location")+'</span></div><div><small>FORCES</small><b>'+dEsc((c.players||[]).length)+' players</b><span>'+dEsc(Object.keys(c.agendaAchieved||{}).reduce(function(a,k){return a+(c.agendaAchieved[k]||0)},0))+' Agenda Achieved</span></div></div></section>';
+ h+=dRenderArmageddonMap(c);
  h+=dRenderRandomApproval(c);
  if(!isAdmin&&c.phaseStatus==="setup")h+='<section class="dom-panel"><b>Phase în curs de configurare</b><p>Warmaster verifică selecțiile aleatorii înainte de activarea fazei.</p></section>';
  if(isAdmin)h+='<section class="dom-panel"><div class="dom-section-head"><div><span class="dom-kicker">WARMASTER CONTROL</span><h3>Campaign Administration</h3></div><span class="dom-admin-mark">ADMIN</span></div><div class="dom-admin-actions"><button id="domRollLocation" class="ghost">Roll / reroll location</button><button id="domNextPhase" class="ghost">Advance phase</button><button id="domToggleStatus" class="ghost" '+(c.phaseStatus==="setup"?"disabled":"")+'>'+(c.status==="active"?"Închide campania":"Reactivează campania")+'</button><button id="domDeleteCampaignDetail" class="ghost">Șterge campania</button></div><p class="dom-muted">Warmaster este contul Admin existent al JoiHammer. Administrarea Dominatus nu creează un rol global nou.</p></section>';
@@ -288,6 +372,8 @@ function dRenderDetail(c){
  h+='</section>';
  if(isAdmin)h+='<section class="dom-panel"><div class="dom-section-head"><div><span class="dom-kicker">SUBMITTED BATTLE REPORTS</span><h3>Reports awaiting validation</h3></div></div><div id="domReports"><p class="empty">Se verifică rapoartele…</p></div></section>';
  el.innerHTML=h;
+ el.querySelectorAll("[data-arm-location]").forEach(function(pin){pin.onclick=function(){var id=pin.getAttribute("data-arm-location"),loc=dById(DOM_DATA.locations,id),panel=document.getElementById("armMapDetail");el.querySelectorAll("[data-arm-location]").forEach(function(x){x.classList.toggle("is-selected",x===pin)});if(panel)panel.innerHTML=dMapLocationDetail(c,loc)}});
+ var initialPin=c.locationId?el.querySelector('[data-arm-location="'+c.locationId+'"]'):null;if(initialPin)initialPin.classList.add("is-selected");
  dLoadRewards(c);
  if(isAdmin){var approve=document.getElementById("domApproveSetup");if(approve)approve.onclick=function(){dApproveRandomSetup(c)};var reroll=document.getElementById("domRerollSetup");if(reroll)reroll.onclick=function(){dRerollRandomSetup(c)};document.getElementById("domRollLocation").onclick=function(){dRollLocation(c)};document.getElementById("domNextPhase").onclick=function(){dAdvancePhase(c)};document.getElementById("domToggleStatus").onclick=function(){dUpdateCampaign(c,{status:c.status==="active"?"completed":"active"})};var delCampaign=document.getElementById("domDeleteCampaignDetail");if(delCampaign)delCampaign.onclick=function(){dDeleteCampaign(c.id)};var addBattle=document.getElementById("domAddBattle");if(addBattle)addBattle.onclick=function(){var f=document.getElementById("domBattleForm");f.hidden=!f.hidden;dRefreshAgendaSelects(c)};var genMatches=document.getElementById("domGeneratePhaseMatches");if(genMatches)genMatches.onclick=function(){dGeneratePhaseMatches(c,false)};document.querySelectorAll("[data-dom-delete-battle]").forEach(function(b){b.onclick=function(){dDeleteScheduledBattle(c,b.getAttribute("data-dom-delete-battle"))}});document.getElementById("domCancelBattle").onclick=function(){document.getElementById("domBattleForm").hidden=true};document.getElementById("domBattleA").onchange=function(){dRefreshAgendaSelects(c)};document.getElementById("domBattleB").onchange=function(){dRefreshAgendaSelects(c)};document.getElementById("domSaveBattle").onclick=function(){dSaveBattle(c)};document.getElementById("domGrantUpgrade").onclick=function(){var f=document.getElementById("domUpgradeForm");f.hidden=!f.hidden;dRefreshUpgradeCards(c)};document.getElementById("domUpgradeType").onchange=function(){dRefreshUpgradeCards(c)};document.getElementById("domSaveUpgrade").onclick=function(){dSaveUpgrade(c)};dLoadReports(c)}
  else {document.querySelectorAll("[data-dom-report]").forEach(function(b){b.onclick=function(){dShowReportForm(c,b.getAttribute("data-dom-report"))}})}
@@ -323,12 +409,19 @@ async function dApproveRandomSetup(c){
 }
 async function dAdvancePhase(c){
  if(c.phaseStatus!=="active"){alert("Aprobă mai întâi configurarea aleatorie a fazei curente.");return}
- if(Number(c.phase)>=3){if(!confirm("Phase 3 este finalul campaniei. Marchezi campania ca încheiată?"))return;await dUpdateCampaign(c,{status:"completed",phaseStatus:"completed"});return}
- var relicSummary=Number(c.phase)<3?(c.players||[]).map(function(p){return p.id+": "+((c.agendaAchieved||{})[p.id]||0)+" Relics de tras"}).join("\\n"):"Phase 3 nu acordă tragere normală de Relics.";
- if(!confirm("Închei Phase "+c.phase+" și treci la Phase "+(Number(c.phase)+1)+"?\\n\\nTragerile de Relics vor fi generate automat pentru fiecare jucător în funcție de Agenda Achieved:\\n"+relicSummary+"\\n\\nAgenda Achieved din faza curentă va fi arhivată și resetată."))return;
- var next=Number(c.phase)+1,r=dRandomLocation(next),hist=(c.phaseHistory||[]).slice(),agendaSelections=dRandomAgendaAssignments(c.players,next),forceDispositions=dRandomForceDispositions(c.players);
- try{await dCreatePhaseRelicDraws(c);}catch(e){fail(e);return}
- hist.push({phase:c.phase,locationId:c.locationId,locationRoll:c.locationRoll,agendaAchieved:Object.assign({},c.agendaAchieved||{}),upgradesByPlayer:Object.keys(c.upgrades||{}).reduce(function(o,k){o[k]=(c.upgrades[k]||[]).filter(function(u){return Number(u.phase||1)===Number(c.phase)}).length;return o},{}),closedAt:Date.now()});
+ var phase=Number(c.phase||1),control=await dResolvePhaseControl(c,phase);if(!control)return;
+ if(phase>=3){
+  if(!confirm("Phase 3 este finalul campaniei. Locația "+(dLocation(c)?dLocation(c).name:"curentă")+" va fi marcată ca fiind controlată de "+dAllianceName(control.controlAlliance)+". Marchezi campania ca încheiată?"))return;
+  var finalHistory=(c.phaseHistory||[]).slice();
+  finalHistory.push({phase:phase,locationId:c.locationId,locationRoll:c.locationRoll,controlAlliance:control.controlAlliance,controlMethod:control.controlMethod,controlBattleHonours:control.controlBattleHonours,totalBattleHonours:control.totalBattleHonours,agendaAchieved:Object.assign({},c.agendaAchieved||{}),closedAt:Date.now()});
+  await dUpdateCampaign(c,{phaseHistory:finalHistory,status:"completed",phaseStatus:"completed"});
+  return;
+ }
+ var relicSummary=(c.players||[]).map(function(p){return p.id+": "+((c.agendaAchieved||{})[p.id]||0)+" Relics de tras"}).join("\\n");
+ if(!confirm("Închei Phase "+phase+" și treci la Phase "+(phase+1)+"?\\n\\nControlul locației: "+dAllianceName(control.controlAlliance)+".\\n\\nTragerile de Relics:\\n"+relicSummary+"\\n\\nAgenda Achieved din faza curentă va fi arhivată și resetată."))return;
+ var next=phase+1,r=dRandomLocation(next),hist=(c.phaseHistory||[]).slice(),agendaSelections=dRandomAgendaAssignments(c.players,next),forceDispositions=dRandomForceDispositions(c.players);
+ try{await dCreatePhaseRelicDraws(c)}catch(e){fail(e);return}
+ hist.push({phase:phase,locationId:c.locationId,locationRoll:c.locationRoll,controlAlliance:control.controlAlliance,controlMethod:control.controlMethod,controlBattleHonours:control.controlBattleHonours,totalBattleHonours:control.totalBattleHonours,agendaAchieved:Object.assign({},c.agendaAchieved||{}),upgradesByPlayer:Object.keys(c.upgrades||{}).reduce(function(o,k){o[k]=(c.upgrades[k]||[]).filter(function(u){return Number(u.phase||1)===phase}).length;return o},{}),closedAt:Date.now()});
  await dUpdateCampaign(c,{phase:next,phaseStatus:"setup",status:"setup",locationId:r.location?r.location.id:"",locationRoll:r.roll,agendaSelections:agendaSelections,forceDispositions:forceDispositions,phaseHistory:hist,agendaAchieved:{}});
 }
 async function dUpdateCampaign(c,patch){

@@ -70,22 +70,36 @@ function dLoadRewards(c){
  if(!App.isAdmin)q=q.where("playerId","==",App.me);
  DOM_REWARD_UNSUB=q.onSnapshot(function(s){DOM_REWARDS=s.docs.map(function(d){return Object.assign({id:d.id},d.data())});if(DOM_CURRENT&&DOM_CURRENT.id===c.id)dRenderDetail(DOM_CURRENT);else dRenderRewardDecks(c);},function(e){var el=document.getElementById("domRewardDecks");if(el)el.innerHTML='<p class="err">Nu pot încărca recompensele: '+dEsc(e.message||e)+'</p>'});
 }
+function dRewardDetailsHtml(card){
+ if(!card)return '<p class="dom-muted">Selectează o carte pentru a vedea detaliile.</p>';
+ var h='<div class="dom-reward-details"><div class="dom-reward-details-head"><b>'+dEsc(card.name||'Reward card')+'</b><span>'+dEsc(card.type||'')+'</span></div>';
+ if(card.who)h+='<p class="dom-reward-who"><b>Eligibilitate:</b> '+dEsc(card.who)+'</p>';
+ if(card.effect||card.effectRo)h+='<div class="dom-reward-effect"><b>Efect în joc</b><p>'+dEsc(card.effectRo||card.effect)+'</p></div>';
+ if(card.bonusEffect||card.bonusEffectRo)h+='<div class="dom-reward-bonus"><b>Efect suplimentar</b><p>'+dEsc(card.bonusEffectRo||card.bonusEffect)+'</p></div>';
+ if(card.loreTextRo)h+='<details class="dom-reward-lore"><summary>Detalii / lore</summary><p>'+dEsc(card.loreTextRo)+'</p></details>';
+ if(!card.effect&&!card.effectRo&&!card.bonusEffect&&!card.bonusEffectRo&&!card.loreTextRo)h+='<p class="dom-muted">Descrierea acestei cărți nu este disponibilă în datele locale.</p>';
+ return h+'</div>';
+}
 function dRenderRewardDecks(c){
  var el=document.getElementById("domRewardDecks");if(!el)return;
  var list=DOM_REWARDS.filter(function(r){return App.isAdmin||r.playerId===App.me;});
  if(!list.length){el.innerHTML='<p class="empty">Nu există cărți trase încă. Recompensele vor fi generate automat după validarea bătăliilor și la încheierea fazelor.</p>';return;}
  el.innerHTML=list.sort(function(a,b){return (b.createdAt&&b.createdAt.toMillis?b.createdAt.toMillis():0)-(a.createdAt&&a.createdAt.toMillis?a.createdAt.toMillis():0)}).map(function(r){
-  var owner=dPlayer(c,r.playerId),pending=r.status==="pending",selected=r.status==="selected",cards=r.candidates||[];
-  var body='';
+  var pending=r.status==="pending",selected=r.status==="selected",cards=r.candidates||[],body='';
   if(pending&&r.playerId===App.me&&!App.isAdmin){
-   var options=cards.map(function(x){return '<option value="'+dEsc(x.id)+'">'+dEsc(x.name)+'</option>'}).join("");
+   var options=cards.map(function(x){return '<option value="'+dEsc(x.id)+'">'+dEsc(x.name)+'</option>'}).join(""),first=cards[0]||null;
    var needsUnit=cards.some(function(x){return x.who&&x.who.indexOf("Campaign card")<0});
-   body='<div class="dom-reward-choice">'+(cards.length>1?'<label class="opt">Alege cartea pe care o păstrezi<select id="domRewardCard_'+dEsc(r.id)+'">'+options+'</select></label>':'<p class="dom-muted">Cartea trasă: <b>'+dEsc(cards[0]&&cards[0].name||"—")+'</b></p>')+(needsUnit?'<label class="opt">Unitatea / modelul care primește upgrade-ul<input id="domRewardUnit_'+dEsc(r.id)+'" maxlength="100" placeholder="Ex. Captain in Terminator Armour" required></label>':'')+'<button class="primary sm" data-dom-keep-reward="'+dEsc(r.id)+'">Păstrează cartea</button></div>';
-  }else if(selected){var kept=dRewardCardById(r.category,r.selectedCardId);body='<p class="dom-success">Păstrată: <b>'+dEsc(kept?kept.name:r.selectedCardId)+'</b>'+(r.assignedUnit?' · '+dEsc(r.assignedUnit):'')+'</p>'+(kept?'<p>'+dEsc(kept.effectRo||kept.effect||'')+'</p>':'');}
-  else if(pending&&App.isAdmin){body='<p class="dom-muted">Așteaptă alegerea lui '+dEsc(r.playerId)+'. Cărți disponibile: '+dEsc(cards.map(function(x){return x.name}).join(", "))+'</p>';}
-  else if(r.status==="exhausted"){body='<p class="dom-muted">Pachetul nu mai are cărți disponibile pentru această tragere.</p>';}
+   body='<div class="dom-reward-choice">'+(cards.length>1?'<label class="opt">Alege cartea pe care o păstrezi<select id="domRewardCard_'+dEsc(r.id)+'">'+options+'</select></label>':'<p class="dom-muted">Cartea trasă: <b>'+dEsc(first&&first.name||"—")+'</b></p>')+'<div id="domRewardPreview_'+dEsc(r.id)+'">'+dRewardDetailsHtml(first)+'</div>'+(needsUnit?'<label class="opt">Unitatea / modelul care primește upgrade-ul<input id="domRewardUnit_'+dEsc(r.id)+'" maxlength="100" placeholder="Ex. Captain in Terminator Armour" required></label>':'')+'<button class="primary sm" data-dom-keep-reward="'+dEsc(r.id)+'">Păstrează cartea</button></div>';
+  }else if(selected){
+   var kept=(cards||[]).filter(function(x){return x.id===r.selectedCardId})[0]||dRewardCardById(r.category,r.selectedCardId)||{id:r.selectedCardId,name:r.selectedCardId};
+   kept=Object.assign({},kept,{type:r.category});
+   body='<p class="dom-success">Păstrată: <b>'+dEsc(kept.name||r.selectedCardId)+'</b>'+(r.assignedUnit?' · '+dEsc(r.assignedUnit):'')+'</p>'+dRewardDetailsHtml(kept);
+  }else if(pending&&App.isAdmin){
+   body='<p class="dom-muted">Așteaptă alegerea lui '+dEsc(r.playerId)+'.</p>'+(cards.length?cards.map(function(x){return dRewardDetailsHtml(Object.assign({},x,{type:r.category}))}).join(''):'');
+  }else if(r.status==="exhausted"){body='<p class="dom-muted">Pachetul nu mai are cărți disponibile pentru această tragere.</p>';}
   return '<article class="dom-reward-card"><div class="dom-battle-top"><span class="dom-kicker">'+dEsc(dRewardTypeLabel(r.category))+' · PHASE '+dEsc(r.phase)+'</span><span class="dom-status '+(selected?'is-active':'')+'">'+(selected?'Kept':pending?'Awaiting choice':dEsc(r.status||"—"))+'</span></div><b>'+dEsc(r.playerId)+'</b>'+(r.reason?'<p class="dom-muted">'+dEsc(r.reason)+'</p>':'')+body+'</article>';
  }).join("");
+ el.querySelectorAll('[id^="domRewardCard_"]').forEach(function(select){select.onchange=function(){var rewardId=select.id.substring('domRewardCard_'.length),reward=DOM_REWARDS.filter(function(x){return x.id===rewardId})[0],card=reward&&(reward.candidates||[]).filter(function(x){return x.id===select.value})[0],preview=document.getElementById('domRewardPreview_'+rewardId);if(preview)preview.innerHTML=dRewardDetailsHtml(card);};});
  el.querySelectorAll('[data-dom-keep-reward]').forEach(function(b){b.onclick=function(){dKeepReward(c,b.getAttribute('data-dom-keep-reward'))}});
 }
 async function dKeepReward(c,rewardId){

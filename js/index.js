@@ -1,9 +1,20 @@
 function showLogin(){$("login").classList.remove("hidden");$("dash").classList.add("hidden")}
-var MS=[];
+var MS=[],CAMPAIGN_MATCHES={},CAMPAIGN_WATCHERS={};
+function watchCampaignRounds(ms){
+  var ids={};ms.forEach(function(m){if(m.campaignId)ids[m.campaignId]=true});
+  Object.keys(ids).forEach(function(id){if(CAMPAIGN_WATCHERS[id])return;CAMPAIGN_WATCHERS[id]=App.db.collection("matches").where("campaignId","==",id).onSnapshot(function(s){CAMPAIGN_MATCHES[id]=s.docs.map(function(d){return Object.assign({id:d.id},d.data())});draw(MS)},function(e){console.warn("Campaign round watcher",e)})});
+}
+function campaignRoundUnlocked(m){
+  var all=CAMPAIGN_MATCHES[m.campaignId]||[],round=Number(m.campaignRound||1),phase=Number(m.campaignPhase||1);
+  if(round<=1)return m.status!=="campaign_locked";
+  var previous=all.filter(function(x){return Number(x.campaignPhase||1)===phase&&Number(x.campaignRound||1)===round-1});
+  return [m.a,m.b].every(function(player){return previous.filter(function(x){return x.a===player||x.b===player}).every(function(x){return x.status==="done"})});
+}
 function draw(ms){
   MS=ms;
   var inv=ms.filter(function(m){return m.status==="invited"});
-  var campaigns=ms.filter(function(m){return m.type==="campaign"||!!m.campaignId});
+  watchCampaignRounds(ms);
+  var campaigns=ms.filter(function(m){return (m.type==="campaign"||!!m.campaignId)&&m.status!=="campaign_locked"&&campaignRoundUnlocked(m)});
   var regular=ms.filter(function(m){return m.type!=="campaign"&&!m.campaignId});
   var act=regular.filter(function(m){return m.status==="active"||m.status==="confirm"});
   var done=regular.filter(function(m){return m.status==="done"}).slice(0,8);

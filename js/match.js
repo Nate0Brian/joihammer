@@ -238,19 +238,21 @@ function setupHtml(s){
   var ps=PS(s),pl=P(s),mine=own(s),live=M.status==="active";
   var fo=Data.fdsFor(pl.army,pl.dets),fdOk=fo.indexOf(pl.fd)>=0;
   var okFix=fdOk&&(ps.mode==="T"||(ps.mode==="F"&&ps.fixed.length===2));
-  var pn=primOf(s),pr=PRI[pn];
+  var pn=M.type==="campaign"?"Dominatus Agenda":primOf(s),pr=PRI[pn];
   var h='<section class="side setup"><h2>'+esc(pl.name)+(App.me===M[s]?' <small>(tu)</small>':'')+(M.atk?' <span class="role">'+(M.atk===s?'Atacator':'Defender')+'</span>':'')+(ps.ready?' <span class="ok">✓ salvat</span>':'')+'</h2><div class="info">'+esc([pl.army,pl.det].filter(Boolean).join(" · ")||"Armata nu e aleasă")+'</div>';
   if(mine&&live&&!ps.ready){
     if(!fo.length)h+='<div class="legend">Alege armata și detașamentul în <a href="profile.html">Profil</a>; se preiau automat aici.</div>';
     else h+='<label class="opt">Force Disposition <select data-act="fd" data-s="'+s+'">'+(fdOk?'':'<option value="">Alege…</option>')+fo.map(function(f){return '<option'+(f===pl.fd?' selected':'')+'>'+f+'</option>'}).join("")+'</select></label>';
+    if(M.type==="campaign")h+=campaignPrimaryHtml(s,true);else{
     h+='<div class="info">Misiune primară: <b>'+esc(pn)+'</b></div>';
     h+='<details class="mis" data-k="pr'+s+'"'+(openS["pr"+s]?' open':'')+'><summary>Regulile misiunii</summary>'+(pr.a?'<div class="act">'+esc(pr.a)+'</div>':'')+'<ul>'+pr.r.map(function(l){var L=parseLine(l);return '<li><span class="tag">'+tag(L)+'</span> '+esc(L.text)+'</li>'}).join("")+'</ul></details>';
+    }
     h+='<label class="opt">Secundare <select data-act="mode" data-s="'+s+'"><option value=""'+(ps.mode?'':' selected')+'>Alege…</option><option value="T"'+(ps.mode==="T"?" selected":"")+'>Tactical (tragi cărți)</option><option value="F"'+(ps.mode==="F"?" selected":"")+'>Fixed (2 cărți fixe)</option></select></label>';
     if(ps.mode==="F")h+='<div class="vpb">'+SEC.filter(function(c){return c.fx}).map(function(c){return '<label class="opt"><input type="checkbox" data-act="fix" data-s="'+s+'" data-n="'+esc(c.n)+'"'+(ps.fixed.indexOf(c.n)>=0?' checked':'')+'> '+esc(c.n)+'</label>'}).join("")+'</div>';
     h+='<div class="vpb">'+B("ready",s,"Salvează alegerea",'',!okFix)+'</div>';
     if(!okFix)h+='<div class="legend">'+(!fdOk?'Alege un Force Disposition permis de detașamentele tale.':!ps.mode?'Alege tipul de secundare.':'Alege exact 2 cărți Fixed.')+'</div>';
   }else{
-    h+='<div class="info">Force Disposition: <b>'+(fdOk?esc(pl.fd):'neales')+'</b></div><div class="info">Misiune primară: <b>'+esc(pn)+'</b></div>';
+    h+='<div class="info">Force Disposition: <b>'+(fdOk?esc(pl.fd):'neales')+'</b></div>'+(M.type==="campaign"?campaignPrimaryHtml(s,true):'<div class="info">Misiune primară: <b>'+esc(pn)+'</b></div>');
     h+=ps.ready?'<div class="info">Secundare: <b>'+(ps.mode==="T"?"Tactical":"Fixed – "+esc(ps.fixed.join(", ")))+'</b></div>':'<div class="info">Încă nu a salvat alegerile.</div>';
     if(ps.ready&&mine&&live)h+='<div class="vpb">'+B("unready",s,"Schimbă alegerea","",false,"ghost")+'</div>';
   }
@@ -274,12 +276,13 @@ function sideHtml(s){
   h+='<div class="vpb">'+B("man",s,"−1 VP primar",' data-k="pri" data-v="-1"',!(mine&&live&&started)||roundVP(ps,"pri",r)<=0,"ghost")+B("man",s,"+1 VP primar",' data-k="pri" data-v="1"',!(mine&&live&&started)||capP.t||capP.r,"ghost")+B("man",s,"−1 VP secundar",' data-k="sec" data-v="-1"',!(mine&&live&&started)||roundVP(ps,"sec",r)<=0,"ghost")+B("man",s,"+1 VP secundar",' data-k="sec" data-v="1"',!(mine&&live&&started)||capS.t||capS.r,"ghost")+'</div>';
   h+='<label class="opt" style="margin-top:8px"><input type="checkbox" data-act="br" data-s="'+s+'"'+(ps.br?' checked':'')+(mine&&live?'':' disabled')+'> Armată pictată (+10 VP)</label>';
 
-  /* primară */
-  var pn=primOf(s),pr=PRI[pn];
-  h+='<h3>Misiune primară: '+esc(pn)+'</h3><div class="mis">'+(pr.a?'<div class="act">'+esc(pr.a)+'</div>':'')+pr.r.map(function(line,i){
+  /* primară: Dominatus folosește Primary Mission imprimată pe Agenda fiecărui jucător */
+  if(M.type==="campaign")h+='<h3>Campaign Primary Mission</h3>'+campaignPrimaryHtml(s,false);
+  else{var pn=primOf(s),pr=PRI[pn];
+   h+='<h3>Misiune primară: '+esc(pn)+'</h3><div class="mis">'+(pr.a?'<div class="act">'+esc(pr.a)+'</div>':'')+pr.r.map(function(line,i){
     var L=parseLine(line),ok=mine&&live&&started&&((L.w==="F"&&ended)||(L.w!=="F"&&!ended&&a===s&&r>=L.min&&r<=L.max))&&!(capP.t||(L.w!=="F"&&capP.r));
     return '<div class="ln"><span class="tag">'+tag(L)+'</span> '+esc(L.text)+'<div class="vpb">'+L.v.map(function(v){return B("pv",s,'+'+v+' VP',' data-i="'+i+'" data-v="'+v+'"',!ok)}).join("")+'</div></div>';
-  }).join("")+'</div>';
+   }).join('')+'</div>'; }
 
   /* secundare */
   h+='<h3>Misiuni secundare'+(ps.mode&&started?' ('+(ps.mode==="T"?"Tactical":"Fixed")+')':'')+'</h3>'+(M.atk&&started?'<div class="legend">Pachetul de secundare al '+(M.atk===s?'Atacatorului':'Defender-ului')+' (cărțile sunt identice în ambele pachete).</div>':'');
@@ -383,6 +386,16 @@ function summaryHtml(){
   return h+'</section>';
 }
 
+function campaignAgendaFor(side){var c=M&&M.campaignContext,p=c&&c.campaignPlayers&&c.campaignPlayers[side];return p&&p.agenda||null}
+function campaignPrimaryHtml(side,setup){
+ var agenda=campaignAgendaFor(side),scoring=agenda&&agenda.primaryMission&&agenda.primaryMission.scoring||[],mine=own(side),started=M.first!=null,live=M.status==="active",current=actS();
+ if(!agenda)return '<div class="mis"><b>Primary Mission</b><p class="legend">Chapter Approved / fără Agenda.</p></div>';
+ var h='<div class="mis campaign-primary-score"><b>'+esc(agenda.name)+' · Primary Mission</b>';
+ if(agenda.lore)h+='<p class="campaign-primary-lore">'+esc(agenda.lore)+'</p>';
+ h+='<ul>';
+ scoring.forEach(function(rule,i){var vp=Number(rule.vp)||0,can=!setup&&mine&&live&&started&&current===side&&vp>0;h+='<li><span class="tag">'+esc(rule.when||'Scoring condition')+'</span> '+esc(rule.condition)+' <b>('+vp+' VP)</b>'+(can?'<div class="vpb">'+B('campaignPv',side,'+'+vp+' VP',' data-i="'+i+'" data-v="'+vp+'"')+'</div>':'')+'</li>'});
+ h+='</ul><div class="legend">Punctele se înregistrează în scorul Primar al meciului. Respectă momentul de scoring indicat de Agenda.</div></div>';return h;
+}
 function campaignMissionHtml(agenda){
  if(!agenda)return '<p class="legend">Chapter Approved / fără Agenda.</p>';
  var scoring=agenda.primaryMission&&agenda.primaryMission.scoring||[];
@@ -402,12 +415,13 @@ function campaignMatchHtml(m){
  var achievedControl=mine?'<label class="campaign-achieved-check"><input type="checkbox" id="campaignAgendaAchieved"> Am îndeplinit condiția Agenda Achieved pentru Agenda mea.</label>':'';
  var reportButton=m.status==="done"&&mine?'<div class="campaign-report-action"><button type="button" class="primary" data-act="campaignReport">Trimite raportul către Warmaster</button><small>Trimite scorul final și confirmarea Agenda Achieved în arhiva campaniei.</small></div>':'';
  var rules=(loc.warZoneRules||[]).map(function(r){return '<li><b>'+esc(r.name)+'</b> — '+esc(r.summary)+'</li>'}).join('');
- var briefs=(c.campaignBriefings||[]).map(function(b){return '<span>'+esc(b.name||b.alliance)+'</span>'}).join('');
+ var allianceLabels={liberators:'Liberators',oppressors:'Oppressors',raiders:'Raiders'};
+ var briefs=(c.campaignBriefings||[]).map(function(b){return '<article class="campaign-briefing-card"><b>'+esc(allianceLabels[b.alliance]||b.alliance)+'</b><span>Phase '+esc(b.phase||phase)+'</span>'+(b.lore?'<p>'+esc(b.lore)+'</p>':'')+(b.strategicObjective?'<small><strong>Strategic Objective:</strong> '+esc(b.strategicObjective)+'</small>':'')+'</article>'}).join('');
  return '<section class="campaign-match-panel"><div class="campaign-match-title"><div><span class="campaign-kicker">DOMINATUS · CAMPAIGN OPERATIONS</span><h2>'+esc(c.campaignName||m.campaignName||"Campaign")+'</h2><p>Phase '+esc(phase)+' · Round '+esc(c.campaignRound||m.campaignRound||1)+' · '+esc(loc.name||"Theatre of War")+'</p></div><a href="dominatus.html?id='+encodeURIComponent(m.campaignId)+'">Campaign HQ ↗</a></div>'+
  (loc.lore?'<p class="campaign-location-lore">'+esc(loc.lore)+'</p>':'')+
  (loc.bonus&&loc.bonus.name?'<div class="campaign-location-bonus"><b>'+esc(loc.bonus.name)+'</b> · '+esc(loc.bonus.summary||"")+'</div>':'')+
  (rules?'<div class="campaign-warzone"><b>War Zone Rules</b><ul>'+rules+'</ul></div>':'')+
- '<div class="campaign-briefings"><b>Alliance Briefings</b>'+briefs+'</div><div class="campaign-players-grid">'+playerCard("a")+playerCard("b")+'</div>'+
+ '<div class="campaign-briefings"><b>Alliance Briefings</b><div class="campaign-briefing-grid">'+briefs+'</div></div><div class="campaign-players-grid">'+playerCard("a")+playerCard("b")+'</div>'+
  achievedControl+reportButton+'</section>';
 }
 async function submitCampaignReport(){
@@ -430,6 +444,7 @@ function render(){
   var h='<h1>'+na+' <span class="vs">vs</span> '+nb+'</h1>';
   h+='<div class="depbar"><div class="info">'+(m.type==="tournament"?"Meci de turneu":m.type==="combat-patrol"?"Combat Patrol · ediție aleasă individual":"Meci amical")+(m.deploy?' · Deployment: <b>'+esc(m.deploy)+'</b>'+(DEPNOTE[m.deploy]?'<br><small>'+esc(DEPNOTE[m.deploy])+'</small>':''):'')+(m.twist?' · Twist: <b>'+esc(m.twist)+'</b> – '+esc(TWISTS[m.twist]):'')+'</div>'+(m.deploy?Data.depImg(m.deploy):'')+'</div>';
   if(m.type==="campaign"||m.campaignId)h+=campaignMatchHtml(m);
+  if(m.status==="campaign_locked"){$("box").innerHTML=h+'<div class="banner"><b>Campaign Match locked</b><p>Acest meci se deblochează automat după ce toți jucătorii termină meciurile din runda anterioară.</p></div>';return}
   if(m.status==="invited"){
     h+='<div class="banner">'+(m.type==="combat-patrol"?"Invitație Combat Patrol în așteptare.":"Invitație în așteptare.")+(App.me===m.b?'<div class="vpb" style="justify-content:center">'+B("acc","","Acceptă","")+B("dec","","Refuză","",false,"ghost")+'</div>':' Așteaptă răspunsul lui '+esc(m.b)+'.'+(App.me===m.a?'<div class="vpb" style="justify-content:center">'+B("dec","","Anulează invitația","",false,"ghost")+'</div>':''))+'</div>';
     $("box").innerHTML=h;return;
@@ -485,7 +500,21 @@ function syncProfile(){
     var o={};o[s==="a"?"pa":"pb"]=Object.assign({},old,{army:cur.army,det:cur.det,dets:cur.dets,fd:fd,warlordName:cur.warlordName||"",warlordExtraCP:!!cur.warlordExtraCP});upd(o);
   });
 }
-function afterDone(){if(M.type==="tournament"&&M.tid)Tourney.tryAdvance(M.tid).catch(fail)}
+async function unlockNextCampaignRound(){
+ if(!M||!M.campaignId)return;
+ try{
+  var snap=await App.db.collection("matches").where("campaignId","==",M.campaignId).get(),all=snap.docs.map(function(d){return Object.assign({id:d.id},d.data())});
+  var phase=Number(M.campaignPhase||1),round=Number(M.campaignRound||1),next=all.filter(function(x){return Number(x.campaignPhase||1)===phase&&Number(x.campaignRound||1)===round+1&&x.status==="campaign_locked"});
+  if(!next.length)return;
+  var ready=next.filter(function(match){
+   return [match.a,match.b].every(function(player){return all.filter(function(x){return Number(x.campaignPhase||1)===phase&&Number(x.campaignRound||1)===round&&(x.a===player||x.b===player)}).every(function(x){return x.status==="done"})});
+  });
+  if(!ready.length)return;
+  var batch=App.db.batch();ready.forEach(function(x){batch.update(App.db.collection("matches").doc(x.id),{status:"active",campaignUnlockedAt:firebase.firestore.FieldValue.serverTimestamp()})});await batch.commit();
+ }catch(e){console.warn("Could not unlock next campaign round",e)}
+}
+function afterDone(){if(M.type==="tournament"&&M.tid)Tourney.tryAdvance(M.tid).catch(fail);if(M.type==="campaign"||M.campaignId)unlockNextCampaignRound()}
+
 function verdict(){
   var ta=M.type==="combat-patrol"?M.sa.log.filter(function(e){return e.k==="cpvp"}).reduce(function(a,e){return a+e.v},0):totalPS(M.sa),tb=M.type==="combat-patrol"?M.sb.log.filter(function(e){return e.k==="cpvp"}).reduce(function(a,e){return a+e.v},0):totalPS(M.sb),w=ta>tb?"a":(tb>ta?"b":"draw");
   if(w==="draw"&&M.type==="tournament"&&(M.fmt||"elim")==="elim")w=confirm("Egalitate "+ta+"–"+tb+". "+M.pa.name+" trece mai departe? OK = "+M.pa.name+", Anulează = "+M.pb.name)?"a":"b";
@@ -512,6 +541,12 @@ function go(a,el){
   if(a==="contest"||a==="withdraw"){upd({status:"active",pw:null,pBy:null,early:false});return}
   if(a==="cancel"){if(confirm(M.type==="combat-patrol"?"Anulezi complet partida Combat Patrol? Nu va fi înregistrată ca rezultat.":"Anulezi meciul? Nu se va număra în statistici și dispare din Live."))upd({status:"cancelled",pw:null,pBy:null,early:false});return}
   if(a==="early"){var e=verdict();if(confirm("Oprești jocul cu scorul curent ("+e.ta+" – "+e.tb+")? Adversarul trebuie să confirme scorul."))upd({status:"confirm",pw:e.w,pBy:App.me===M.b?"b":"a",pta:e.ta,ptb:e.tb,early:true});return}
+  if(a==="campaignPv"){
+    var agenda=campaignAgendaFor(s),rule=agenda&&agenda.primaryMission&&agenda.primaryMission.scoring&&agenda.primaryMission.scoring[i];
+    if(!rule||!v||v!==Number(rule.vp)||M.type!=="campaign")return;
+    if(App.me!==M[s]||M.status!=="active"||M.first==null||actS()!==s)return;
+    mut(s,function(ps){logAdd(ps,"pri",v,(agenda.name+" – "+rule.condition).slice(0,60),false)});return;
+  }
   if(a==="pv"){var pn=primOf(s),L=parseLine(PRI[pn].r[i]);mut(s,function(ps){logAdd(ps,"pri",v,pn+" – "+L.text.slice(0,45),L.w==="F")});return}
   if(a==="sv"){mut(s,function(ps){logAdd(ps,"sec",v,n);if(ps.mode==="T"){rm(ps.hand,n);rm(ps.fresh,n);ps.used.push(n)}});return}
   if(a==="toss"){mut(s,function(ps){var amount=Math.min(1,Math.max(0,25-cpBalance(ps,s)));if(amount)logAdd(ps,"cp",amount,"CP Tactical discard: "+n);rm(ps.hand,n);rm(ps.fresh,n);ps.used.push(n)});return}

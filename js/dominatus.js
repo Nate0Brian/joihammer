@@ -205,17 +205,23 @@ function dCampaignMatchContext(c,b,rewardRows){
   });
   return list.map(function(u){return {id:u.id,name:u.name,type:u.type,unit:u.unit||"",effect:u.effectRo||u.effect||""}}).concat(selected);
  }
- return {campaignId:c.id,campaignName:c.name,campaignPhase:Number(b.phase||c.phase||1),campaignRound:Number(b.round||1),campaignBattleId:b.id,campaignLocation:loc?{id:loc.id,name:loc.name,lore:loc.loreTextRo||"",bonus:loc.bonus||{},warZoneRules:loc.warZoneRules||[]}:null,campaignPlayers:{a:{id:pa.id,alliance:pa.alliance,forceDisposition:(c.forceDispositions||{})[pa.id]||pa.fd||"",agenda:agendaInfo(aa),upgrades:upgrades(pa.id)},b:{id:pb.id,alliance:pb.alliance,forceDisposition:(c.forceDispositions||{})[pb.id]||pb.fd||"",agenda:agendaInfo(ab),upgrades:upgrades(pb.id)}},campaignBriefings:(DOM_DATA.briefings||[]).filter(function(x){return Number(x.phase)===Number(b.phase||c.phase)&&[pa.alliance,pb.alliance].indexOf(x.alliance)>=0}).map(function(x){return {alliance:x.alliance,name:x.name||x.id,lore:x.loreTextRo||""}})};
+ return {campaignId:c.id,campaignName:c.name,campaignPhase:Number(b.phase||c.phase||1),campaignRound:Number(b.round||1),campaignBattleId:b.id,campaignLocation:loc?{id:loc.id,name:loc.name,lore:loc.loreTextRo||"",bonus:loc.bonus||{},warZoneRules:loc.warZoneRules||[]}:null,campaignPlayers:{a:{id:pa.id,alliance:pa.alliance,forceDisposition:(c.forceDispositions||{})[pa.id]||pa.fd||"",agenda:agendaInfo(aa),upgrades:upgrades(pa.id)},b:{id:pb.id,alliance:pb.alliance,forceDisposition:(c.forceDispositions||{})[pb.id]||pb.fd||"",agenda:agendaInfo(ab),upgrades:upgrades(pb.id)}},campaignBriefings:(DOM_DATA.briefings||[]).filter(function(x){return Number(x.phase)===Number(b.phase||c.phase)&&[pa.alliance,pb.alliance].indexOf(x.alliance)>=0}).map(function(x){return {id:x.id,alliance:x.alliance,phase:x.phase,lore:x.loreTextRo||x.narrativeSummary||"",strategicObjective:x.strategicObjective||""}})};
 }
 async function dEnsureCampaignMatchDocs(c,battles){
  var out=(battles||[]).map(function(b){return Object.assign({},b)}),batch=App.db.batch(),pending=0;
- var rewardSnap=await App.db.collection(DOM_COLL).doc(c.id).collection("rewards").get(),rewardRows=rewardSnap.docs.map(function(d){return d.data()});
+ var rewardSnap=await App.db.collection(DOM_COLL).doc(c.id).collection("rewards").get(),rewardRows=rewardSnap.docs.map(function(d){return d.data()}),existingSnap=await App.db.collection("matches").where("campaignId","==",c.id).get(),existingMatches=existingSnap.docs.map(function(d){return Object.assign({id:d.id},d.data())});
+ function previousRoundDone(b){var round=Number(b.round||1);if(round<=1)return true;var prev=existingMatches.filter(function(x){return Number(x.campaignPhase||1)===Number(b.phase||c.phase||1)&&Number(x.campaignRound||1)===round-1});return [b.a,b.b].every(function(player){return prev.filter(function(x){return x.a===player||x.b===player}).every(function(x){return x.status==="done"})})}
  for(var i=0;i<out.length;i++){
-  var b=out[i];if(b.matchId||b.status==="completed")continue;
-  var matchId=dCampaignMatchId(c,b),ref=App.db.collection("matches").doc(matchId),old=await ref.get();
+  var b=out[i];if(b.status==="completed")continue;
+  var matchId=b.matchId||dCampaignMatchId(c,b),ref=App.db.collection("matches").doc(matchId),old=await ref.get();
+  var context=dCampaignMatchContext(c,b,rewardRows);
   if(!old.exists){
-   var payload=App.newMatch({type:"campaign",a:b.a,b:b.b,status:"active",pa:App.snap(b.a),pb:App.snap(b.b),campaignId:c.id,campaignBattleId:b.id,campaignContext:dCampaignMatchContext(c,b,rewardRows),campaignPhase:Number(b.phase||c.phase||1),campaignRound:Number(b.round||1),campaignAgendaA:b.agendaA||"",campaignAgendaB:b.agendaB||"",campaignLocationId:b.locationId||c.locationId||"",campaignName:c.name||""});
+   var payload=App.newMatch({type:"campaign",a:b.a,b:b.b,status:previousRoundDone(b)?"active":"campaign_locked",pa:App.snap(b.a),pb:App.snap(b.b),campaignId:c.id,campaignBattleId:b.id,campaignContext:context,campaignPhase:Number(b.phase||c.phase||1),campaignRound:Number(b.round||1),campaignAgendaA:b.agendaA||"",campaignAgendaB:b.agendaB||"",campaignLocationId:b.locationId||c.locationId||"",campaignName:c.name||""});
    batch.set(ref,payload);pending++;
+  }else{
+   var oldData=old.data()||{},updates={campaignContext:context,campaignPhase:Number(b.phase||c.phase||1),campaignRound:Number(b.round||1),campaignAgendaA:b.agendaA||"",campaignAgendaB:b.agendaB||"",campaignLocationId:b.locationId||c.locationId||"",campaignName:c.name||""};
+   if(oldData.first==null&&oldData.status!=="done")updates.status=previousRoundDone(b)?"active":(Number(b.round||1)>1?"campaign_locked":"active");
+   batch.update(ref,updates);pending++;
   }
   b.matchId=matchId;
  }

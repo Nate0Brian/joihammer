@@ -50,6 +50,7 @@ App.nav=function(){
     ["combat-patrol.html","Combat Patrol","⬡","more"],
     ["stats.html","Leaderboard","▥","more"],
     ["army-stats.html","Army Stats","♙","more"],
+    ["dominatus.html","Dominatus","✠","more"],
     ["profile.html","Profile","◉","more"]
   ];
   if(App.isAdmin)items.push(["admin.html","Admin","⚙","more"]);

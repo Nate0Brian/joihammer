@@ -132,3 +132,29 @@
 .dom-reward-lore p{padding:7px 0;color:#bfb098;font-style:italic}
 .dom-reward-choice select{width:100%;margin-top:5px}
 .dom-reward-choice .dom-reward-details{margin-top:12px}
+
+/* Campaign progression and territorial overlays */
+.campaign-stage{margin:10px 0 0;padding:7px 9px;border-left:3px solid #c6a15a;background:#c6a15a12;color:#e6d5b4;font-size:.86rem}
+.campaign-upgrades{background:#0002;border-radius:8px;padding:8px 10px}
+.arm-map-territories{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;overflow:visible}
+.arm-map-territory{stroke-width:.55;stroke:#e6d2a4;stroke-opacity:.65;fill-opacity:.22;vector-effect:non-scaling-stroke}
+.arm-map-territory.is-unclaimed{fill:#92918b;stroke:#bdb7a7;fill-opacity:.08;stroke-dasharray:1.2 1.1}
+.arm-map-territory.alliance-liberators{fill:#52a8d2;stroke:#9bdcff;fill-opacity:.34}
+.arm-map-territory.alliance-oppressors{fill:#b94136;stroke:#ff9b83;fill-opacity:.34}
+.arm-map-territory.alliance-raiders{fill:#c29a36;stroke:#f4d37a;fill-opacity:.34}
+.arm-map-pin{z-index:2}
+
+/* Warmaster's Verdict: compact per-player reward decisions */
+.dom-verdict-player{display:grid;gap:7px;padding:10px;margin:8px 0;border:1px solid #c6a15a44;border-radius:9px;background:#09090955}
+.dom-verdict-player> b{color:#ead9b5;font-family:Cinzel,Georgia,serif}
+.dom-verdict-player .dom-check{display:flex;align-items:center;gap:8px;color:#d9c9ad}
+.dom-verdict-player textarea{width:100%;margin-top:5px}
+.dom-report-achievements{margin:10px 0;padding:10px;border:1px solid #c6a15a33;border-radius:8px}
+.dom-report-achievements> b{display:block;margin-bottom:7px;color:#e2c77f}
+/* Warmaster's Verdict: compact per-player reward decisions */
+.dom-verdict-player{display:grid;gap:7px;padding:10px;margin:8px 0;border:1px solid #c6a15a44;border-radius:9px;background:#09090955}
+.dom-verdict-player> b{color:#ead9b5;font-family:Cinzel,Georgia,serif}
+.dom-verdict-player .dom-check{display:flex;align-items:center;gap:8px;color:#d9c9ad}
+.dom-verdict-player textarea{width:100%;margin-top:5px}
+.dom-report-achievements{margin:10px 0;padding:10px;border:1px solid #c6a15a33;border-radius:8px}
+.dom-report-achievements> b{display:block;margin-bottom:7px;color:#e2c77f}

@@ -413,9 +413,9 @@ function campaignOrdersHtml(){
  ["a","b"].forEach(function(side){
   var player=side==="a"?M.pa:M.pb,name=player&&player.name?player.name:(side==="a"?M.a:M.b),o=orders[side],item=o&&jhOrderById(o.orderId),label=side==="a"?"PLAYER A":"PLAYER B";
   h+='<div class="campaign-order-player"><div class="campaign-order-player-head"><span>'+label+'</span><strong>'+esc(name||label)+'</strong></div>';
-  h+='<div class="campaign-order-current">'+(item?'<span class="campaign-order-type '+esc(item.type)+'">'+campaignOrderTypeLabel(item.type)+'</span><b>'+esc(item.name)+'</b><p>'+esc(item.effect)+'</p><small class="campaign-order-state">'+(Number(o.round)===round?'ACTIVE NOW':Number(o.round)<round?'COMPLETED':'UPCOMING')+' · BATTLE ROUND '+esc(o.round)+'</small>':'<span class="campaign-order-none">No Order assigned</span>')+'</div>';
+  h+='<div class="campaign-order-current">'+(item?'<span class="campaign-order-type '+esc(item.type)+'">'+campaignOrderTypeLabel(item.type)+'</span><b>'+esc(item.name)+'</b><p>'+esc(item.effect)+'</p><small class="campaign-order-state">'+(Number(o.round)===round?'ACTIVE NOW':Number(o.round)<round?'COMPLETED':'UPCOMING')+' · BATTLE ROUND '+esc(o.round)+' · '+esc(campaignOrderTimingLabel(o.timing||'round-start'))+'</small>':'<span class="campaign-order-none">No Order assigned</span>')+'</div>';
   if(App.isAdmin&&!M.first&&M.status==="active"){
-   h+='<div class="campaign-order-editor"><div class="campaign-order-editor-title">Assign Order to '+esc(name||label)+'</div><div class="campaign-order-round"><label>Active Battle Round<select data-order-round="'+side+'">'+[1,2,3,4,5].map(function(n){return '<option value="'+n+'" '+(Number(o&&o.round||1)===n?'selected':'')+'>Battle Round '+n+'</option>'}).join('')+'</select></label></div>';
+   h+='<div class="campaign-order-editor"><div class="campaign-order-editor-title">Assign Order to '+esc(name||label)+'</div><div class="campaign-order-round"><label>Active Battle Round<select data-order-round="'+side+'">'+[1,2,3,4,5].map(function(n){return '<option value="'+n+'" '+(Number(o&&o.round||1)===n?'selected':'')+'>Battle Round '+n+'</option>'}).join('')+'</select></label></div>'+'<div class="campaign-order-timing"><label>Apply Order During<select data-order-timing="'+side+'">'+[['round-start','Start of Battle Round'],['command','Command Phase'],['movement','Movement Phase'],['shooting','Shooting Phase'],['charge','Charge Phase'],['fight','Fight Phase'],['round-end','End of Battle Round']].map(function(t){return '<option value="'+t[0]+'" '+((o&&o.timing||'round-start')===t[0]?'selected':'')+'>'+t[1]+'</option>'}).join('')+'</select></label></div>';
    h+='<div class="campaign-order-catalog"><label class="campaign-order-choice campaign-order-none-choice '+(!item?'selected':'')+'"><input type="radio" name="campaign-order-'+side+'" data-order-id="'+side+'" value="" '+(!item?'checked':'')+'><span><b>No Order</b><small>Acest jucător nu primește niciun efect în acest meci.</small></span></label>';
    ["buff","debuff","mixed"].forEach(function(type){var items=JH_ORDERS.filter(function(x){return x.type===type});h+='<div class="campaign-order-category '+type+'"><div class="campaign-order-category-title">'+campaignOrderTypeLabel(type)+'</div><div class="campaign-order-options">'+items.map(function(x){return '<label class="campaign-order-choice '+type+' '+(item&&item.id===x.id?'selected':'')+'"><input type="radio" name="campaign-order-'+side+'" data-order-id="'+side+'" value="'+esc(x.id)+'" '+(item&&item.id===x.id?'checked':'')+'><span class="campaign-order-choice-content"><span class="campaign-order-choice-top"><b>'+esc(x.name)+'</b><em class="campaign-order-type '+type+'">'+campaignOrderTypeLabel(type)+'</em></span><small class="campaign-order-effect-label">EFFECT</small><span class="campaign-order-effect">'+esc(x.effect)+'</span><small class="campaign-order-duration">Duration: selected Battle Round only</small></span></label>'}).join('')+'</div></div>'});
    h+='</div></div>';
@@ -427,17 +427,23 @@ function campaignOrdersHtml(){
 }
 function saveCampaignOrders(){
  if(!M||M.type!=="campaign"||!App.isAdmin||M.first!=null)return;
- var out={};["a","b"].forEach(function(side){var chosen=document.querySelector('input[name="campaign-order-'+side+'"]:checked'),id=chosen?chosen.value:"";if(!id)return;var item=jhOrderById(id),round=document.querySelector('[data-order-round="'+side+'"]');if(!item)throw new Error("Order invalid pentru "+(side==="a"?M.pa.name:M.pb.name)+".");out[side]={orderId:id,round:Number(round&&round.value||1)}});
+ var out={};["a","b"].forEach(function(side){var chosen=document.querySelector('input[name="campaign-order-'+side+'"]:checked'),id=chosen?chosen.value:"";if(!id)return;var item=jhOrderById(id),round=document.querySelector('[data-order-round="'+side+'"]');if(!item)throw new Error("Order invalid pentru "+(side==="a"?M.pa.name:M.pb.name)+".");var timing=document.querySelector('[data-order-timing="'+side+'"]');out[side]={orderId:id,round:Number(round&&round.value||1),timing:timing&&timing.value||'round-start'}});
  upd({campaignOrders:out}).catch(fail)
 }
 
+function campaignOrderTimingLabel(t){return ({'round-start':'Start of Battle Round','command':'Command Phase','movement':'Movement Phase','shooting':'Shooting Phase','charge':'Charge Phase','fight':'Fight Phase','round-end':'End of Battle Round'})[t]||'Start of Battle Round'}
+function campaignOrdersForMatch(){if(!M||M.type!=='campaign')return[];var all=M.campaignOrders||[],out=[];['a','b'].forEach(function(side){var o=all[side],item=o&&jhOrderById(o.orderId);if(item)out.push({side:side,player:(side==='a'?M.pa:M.pb).name,item:item,round:Number(o.round||1),timing:o.timing||'round-start'})});return out}
+function campaignOrderStatus(o){var r=rd();if(!M||M.first==null)return 'UPCOMING';if(M.status==='done'||M.status==='cancelled'||M.turn>=10)return 'COMPLETED';if(r>o.round)return 'COMPLETED';if(r<o.round)return 'UPCOMING';return 'ACTIVE THIS ROUND'}
+function campaignOrdersModalHtml(){var list=campaignOrdersForMatch();if(!list.length)return '<div class="orders-modal-empty">No Warmaster Orders assigned to this match.</div>';return list.map(function(o){var status=campaignOrderStatus(o),active=status==='ACTIVE THIS ROUND';return '<article class="orders-modal-card '+esc(o.item.type)+' '+(active?'active':'')+'"><small>'+esc(o.player)+' · PLAYER '+o.side.toUpperCase()+'</small><div class="campaign-order-choice-top"><h3>'+esc(o.item.name)+'</h3><em class="campaign-order-type '+esc(o.item.type)+'">'+campaignOrderTypeLabel(o.item.type)+'</em></div><p>'+esc(o.item.effect)+'</p><div class="orders-modal-meta"><span>Battle Round '+o.round+'</span><span>'+esc(campaignOrderTimingLabel(o.timing))+'</span><span>'+status+'</span></div>'+(active?'<div class="campaign-order-state">✦ CHECK THIS ORDER NOW · APPLY DURING '+esc(campaignOrderTimingLabel(o.timing).toUpperCase())+'</div>':'')+'</article>'}).join('')}
+function refreshCampaignOrdersModal(){var body=$('campaignOrdersModalBody');if(body)body.innerHTML=campaignOrdersModalHtml()}
+function campaignOrdersAlertHtml(){var active=campaignOrdersForMatch().filter(function(o){return campaignOrderStatus(o)==='ACTIVE THIS ROUND'});if(!active.length)return '';return '<section class="orders-live-alert '+(active.some(function(o){return o.item.type==='debuff'})?'urgent':'')+'"><small>✦ WARMASTER ORDERS · ROUND '+rd()+'</small><h3>ORDERS ACTIVE THIS BATTLE ROUND</h3>'+active.map(function(o){return '<p><b>'+esc(o.player)+'</b> · '+esc(o.item.name)+' — apply during <b>'+esc(campaignOrderTimingLabel(o.timing))+'</b>.</p>'}).join('')+'<button type="button" class="sm" onclick="document.getElementById(\'openCampaignOrders\').click()">View Orders</button></section>'}
 function render(){
   var m=M,started=m.first!=null,ended=m.turn>=10,a=actS(),live=m.status==="active";
   ["sa","sb"].forEach(function(k){m[k]=Object.assign(newPS(),m[k])});
   var rdy=!!(m.sa.ready&&m.sb.ready),roleOk=!!m.atk,na=esc(m.pa.name),nb=esc(m.pb.name);
   var h='<h1>'+na+' <span class="vs">vs</span> '+nb+'</h1>';
   h+='<div class="depbar"><div class="info">'+(m.type==="tournament"?"Meci de turneu":m.type==="combat-patrol"?"Combat Patrol · ediție aleasă individual":m.type==="campaign"?"Dominatus · Phase "+esc(m.campaignPhase||"—")+(m.campaignLocationName?" · "+esc(m.campaignLocationName):""):"Meci amical")+(m.deploy?' · Deployment: <b>'+esc(m.deploy)+'</b>'+(DEPNOTE[m.deploy]?'<br><small>'+esc(DEPNOTE[m.deploy])+'</small>':''):'')+(m.twist?' · Twist: <b>'+esc(m.twist)+'</b> – '+esc(TWISTS[m.twist]):'')+'</div>'+(m.deploy?Data.depImg(m.deploy):'')+'</div>';
-  if(m.type==="campaign")h+=campaignOrdersHtml();
+  if(m.type==="campaign")h+=campaignOrdersAlertHtml()+campaignOrdersHtml();
   if(m.status==="invited"){
     h+='<div class="banner">'+(m.type==="combat-patrol"?"Invitație Combat Patrol în așteptare.":"Invitație în așteptare.")+(App.me===m.b?'<div class="vpb" style="justify-content:center">'+B("acc","","Acceptă","")+B("dec","","Refuză","",false,"ghost")+'</div>':' Așteaptă răspunsul lui '+esc(m.b)+'.'+(App.me===m.a?'<div class="vpb" style="justify-content:center">'+B("dec","","Anulează invitația","",false,"ghost")+'</div>':''))+'</div>';
     $("box").innerHTML=h;return;
@@ -478,6 +484,8 @@ function render(){
   var isCP=m.type==="combat-patrol",ownSide=cpOwnSide(),ownPatrol=ownSide&&cpPatrolFor(ownSide);
   $("openCoreStratagems").textContent=isCP?"⚔ Stratagems":"⚔ Core Stratagems";
   $("openPatrolDatasheets").hidden=!isCP;
+  var ordersBtn=$("openCampaignOrders"),campaignMatch=m.type==="campaign",activeOrders=campaignOrdersForMatch().filter(function(o){return campaignOrderStatus(o)==="ACTIVE THIS ROUND"});ordersBtn.hidden=!campaignMatch;ordersBtn.classList.toggle("has-active",activeOrders.length>0);ordersBtn.textContent=activeOrders.length?"✦ Orders · "+activeOrders.length+" ACTIVE":"✦ Orders";
+  if(!$("campaignOrdersModal").hidden)refreshCampaignOrdersModal();
   $("matchToolsHint").textContent=isCP?(ownPatrol?"Core + "+ownPatrol.name:"Alege-ți Combat Patrol-ul pentru a încărca regulile."):"Referință rapidă · fără să părăsești meciul";
   [].forEach.call(document.querySelectorAll("details[data-k]"),function(d){d.addEventListener("toggle",function(){openS[d.getAttribute("data-k")]=d.open})});
 }
@@ -568,6 +576,9 @@ App.start(function(){
   function closeStratagems(){cpModalClose("coreStratagemModal");}
   function openStratagems(){if(!stratModal)return;if(M&&M.type==="combat-patrol")cpOpenPatrolModal("strat");else{stratModal.hidden=false;$("cpStratTabs").hidden=true;$("cpPatrolStratPanel").hidden=true;$("matchCoreStratagemList").hidden=false;$("matchStratQ").hidden=false;$("stratModalTitle").textContent="Core Stratagems";$("stratModalDesc").textContent="Core Rules reference";renderCoreStratagems(stratList,stratSearch.value)}}
   $("openCoreStratagems").addEventListener("click",openStratagems);
+  $("openCampaignOrders").addEventListener("click",function(){refreshCampaignOrdersModal();cpModalOpen("campaignOrdersModal")});
+  $("closeCampaignOrders").addEventListener("click",function(){cpModalClose("campaignOrdersModal")});
+  $("campaignOrdersModal").addEventListener("click",function(e){if(e.target===this)cpModalClose("campaignOrdersModal")});
   $("openPatrolDatasheets").addEventListener("click",function(){cpOpenPatrolModal("data")});
   $("closeCoreStratagems").addEventListener("click",closeStratagems);
   stratModal.addEventListener("click",function(e){if(e.target===stratModal)closeStratagems()});
@@ -575,7 +586,7 @@ App.start(function(){
   document.querySelectorAll("[data-close-modal]").forEach(function(b){b.addEventListener("click",function(){cpModalClose(this.getAttribute("data-close-modal"))})});
   ["patrolDatasheetModal"].forEach(function(id){var x=$(id);x.addEventListener("click",function(e){if(e.target===x)cpModalClose(id)})});
   stratSearch.addEventListener("input",function(){if(M&&M.type==="combat-patrol"){var ed=cpOwnSide()?cpEditionFor(cpOwnSide()):"";if(ed==="11")renderCoreStratagems(stratList,stratSearch.value,CORE_STRATAGEMS.filter(function(x){return ["Explosives","Crushing Impact","Rapid Ingress"].indexOf(x.name)<0}));}else renderCoreStratagems(stratList,stratSearch.value)});
-  document.addEventListener("keydown",function(e){if(e.key==="Escape"){closeStratagems();cpModalClose("patrolDatasheetModal");cpModalClose("patrolMissionModal")}});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"){closeStratagems();cpModalClose("campaignOrdersModal");cpModalClose("patrolDatasheetModal");cpModalClose("patrolMissionModal")}});
   App.onPlayers=syncProfile;
 
   setInterval(function(){var e=$("tmr");if(e){var ts=+e.getAttribute("data-ts");e.textContent=ts?fmtT(Date.now()-ts):""}},1000);

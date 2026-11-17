@@ -176,3 +176,15 @@
  .arm-map-scale{font-size:.55rem}
  .arm-map-detail{padding:11px}
 }
+
+/* Dominatus campaign section navigation */
+.dom-campaign-tabs{position:sticky;top:var(--app-header-height,72px);z-index:12;display:flex;gap:8px;overflow-x:auto;padding:10px 2px 12px;margin:0 0 18px;background:linear-gradient(180deg,rgba(17,15,14,.98),rgba(17,15,14,.88));border-bottom:1px solid rgba(196,158,83,.22);scrollbar-width:none}
+.dom-campaign-tabs::-webkit-scrollbar{display:none}
+.dom-campaign-tab{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;flex:0 0 auto;min-height:44px;padding:9px 14px;border:1px solid rgba(196,158,83,.28);border-radius:13px;background:linear-gradient(145deg,rgba(57,43,29,.78),rgba(28,24,21,.94));color:#d9c7a0;text-decoration:none;font-size:.82rem;font-weight:650;letter-spacing:.02em;box-shadow:inset 0 1px rgba(255,255,255,.035),0 4px 12px rgba(0,0,0,.18)}
+.dom-campaign-tab:active,.dom-campaign-tab:focus-visible{border-color:#d5b56b;background:linear-gradient(145deg,rgba(108,79,38,.8),rgba(40,31,23,.96));outline:none}
+.dom-tab-icon{font-size:1rem;color:#d8b76d}
+.dom-campaign-tab i{display:inline-flex;align-items:center;justify-content:center;min-width:19px;height:19px;padding:0 5px;border-radius:20px;background:#a94332;color:#fff;font-size:.68rem;font-style:normal;font-weight:800}
+#dom-map-section,#dom-briefings-section,#dom-battles-section,#dom-forces-section,#dom-rewards-section,#dom-admin-section{scroll-margin-top:130px}
+.dom-battle-card.is-round-locked{opacity:.76;border-style:dashed}
+.dom-round-lock-note{margin:12px 0 0;padding:9px 11px;border-left:2px solid #b58e4b;border-radius:0 8px 8px 0;background:rgba(181,142,75,.09);color:#d2bd92;font-size:.82rem}
+@media(max-width:520px){.dom-campaign-tabs{margin-left:-2px;margin-right:-2px;gap:6px}.dom-campaign-tab{min-height:42px;padding:8px 11px;font-size:.76rem}}

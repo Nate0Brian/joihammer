@@ -40,10 +40,12 @@ function side(m,s,lead){
     +(started?'<div class="st">'+esc(primName(m,s))+'</div>':'')
     +'<div class="st">'+secInfo(ps,started)+'</div></div>';
 }
+function isCampaignMatch(m){return m.type==="campaign"||!!m.campaignId;}
+function matchTypeLabel(m){return isCampaignMatch(m)?"Campaign Match":m.type==="tournament"?"Turneu":m.type==="combat-patrol"?"Combat Patrol":"Amical";}
 function card(m){
   norm(m);
   var ta=totalPS(m.sa),tb=totalPS(m.sb),started=m.first!=null,r=curRound(m);
-  var h='<article class="wm"><div class="wmh"><span><span class="live"></span><span class="chip">'+(m.type==="tournament"?"Turneu":"Amical")+'</span></span><span>'+status(m)+'</span></div>';
+  var h='<article class="wm"><div class="wmh"><span><span class="live"></span><span class="chip">'+matchTypeLabel(m)+'</span></span><span>'+status(m)+'</span></div>';
   h+='<div class="wsides">'+side(m,"a",ta>tb)+side(m,"b",tb>ta)+'</div>';
   if(started){
     h+='<table class="wt"><tr><th></th>'+[1,2,3,4,5].map(function(i){return '<th'+(i===r&&m.turn<10?' class="cur"':'')+'>R'+i+'</th>'}).join("")+'<th>F</th></tr>';
@@ -63,7 +65,8 @@ function card(m){
 function render(){
   var list=MS.filter(function(m){
     if(flt==="t")return m.type==="tournament";
-    if(flt==="f")return m.type==="friendly";
+    if(flt==="f")return !isCampaignMatch(m)&&m.type==="friendly";
+    if(flt==="c")return isCampaignMatch(m);
     if(flt==="m")return m.a===App.me||m.b===App.me;
     return true;
   });

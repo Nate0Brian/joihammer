@@ -269,6 +269,8 @@ function sideHtml(s){
   }else h+='<div class="info">Force Disposition: <b>'+(fdOk||started?esc(pl.fd):'neales')+'</b></div>';
 
   if(started)h+='<div class="info">Timp jucat: <b>'+fmtT((M.tt&&M.tt[s])||0)+'</b></div>';
+  /* Campaign Primary Mission appears once, immediately above this player's scoring area. */
+  if(M.type==="campaign")h+='<h3>Primary Mission</h3>'+campaignPrimaryHtml(s,false);
   h+='<div class="board"><div><span>Primar</span><b>'+sums(ps,"pri")+'</b></div><div><span>Secundar</span><b>'+sums(ps,"sec")+'</b></div><div><span>Pictată</span><b>'+(ps.br?10:0)+'</b></div><div class="bt"><span>Total VP</span><b>'+totalPS(ps)+'</b></div></div>';
   h+='<div class="cpbox'+(mine&&live?'':' ro')+'">'+(mine&&live?B("cp",s,"−",' data-v="-1" aria-label="Scade CP"',cp<=0):'')+'<div class="cpnum"><span>CP</span><b>'+cp+'</b></div>'+(mine&&live?B("cp",s,"+",' data-v="1" aria-label="Adaugă CP"',false):'')+'</div>';
   h+='<div class="legend">Pe runde (max 15): primar '+[1,2,3,4,5].map(function(i){return roundVP(ps,"pri",i)}).join(" / ")+' · secundar '+[1,2,3,4,5].map(function(i){return roundVP(ps,"sec",i)}).join(" / ")+'</div>';
@@ -276,9 +278,8 @@ function sideHtml(s){
   h+='<div class="vpb">'+B("man",s,"−1 VP primar",' data-k="pri" data-v="-1"',!(mine&&live&&started)||roundVP(ps,"pri",r)<=0,"ghost")+B("man",s,"+1 VP primar",' data-k="pri" data-v="1"',!(mine&&live&&started)||capP.t||capP.r,"ghost")+B("man",s,"−1 VP secundar",' data-k="sec" data-v="-1"',!(mine&&live&&started)||roundVP(ps,"sec",r)<=0,"ghost")+B("man",s,"+1 VP secundar",' data-k="sec" data-v="1"',!(mine&&live&&started)||capS.t||capS.r,"ghost")+'</div>';
   h+='<label class="opt" style="margin-top:8px"><input type="checkbox" data-act="br" data-s="'+s+'"'+(ps.br?' checked':'')+(mine&&live?'':' disabled')+'> Armată pictată (+10 VP)</label>';
 
-  /* primară: Dominatus folosește Primary Mission imprimată pe Agenda fiecărui jucător */
-  if(M.type==="campaign")h+='<h3>Campaign Primary Mission</h3>'+campaignPrimaryHtml(s,false);
-  else{var pn=primOf(s),pr=PRI[pn];
+  /* Misiunea primară pentru meciurile non-campaign rămâne neschimbată. */
+  if(M.type!=="campaign"){var pn=primOf(s),pr=PRI[pn];
    h+='<h3>Misiune primară: '+esc(pn)+'</h3><div class="mis">'+(pr.a?'<div class="act">'+esc(pr.a)+'</div>':'')+pr.r.map(function(line,i){
     var L=parseLine(line),ok=mine&&live&&started&&((L.w==="F"&&ended)||(L.w!=="F"&&!ended&&a===s&&r>=L.min&&r<=L.max))&&!(capP.t||(L.w!=="F"&&capP.r));
     return '<div class="ln"><span class="tag">'+tag(L)+'</span> '+esc(L.text)+'<div class="vpb">'+L.v.map(function(v){return B("pv",s,'+'+v+' VP',' data-i="'+i+'" data-v="'+v+'"',!ok)}).join("")+'</div></div>';
@@ -401,8 +402,7 @@ function campaignMissionHtml(agenda){
  var scoring=agenda.primaryMission&&agenda.primaryMission.scoring||[];
  var achieved=agenda.agendaAchieved||[];
  return '<div class="campaign-agenda"><h4>'+esc(agenda.name)+'</h4>'+(agenda.lore?'<p>'+esc(agenda.lore)+'</p>':'')+
- (achieved.length?'<div class="campaign-achieved"><b>Agenda Achieved</b><ul>'+achieved.map(function(x){return '<li>'+esc((x.any||[]).join(" OR "))+'</li>'}).join('')+'</ul></div>':'')+
- (scoring.length?'<div class="campaign-primary"><b>Primary Mission</b><ul>'+scoring.map(function(x){return '<li><b>'+esc(x.vp)+' VP</b> · '+esc(x.when)+' — '+esc(x.condition)+'</li>'}).join('')+'</ul></div>':'')+'</div>';
+ (achieved.length?'<div class="campaign-achieved"><b>Agenda Achieved</b><ul>'+achieved.map(function(x){return '<li>'+esc((x.any||[]).join(" OR "))+'</li>'}).join('')+'</ul></div>':'')+'</div>';
 }
 function campaignMatchHtml(m){
  var c=m.campaignContext;if(!c)return '<section class="campaign-match-panel"><b>Dominatus Campaign Match</b><p class="legend">Detaliile campaniei nu sunt disponibile în acest document. Deschide campania pentru informații.</p><a class="button" href="dominatus.html?id='+encodeURIComponent(m.campaignId||"")+'">Deschide campania</a></section>';

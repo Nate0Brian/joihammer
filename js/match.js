@@ -1,4 +1,4 @@
-var mid=new URLSearchParams(location.search).get("id"),M=null,openS={},CPMATCH=null,cpModalTab="core";
+var mid=new URLSearchParams(location.search).get("id"),M=null,openS={},CPMATCH=null,cpModalTab="core",CM_REWARDS=[],CM_REWARD_READY=false,CM_REWARD_LOADING="";
 var CP_ARM_DB=window.CP_ARMAMENTARIUM||null;
 function cpArmRows(){return CP_ARM_DB&&CP_ARM_DB.patrols?Object.keys(CP_ARM_DB.patrols).map(function(k){return CP_ARM_DB.patrols[k]}):[]}
 function cpArmSelection(r){return {id:r.id,selectionId:r.category+":"+r.id,name:r.displayName||r.name,group:r.group,sourceFaction:r.faction,armamentarium:true,category:r.category,sourceEdition:r.edition,editionLabel:r.category==="11-current"?"11th Edition":"10th Edition",fallback:r.category!=="11-current",record:r}}
@@ -233,6 +233,15 @@ function tag(L){
 function fixedSum(ps,n){return ps.log.reduce(function(a,e){return a+(e.k==="sec"&&e.l===n?e.v:0)},0)}
 function cardHtml(c){return '<b class="t">'+esc(c.n)+'</b><ul>'+c.r.map(function(x){return '<li>'+esc(x)+'</li>'}).join("")+'</ul>'}
 
+function campaignSideLoadout(s){return M?(M[s==="a"?"campaignLoadoutA":"campaignLoadoutB"]||null):null}
+function campaignLoadoutLimit(){return Number(M&&M.campaignUpgradeLimit)||3}
+function campaignRewardCard(r){var card=(r.candidates||[]).filter(function(x){return x.id===r.selectedCardId})[0]||{};var cond=card.who?[card.who]:[];if(card.audit&&card.audit.limitations&&card.audit.limitations!=="Fără efect bonus suplimentar indicat pe carte.")cond.push(card.audit.limitations);return {rewardId:r.id,id:r.selectedCardId,name:card.name||r.selectedCardId,type:r.category,effect:card.effectRo||card.effect||"",bonusEffect:card.bonusEffectRo||"",conditions:card.conditions||cond,auditStatus:card.sourceAuditStatus||card.audit&&card.audit.status||"not_documented"}}
+function loadCampaignRewards(){if(!M||M.type!=="campaign"||!M.campaignId||CM_REWARD_LOADING===M.campaignId)return;CM_REWARD_LOADING=M.campaignId;CM_REWARD_READY=false;App.db.collection("dominatusCampaigns").doc(M.campaignId).collection("rewards").where("playerId","==",App.me).onSnapshot(function(s){CM_REWARDS=s.docs.map(function(d){return Object.assign({id:d.id},d.data())}).filter(function(r){return r.status==="selected"}).map(campaignRewardCard);CM_REWARD_READY=true;if(M&&M.first==null)render()},function(e){console.warn("Campaign rewards unavailable",e);CM_REWARD_READY=true;if(M&&M.first==null)render()})}
+function campaignUpgradeSetupHtml(s){if(!M||M.type!=="campaign"||App.me!==M[s])return "";var saved=campaignSideLoadout(s),limit=campaignLoadoutLimit(),groups={"Battle Honour":[],"Battle Skill":[],"Relic":[],"Path to Conquest":[]};CM_REWARDS.forEach(function(x){if(groups[x.type])groups[x.type].push(x)});var rows="";for(var i=0;i<limit;i++){var cur=saved&&saved[i]||{};var opts=Object.keys(groups).map(function(k){return '<optgroup label="'+esc(k)+'">'+groups[k].map(function(x){return '<option value="'+esc(x.rewardId)+'" '+(x.rewardId===cur.rewardId?'selected':'')+'>'+esc(x.name)+'</option>'}).join('')+'</optgroup>'}).join('');rows+='<div class="campaign-upgrade-row"><label class="opt">Upgrade '+(i+1)+'<select data-campaign-upgrade-card="'+s+'" data-slot="'+i+'"><option value="">— Fără upgrade —</option>'+opts+'</select></label><label class="opt">Unitate / model<input maxlength="100" data-campaign-upgrade-unit="'+s+'" data-slot="'+i+'" value="'+esc(cur.unit||'')+'" placeholder="Ex. Captain in Terminator Armour"></label></div>'}
+ var cards=CM_REWARDS.map(function(x){return '<details class="campaign-upgrade-card"><summary><b>'+esc(x.name)+'</b><span>'+esc(x.type)+'</span></summary><p>'+esc(x.effect)+'</p>'+(x.bonusEffect?'<p><b>Bonus:</b> '+esc(x.bonusEffect)+'</p>':'')+'<div class="campaign-upgrade-conditions"><b>Condiții / eligibilitate</b><p>'+esc((x.conditions||[]).join(' · ')||'Nu sunt documentate în sursa disponibilă.')+'</p><small>Audit: '+esc(x.auditStatus||'not_documented')+'</small></div></details>'}).join('');
+ return '<section class="campaign-match-upgrades"><div class="campaign-match-upgrades-head"><div><b>DOMINATUS · BEGINNING OF GAME</b><h3>Upgrade-uri de campanie</h3><p>Alege până la '+limit+' upgrade-uri din colecția ta și atribuie fiecare unei unități diferite. Condițiile fiecărei cărți sunt afișate mai jos.</p></div><span>'+(saved?'Salvat':'Nesalvat')+'</span></div>'+(CM_REWARD_READY?(CM_REWARDS.length?'<div class="campaign-match-upgrade-counts"><span>Battle Honours: '+groups['Battle Honour'].length+'</span><span>Battle Skills: '+groups['Battle Skill'].length+'</span><span>Relics: '+groups['Relic'].length+'</span></div><div class="campaign-match-upgrade-grid">'+rows+'</div><button class="sm" data-act="campaign-upgrades-save" data-s="'+s+'">Salvează upgrade-urile</button><details class="campaign-match-upgrade-library"><summary>Vezi efectele și condițiile cărților din colecție</summary>'+cards+'</details>':'<p class="legend">Nu ai upgrade-uri păstrate în colecție. Confirmă setup-ul fără upgrade-uri.</p><button class="sm" data-act="campaign-upgrades-save" data-s="'+s+'">Confirmă fără upgrade-uri</button>'):'<p class="legend">Se încarcă recompensele campaniei…</p>')+'</section>'}
+function saveCampaignUpgrades(s){if(!M||M.type!=="campaign"||App.me!==M[s]||M.first!=null)return;var chosen=[],usedUnits={},usedCards={},limit=campaignLoadoutLimit();document.querySelectorAll('[data-campaign-upgrade-card="'+s+'"]').forEach(function(sel){if(!sel.value)return;var slot=sel.getAttribute('data-slot'),unitEl=document.querySelector('[data-campaign-upgrade-unit="'+s+'"][data-slot="'+slot+'"]'),unit=(unitEl&&unitEl.value||'').trim(),card=CM_REWARDS.filter(function(x){return x.rewardId===sel.value})[0];if(!card)throw new Error('Cartea selectată nu mai este disponibilă.');if(!unit)throw new Error('Completează unitatea pentru fiecare upgrade ales.');var uk=unit.toLowerCase();if(usedUnits[uk])throw new Error('Fiecare upgrade trebuie atribuit unei unități diferite.');if(usedCards[card.rewardId])throw new Error('Nu poți selecta aceeași carte de două ori.');usedUnits[uk]=true;usedCards[card.rewardId]=true;chosen.push(Object.assign({},card,{unit:unit}))});if(chosen.length>limit)throw new Error('Limita este de '+limit+' upgrade-uri.');var field=s==='a'?'campaignLoadoutA':'campaignLoadoutB',patch={};patch[field]=chosen;App.db.collection('matches').doc(mid).update(patch).catch(fail)}
+function campaignUpgradesSummary(s){var list=campaignSideLoadout(s);if(!Array.isArray(list)||!list.length)return '';return '<div class="match-campaign-upgrades"><b>Campaign upgrades</b>'+list.map(function(x){return '<div class="match-campaign-upgrade"><strong>'+esc(x.name)+'</strong><span>'+esc(x.type)+' · '+esc(x.unit)+'</span><small>'+esc(x.effect||'')+'</small></div>'}).join('')+'</div>'}
 /* înainte de start: tot ce alege un jucător e sus, într-un singur card, cu butonul de salvare */
 function setupHtml(s){
   var ps=PS(s),pl=P(s),mine=own(s),live=M.status==="active";
@@ -247,6 +256,12 @@ function setupHtml(s){
     h+='<details class="mis" data-k="pr'+s+'"'+(openS["pr"+s]?' open':'')+'><summary>Regulile misiunii</summary>'+(pr.a?'<div class="act">'+esc(pr.a)+'</div>':'')+'<ul>'+pr.r.map(function(l){var L=parseLine(l);return '<li><span class="tag">'+tag(L)+'</span> '+esc(L.text)+'</li>'}).join("")+'</ul></details>';
     h+='<label class="opt">Secundare <select data-act="mode" data-s="'+s+'"><option value=""'+(ps.mode?'':' selected')+'>Alege…</option><option value="T"'+(ps.mode==="T"?" selected":"")+'>Tactical (tragi cărți)</option><option value="F"'+(ps.mode==="F"?" selected":"")+'>Fixed (2 cărți fixe)</option></select></label>';
     if(ps.mode==="F")h+='<div class="vpb">'+SEC.filter(function(c){return c.fx}).map(function(c){return '<label class="opt"><input type="checkbox" data-act="fix" data-s="'+s+'" data-n="'+esc(c.n)+'"'+(ps.fixed.indexOf(c.n)>=0?' checked':'')+'> '+esc(c.n)+'</label>'}).join("")+'</div>';
+    if(M.type==="campaign"){
+      var loadoutReady=Array.isArray(campaignSideLoadout(s));
+      h+=campaignUpgradeSetupHtml(s);
+      okFix=okFix&&loadoutReady;
+      if(!loadoutReady)h+='<div class="legend">Salvează selecția de upgrade-uri înainte să confirmi Beginning of Game.</div>';
+    }
     h+='<div class="vpb">'+B("ready",s,"Salvează alegerea",'',!okFix)+'</div>';
     if(!okFix)h+='<div class="legend">'+(!fdOk?'Alege un Force Disposition permis de detașamentele tale.':!ps.mode?'Alege tipul de secundare.':'Alege exact 2 cărți Fixed.')+'</div>';
   }else{
@@ -260,6 +275,7 @@ function setupHtml(s){
 function sideHtml(s){
   var ps=PS(s),pl=P(s),started=M.first!=null,ended=M.turn>=10,a=actS(),mine=own(s),live=M.status==="active",r=rd(),cp=cpOf(ps,s),capP={t:sums(ps,"pri")>=45,r:roundVP(ps,"pri",r)>=15},capS={t:sums(ps,"sec")>=45,r:roundVP(ps,"sec",r)>=15};
   var h='<section class="side"><h2>'+esc(pl.name)+(App.me===M[s]?' <small>(tu)</small>':'')+(M.atk?' <span class="role">'+(M.atk===s?'Atacator':'Defender')+'</span>':'')+'</h2><div class="info">'+esc([pl.army,pl.det].filter(Boolean).join(" · "))+'</div>';
+  if(M.type==="campaign")h+=campaignUpgradesSummary(s);
   var fo=Data.fdsFor(pl.army,pl.dets),fdOk=fo.indexOf(pl.fd)>=0;
   if(!started&&mine&&live){
     if(!fo.length)h+='<div class="legend">Nu ai ales armata și detașamentul. Alege-le în <a href="profile.html">Profil</a>; se preiau automat aici.</div>';
@@ -395,7 +411,7 @@ function render(){
   ["sa","sb"].forEach(function(k){m[k]=Object.assign(newPS(),m[k])});
   var rdy=!!(m.sa.ready&&m.sb.ready),roleOk=!!m.atk,na=esc(m.pa.name),nb=esc(m.pb.name);
   var h='<h1>'+na+' <span class="vs">vs</span> '+nb+'</h1>';
-  h+='<div class="depbar"><div class="info">'+(m.type==="tournament"?"Meci de turneu":m.type==="combat-patrol"?"Combat Patrol · ediție aleasă individual":"Meci amical")+(m.deploy?' · Deployment: <b>'+esc(m.deploy)+'</b>'+(DEPNOTE[m.deploy]?'<br><small>'+esc(DEPNOTE[m.deploy])+'</small>':''):'')+(m.twist?' · Twist: <b>'+esc(m.twist)+'</b> – '+esc(TWISTS[m.twist]):'')+'</div>'+(m.deploy?Data.depImg(m.deploy):'')+'</div>';
+  h+='<div class="depbar"><div class="info">'+(m.type==="tournament"?"Meci de turneu":m.type==="combat-patrol"?"Combat Patrol · ediție aleasă individual":m.type==="campaign"?"Dominatus · Phase "+esc(m.campaignPhase||"—")+(m.campaignLocationName?" · "+esc(m.campaignLocationName):""):"Meci amical")+(m.deploy?' · Deployment: <b>'+esc(m.deploy)+'</b>'+(DEPNOTE[m.deploy]?'<br><small>'+esc(DEPNOTE[m.deploy])+'</small>':''):'')+(m.twist?' · Twist: <b>'+esc(m.twist)+'</b> – '+esc(TWISTS[m.twist]):'')+'</div>'+(m.deploy?Data.depImg(m.deploy):'')+'</div>';
   if(m.status==="invited"){
     h+='<div class="banner">'+(m.type==="combat-patrol"?"Invitație Combat Patrol în așteptare.":"Invitație în așteptare.")+(App.me===m.b?'<div class="vpb" style="justify-content:center">'+B("acc","","Acceptă","")+B("dec","","Refuză","",false,"ghost")+'</div>':' Așteaptă răspunsul lui '+esc(m.b)+'.'+(App.me===m.a?'<div class="vpb" style="justify-content:center">'+B("dec","","Anulează invitația","",false,"ghost")+'</div>':''))+'</div>';
     $("box").innerHTML=h;return;
@@ -460,9 +476,10 @@ function verdict(){
 
 function go(a,el){
   var s=el.getAttribute("data-s"),n=el.getAttribute("data-n"),v=+el.getAttribute("data-v"),i=+el.getAttribute("data-i");
+  if(a==="campaign-upgrades-save"){try{saveCampaignUpgrades(s)}catch(e){alert(e.message||e)}return}
   if(a==="acc"){upd({status:"active",pa:App.snapOr(M.a,M.pa),pb:App.snapOr(M.b,M.pb)});return}
   if(a==="dec"){upd({status:"declined"});return}
-  if(a==="ready"){if(M.type==="combat-patrol"&&(!PS(s).cpEdition||!PS(s).cpPatrolId))return;mut(s,function(ps){ps.ready=true});return}
+  if(a==="ready"){if(M.type==="combat-patrol"&&(!PS(s).cpEdition||!PS(s).cpPatrolId))return;if(M.type==="campaign"&&!Array.isArray(campaignSideLoadout(s))){alert("Salvează mai întâi upgrade-urile de campanie.");return}mut(s,function(ps){ps.ready=true});return}
   if(a==="unready"){mut(s,function(ps){ps.ready=false});return}
   if(a==="cpvp"){var reason=document.querySelector('[data-cp-reason="'+s+'"]'),label=n||reason&&reason.value.trim()||"Punctaj misiune";if(v<0){var bal=(PS(s).log||[]).filter(function(e){return e.k==="cpvp"}).reduce(function(t,e){return t+e.v},0);if(bal<=0)return}mut(s,function(ps){logAdd(ps,"cpvp",v,label)});return}
   if(a==="atk"){upd({atk:el.getAttribute("data-v")});return}
@@ -536,7 +553,7 @@ App.start(function(){
   setInterval(function(){var e=$("tmr");if(e){var ts=+e.getAttribute("data-ts");e.textContent=ts?fmtT(Date.now()-ts):""}},1000);
   fetch("data/combat-patrol.json",{cache:"no-cache"}).then(function(r){if(!r.ok)throw new Error("Nu pot încărca biblioteca Combat Patrol.");return r.json()}).catch(function(e){console.warn(e);CPMATCH={factions:[],patrols11_extra:[],sources:{}}}).then(function(data){if(data)CPMATCH=data;App.db.collection("matches").doc(mid).onSnapshot(function(d){
     if(!d.exists){$("box").innerHTML='<p class="err">Meciul nu există.</p>';return}
-    M=Object.assign({id:d.id,cpAuto:[]},d.data());if(!Array.isArray(M.cpAuto))M.cpAuto=[];render();syncProfile();
+    M=Object.assign({id:d.id,cpAuto:[]},d.data());if(!Array.isArray(M.cpAuto))M.cpAuto=[];if(M.type==="campaign")loadCampaignRewards();render();syncProfile();
   },fail)}).catch(fail);
   $("box").addEventListener("click",function(e){var mission=e.target.closest("[data-open-own-mission]");if(mission){cpOpenPatrolModal("mission");return}var el=e.target.closest("button[data-act]");if(el&&!el.disabled&&M)go(el.getAttribute("data-act"),el)});
   $("box").addEventListener("change",function(e){if(M&&e.target.getAttribute("data-act"))onChange(e.target)});

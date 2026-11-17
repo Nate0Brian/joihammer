@@ -3,7 +3,10 @@ var MS=[];
 function draw(ms){
   MS=ms;
   var inv=ms.filter(function(m){return m.status==="invited"});
-  var campaigns=ms.filter(function(m){return (m.type==="campaign"||!!m.campaignId)&&!(m.status==="done"&&m.campaignRewardsDone&&m.campaignRewardsDone[m.a]&&m.campaignRewardsDone[m.b]&&m.campaignWarmasterConfirmed)});
+  var campaigns=ms.filter(function(m){
+    return (m.type==="campaign"||!!m.campaignId)&&m.status!=="campaign_locked"&&
+      !(m.status==="done"&&m.campaignRewardsDone&&m.campaignRewardsDone[m.a]&&m.campaignRewardsDone[m.b]&&m.campaignWarmasterConfirmed);
+  });
   var regular=ms.filter(function(m){return m.type!=="campaign"&&!m.campaignId});
   var act=regular.filter(function(m){return m.status==="active"||m.status==="confirm"});
   var done=regular.filter(function(m){return m.status==="done"}).slice(0,8);

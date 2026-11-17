@@ -408,12 +408,29 @@ function summaryHtml(){
 
 function campaignOrderTypeLabel(t){return t==="buff"?"BUFF":t==="debuff"?"DEBUFF":"MIXED"}
 function campaignOrdersHtml(){
- if(!M||M.type!=="campaign")return "";var orders=M.campaignOrders||{},round=rd(),h='<section class="campaign-match-upgrades"><div class="campaign-match-upgrades-head"><div><b>DOMINATUS · WARMASTER ORDERS</b><h3>Orders</h3><p>Fiecare ordin afectează doar jucătorul desemnat și numai în Battle Round-ul selectat.</p></div></div>';
- ["a","b"].forEach(function(side){var o=orders[side],item=o&&jhOrderById(o.orderId),player=M[side==="a"?"pa":"pb"]||{};h+='<div class="match-campaign-upgrade"><b>'+esc(player.name||side.toUpperCase())+'</b>'+(item?'<span><strong>'+esc(item.name)+'</strong> · '+campaignOrderTypeLabel(item.type)+' · Battle Round '+esc(o.round)+'</span><small>'+esc(item.effect)+'</small><small><b>'+(Number(o.round)===round?'ACTIVE NOW':Number(o.round)<round?'COMPLETED':'UPCOMING')+'</b></small>':'<span>No Order assigned</span>')+'</div>'});
- if(App.isAdmin&&!M.first&&M.status==="active"){h+='<div class="campaign-orders-admin"><b>Configure Orders</b>';["a","b"].forEach(function(side){var o=orders[side]||{},item=jhOrderById(o.orderId),player=M[side==="a"?"pa":"pb"]||{};h+='<div class="campaign-order-config"><label class="opt">'+esc(player.name||side.toUpperCase())+' · Type<select data-order-type="'+side+'"><option value="">No Order</option><option value="buff" '+(item&&item.type==="buff"?'selected':'')+'>Buff</option><option value="debuff" '+(item&&item.type==="debuff"?'selected':'')+'>Debuff</option><option value="mixed" '+(item&&item.type==="mixed"?'selected':'')+'>Mixed</option></select></label><label class="opt">Order<select data-order-id="'+side+'"><option value="">No Order</option>'+JH_ORDERS.map(function(x){return '<option value="'+esc(x.id)+'" '+(x.id===o.orderId?'selected':'')+'>'+esc(x.name)+' · '+campaignOrderTypeLabel(x.type)+'</option>'}).join('')+'</select></label><label class="opt">Battle Round<select data-order-round="'+side+'">'+[1,2,3,4,5].map(function(n){return '<option value="'+n+'" '+(Number(o.round||1)===n?'selected':'')+'>Round '+n+'</option>'}).join('')+'</select></label></div>'});h+='<button class="sm" data-act="campaign-orders-save">Save Orders</button></div>'}
- return h+'</section>'
+ if(!M||M.type!=="campaign")return "";
+ var orders=M.campaignOrders||{},round=rd(),h='<section class="campaign-match-upgrades campaign-orders-panel"><div class="campaign-match-upgrades-head"><div><b>DOMINATUS · WARMASTER ORDERS</b><h3>Orders</h3><p>Fiecare ordin afectează doar jucătorul desemnat și numai în Battle Round-ul selectat.</p></div></div>';
+ ["a","b"].forEach(function(side){
+  var player=side==="a"?M.pa:M.pb,name=player&&player.name?player.name:(side==="a"?M.a:M.b),o=orders[side],item=o&&jhOrderById(o.orderId),label=side==="a"?"PLAYER A":"PLAYER B";
+  h+='<div class="campaign-order-player"><div class="campaign-order-player-head"><span>'+label+'</span><strong>'+esc(name||label)+'</strong></div>';
+  h+='<div class="campaign-order-current">'+(item?'<span class="campaign-order-type '+esc(item.type)+'">'+campaignOrderTypeLabel(item.type)+'</span><b>'+esc(item.name)+'</b><p>'+esc(item.effect)+'</p><small class="campaign-order-state">'+(Number(o.round)===round?'ACTIVE NOW':Number(o.round)<round?'COMPLETED':'UPCOMING')+' · BATTLE ROUND '+esc(o.round)+'</small>':'<span class="campaign-order-none">No Order assigned</span>')+'</div>';
+  if(App.isAdmin&&!M.first&&M.status==="active"){
+   h+='<div class="campaign-order-editor"><div class="campaign-order-editor-title">Assign Order to '+esc(name||label)+'</div><div class="campaign-order-round"><label>Active Battle Round<select data-order-round="'+side+'">'+[1,2,3,4,5].map(function(n){return '<option value="'+n+'" '+(Number(o&&o.round||1)===n?'selected':'')+'>Battle Round '+n+'</option>'}).join('')+'</select></label></div>';
+   h+='<div class="campaign-order-catalog"><label class="campaign-order-choice '+(!item?'selected':'')+'"><input type="radio" name="campaign-order-'+side+'" data-order-id="'+side+'" value="" '+(!item?'checked':'')+'><span><b>No Order</b><small>Acest jucător nu primește niciun efect.</small></span></label>';
+   ["buff","debuff","mixed"].forEach(function(type){var items=JH_ORDERS.filter(function(x){return x.type===type});h+='<div class="campaign-order-category '+type+'"><div class="campaign-order-category-title">'+campaignOrderTypeLabel(type)+'</div><div class="campaign-order-options">'+items.map(function(x){return '<label class="campaign-order-choice '+(item&&item.id===x.id?'selected':'')+'"><input type="radio" name="campaign-order-'+side+'" data-order-id="'+side+'" value="'+esc(x.id)+'" '+(item&&item.id===x.id?'checked':'')+'><span><b>'+esc(x.name)+'</b><small>'+esc(x.effect)+'</small></span></label>'}).join('')+'</div></div>'});
+   h+='</div></div>';
+  }
+  h+='</div>';
+ });
+ if(App.isAdmin&&!M.first&&M.status==="active")h+='<button class="sm campaign-orders-save" data-act="campaign-orders-save">Save Orders</button>';
+ return h+'</section>';
 }
-function saveCampaignOrders(){if(!M||M.type!=="campaign"||!App.isAdmin||M.first!=null)return;var out={};["a","b"].forEach(function(side){var id=document.querySelector('[data-order-id="'+side+'"]').value;if(!id)return;var item=jhOrderById(id),type=document.querySelector('[data-order-type="'+side+'"]').value;if(!item||!type||item.type!==type)throw new Error("Alege un Order din categoria selectată pentru "+(M[side==="a"?"pa":"pb"].name||side.toUpperCase())+".");out[side]={orderId:id,round:Number(document.querySelector('[data-order-round="'+side+'"]').value)}});upd({campaignOrders:out}).catch(fail)}
+function saveCampaignOrders(){
+ if(!M||M.type!=="campaign"||!App.isAdmin||M.first!=null)return;
+ var out={};["a","b"].forEach(function(side){var chosen=document.querySelector('input[name="campaign-order-'+side+'"]:checked'),id=chosen?chosen.value:"";if(!id)return;var item=jhOrderById(id),round=document.querySelector('[data-order-round="'+side+'"]');if(!item)throw new Error("Order invalid pentru "+(side==="a"?M.pa.name:M.pb.name)+".");out[side]={orderId:id,round:Number(round&&round.value||1)}});
+ upd({campaignOrders:out}).catch(fail)
+}
+
 function render(){
   var m=M,started=m.first!=null,ended=m.turn>=10,a=actS(),live=m.status==="active";
   ["sa","sb"].forEach(function(k){m[k]=Object.assign(newPS(),m[k])});
@@ -560,7 +577,7 @@ App.start(function(){
   stratSearch.addEventListener("input",function(){if(M&&M.type==="combat-patrol"){var ed=cpOwnSide()?cpEditionFor(cpOwnSide()):"";if(ed==="11")renderCoreStratagems(stratList,stratSearch.value,CORE_STRATAGEMS.filter(function(x){return ["Explosives","Crushing Impact","Rapid Ingress"].indexOf(x.name)<0}));}else renderCoreStratagems(stratList,stratSearch.value)});
   document.addEventListener("keydown",function(e){if(e.key==="Escape"){closeStratagems();cpModalClose("patrolDatasheetModal");cpModalClose("patrolMissionModal")}});
   App.onPlayers=syncProfile;
-  document.addEventListener("change",function(e){var side=e.target&&e.target.getAttribute&&e.target.getAttribute("data-order-type");if(!side)return;var type=e.target.value,sel=document.querySelector('[data-order-id="'+side+'"]');if(!sel)return;var options='<option value="">No Order</option>'+JH_ORDERS.filter(function(x){return !type||x.type===type}).map(function(x){return '<option value="'+esc(x.id)+'">'+esc(x.name)+'</option>'}).join('');sel.innerHTML=options;});
+
   setInterval(function(){var e=$("tmr");if(e){var ts=+e.getAttribute("data-ts");e.textContent=ts?fmtT(Date.now()-ts):""}},1000);
   fetch("data/combat-patrol.json",{cache:"no-cache"}).then(function(r){if(!r.ok)throw new Error("Nu pot încărca biblioteca Combat Patrol.");return r.json()}).catch(function(e){console.warn(e);CPMATCH={factions:[],patrols11_extra:[],sources:{}}}).then(function(data){if(data)CPMATCH=data;App.db.collection("matches").doc(mid).onSnapshot(function(d){
     if(!d.exists){$("box").innerHTML='<p class="err">Meciul nu există.</p>';return}

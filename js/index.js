@@ -3,9 +3,26 @@ var MS=[];
 function draw(ms){
   MS=ms;
   var inv=ms.filter(function(m){return m.status==="invited"});
-  var campaigns=ms.filter(function(m){
-    return (m.type==="campaign"||!!m.campaignId)&&m.status!=="campaign_locked"&&
+  var campaignMatches=ms.filter(function(m){
+    return (m.type==="campaign"||!!m.campaignId)&&
       !(m.status==="done"&&m.campaignRewardsDone&&m.campaignRewardsDone[m.a]&&m.campaignRewardsDone[m.b]&&m.campaignWarmasterConfirmed);
+  });
+  var campaigns=campaignMatches.filter(function(m){
+    if(App.isAdmin)return m.status!=="campaign_locked";
+    if(m.a!==App.me&&m.b!==App.me)return false;
+    var phase=Number(m.campaignPhase||1),cid=m.campaignId||"";
+    var myPhase=campaignMatches.filter(function(x){
+      return (x.campaignId||"")===cid&&Number(x.campaignPhase||1)===phase&&(x.a===App.me||x.b===App.me);
+    });
+    var openRounds=myPhase.filter(function(x){
+      var round=Number(x.campaignRound||1);
+      var roundMatches=myPhase.filter(function(y){return Number(y.campaignRound||1)===round});
+      return !roundMatches.every(function(y){
+        return y.status==="done"&&y.campaignRewardsDone&&y.campaignRewardsDone[y.a]&&y.campaignRewardsDone[y.b]&&y.campaignWarmasterConfirmed;
+      });
+    }).map(function(x){return Number(x.campaignRound||1)});
+    var currentRound=openRounds.length?Math.min.apply(Math,openRounds):1;
+    return Number(m.campaignRound||1)===currentRound&&m.status!=="campaign_locked";
   });
   var regular=ms.filter(function(m){return m.type!=="campaign"&&!m.campaignId});
   var act=regular.filter(function(m){return m.status==="active"||m.status==="confirm"});

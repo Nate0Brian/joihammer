@@ -4,11 +4,13 @@ function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return
 function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
 function pick(a){return a[Math.floor(Math.random()*a.length)]}
 function fail(e){var s=$("st");if(s)s.textContent="Eroare: "+((e&&(e.code||e.message))||e)}
+function failAt(source,e){var code=(e&&(e.code||e.message))||String(e);var msg="Eroare Firestore ["+source+"]: "+code;console.error("JoiHammer Firestore diagnostic:",source,e);var s=$("st");if(s){var prev=s.dataset.firestoreErrors||"";var entry="• "+msg;s.dataset.firestoreErrors=prev?prev+"\n"+entry:entry;s.textContent=s.dataset.firestoreErrors}}
 function nice(e){var c=(e&&e.code)||"";if(c==="auth/weak-password")return "Parola trebuie să aibă minim 6 caractere.";if(c==="auth/email-already-in-use")return "Contul există deja în Firebase. Alege alt username.";if(c.indexOf("auth/")===0)return "Username sau parolă greșită. ("+c+")";if(c==="permission-denied")return "Nu ai voie să faci asta.";return (e&&e.message)||String(e)}
 
 var App={me:"",isAdmin:false,players:[],auth:null,db:null,onPlayers:function(){}};
 
 App.start=function(cb,onOut){
+  var status=$("st");if(status){status.textContent="";status.dataset.firestoreErrors=""}
   function hideLoading(){document.documentElement.classList.remove("jh-auth-pending")}
   if(CFG.apiKey==="PUNE_AICI"){hideLoading();document.body.insertAdjacentHTML("afterbegin",'<p class="err" style="padding:16px">Completează datele Firebase în js/config.js</p>');return}
   firebase.initializeApp(CFG);App.auth=firebase.auth();App.db=firebase.firestore();
@@ -33,7 +35,7 @@ App.start=function(cb,onOut){
     App.db.collection("players").onSnapshot(function(s){
       App.players=s.docs.map(function(d){var x=d.data();return {name:d.id,army:x.army||"",det:x.det||"",dets:x.dets||[],fd:x.fd||FDS[0],warlordName:x.warlordName||"",warlordExtraCP:!!x.warlordExtraCP}}).sort(function(a,b){return a.name<b.name?-1:1});
       App.onPlayers();
-    },fail);
+    },function(e){failAt("players — ascultare listă jucători",e)});
     try{cb();}finally{hideLoading()}
   })}).catch(function(e){hideLoading();document.body.insertAdjacentHTML("afterbegin",'<p class="err" style="padding:16px">Nu pot citi fișierele din folderul data/ ('+esc(e.message||e)+')</p>')});
 };
@@ -100,8 +102,8 @@ App.watchMatches=function(cb){
   var A=[],B=[],q=App.db.collection("matches");
   function out(){var m={};A.concat(B).forEach(function(x){m[x.id]=x});cb(Object.keys(m).map(function(k){return m[k]}).sort(function(x,y){return y.n-x.n}))}
   function map(s){return s.docs.map(function(d){return Object.assign({id:d.id},d.data())})}
-  q.where("a","==",App.me).onSnapshot(function(s){A=map(s);out()},fail);
-  q.where("b","==",App.me).onSnapshot(function(s){B=map(s);out()},fail);
+  q.where("a","==",App.me).onSnapshot(function(s){A=map(s);out()},function(e){failAt("matches — interogare a = utilizator",e)});
+  q.where("b","==",App.me).onSnapshot(function(s){B=map(s);out()},function(e){failAt("matches — interogare b = utilizator",e)});
 };
 App.score=function(m){if(m.type==="combat-patrol"){function v(p){return (p.log||[]).filter(function(e){return e.k==="cpvp"}).reduce(function(a,e){return a+e.v},0)}return v(Object.assign(newPS(),m.sa))+" – "+v(Object.assign(newPS(),m.sb))}return totalPS(Object.assign(newPS(),m.sa))+" – "+totalPS(Object.assign(newPS(),m.sb))};
 App.matchRow=function(m){
@@ -131,7 +133,7 @@ App.watchInvites=function(){
     App.badge(s.size);
     if(!first&&"Notification" in window&&Notification.permission==="granted")s.docChanges().forEach(function(c){if(c.type==="added")App.notify("Invitație la meci",c.doc.data().a+" te invită la un meci amical.")});
     first=false;
-  },function(){});
+  },function(e){failAt("matches — invitații primite (b + status)",e)});
 };
 
 /* Dominatus Warmaster Orders: campaign-only battle effects, selected per player and round. */

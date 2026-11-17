@@ -70,36 +70,22 @@ function dLoadRewards(c){
  if(!App.isAdmin)q=q.where("playerId","==",App.me);
  DOM_REWARD_UNSUB=q.onSnapshot(function(s){DOM_REWARDS=s.docs.map(function(d){return Object.assign({id:d.id},d.data())});if(DOM_CURRENT&&DOM_CURRENT.id===c.id)dRenderDetail(DOM_CURRENT);else dRenderRewardDecks(c);},function(e){var el=document.getElementById("domRewardDecks");if(el)el.innerHTML='<p class="err">Nu pot încărca recompensele: '+dEsc(e.message||e)+'</p>'});
 }
-function dRewardDetailsHtml(card){
- if(!card)return '<p class="dom-muted">Selectează o carte pentru a vedea detaliile.</p>';
- var h='<div class="dom-reward-details"><div class="dom-reward-details-head"><b>'+dEsc(card.name||'Reward card')+'</b><span>'+dEsc(card.type||'')+'</span></div>';
- if(card.who)h+='<p class="dom-reward-who"><b>Eligibilitate:</b> '+dEsc(card.who)+'</p>';
- if(card.effect||card.effectRo)h+='<div class="dom-reward-effect"><b>Efect în joc</b><p>'+dEsc(card.effectRo||card.effect)+'</p></div>';
- if(card.bonusEffect||card.bonusEffectRo)h+='<div class="dom-reward-bonus"><b>Efect suplimentar</b><p>'+dEsc(card.bonusEffectRo||card.bonusEffect)+'</p></div>';
- if(card.loreTextRo)h+='<details class="dom-reward-lore"><summary>Detalii / lore</summary><p>'+dEsc(card.loreTextRo)+'</p></details>';
- if(!card.effect&&!card.effectRo&&!card.bonusEffect&&!card.bonusEffectRo&&!card.loreTextRo)h+='<p class="dom-muted">Descrierea acestei cărți nu este disponibilă în datele locale.</p>';
- return h+'</div>';
-}
 function dRenderRewardDecks(c){
  var el=document.getElementById("domRewardDecks");if(!el)return;
  var list=DOM_REWARDS.filter(function(r){return App.isAdmin||r.playerId===App.me;});
  if(!list.length){el.innerHTML='<p class="empty">Nu există cărți trase încă. Recompensele vor fi generate automat după validarea bătăliilor și la încheierea fazelor.</p>';return;}
  el.innerHTML=list.sort(function(a,b){return (b.createdAt&&b.createdAt.toMillis?b.createdAt.toMillis():0)-(a.createdAt&&a.createdAt.toMillis?a.createdAt.toMillis():0)}).map(function(r){
-  var pending=r.status==="pending",selected=r.status==="selected",cards=r.candidates||[],body='';
+  var owner=dPlayer(c,r.playerId),pending=r.status==="pending",selected=r.status==="selected",cards=r.candidates||[];
+  var body='';
   if(pending&&r.playerId===App.me&&!App.isAdmin){
-   var options=cards.map(function(x){return '<option value="'+dEsc(x.id)+'">'+dEsc(x.name)+'</option>'}).join(""),first=cards[0]||null;
+   var options=cards.map(function(x){return '<option value="'+dEsc(x.id)+'">'+dEsc(x.name)+'</option>'}).join("");
    var needsUnit=cards.some(function(x){return x.who&&x.who.indexOf("Campaign card")<0});
-   body='<div class="dom-reward-choice">'+(cards.length>1?'<label class="opt">Alege cartea pe care o păstrezi<select id="domRewardCard_'+dEsc(r.id)+'">'+options+'</select></label>':'<p class="dom-muted">Cartea trasă: <b>'+dEsc(first&&first.name||"—")+'</b></p>')+'<div id="domRewardPreview_'+dEsc(r.id)+'">'+dRewardDetailsHtml(first)+'</div>'+(needsUnit?'<label class="opt">Unitatea / modelul care primește upgrade-ul<input id="domRewardUnit_'+dEsc(r.id)+'" maxlength="100" placeholder="Ex. Captain in Terminator Armour" required></label>':'')+'<button class="primary sm" data-dom-keep-reward="'+dEsc(r.id)+'">Păstrează cartea</button></div>';
-  }else if(selected){
-   var kept=(cards||[]).filter(function(x){return x.id===r.selectedCardId})[0]||dRewardCardById(r.category,r.selectedCardId)||{id:r.selectedCardId,name:r.selectedCardId};
-   kept=Object.assign({},kept,{type:r.category});
-   body='<p class="dom-success">Păstrată: <b>'+dEsc(kept.name||r.selectedCardId)+'</b>'+(r.assignedUnit?' · '+dEsc(r.assignedUnit):'')+'</p>'+dRewardDetailsHtml(kept);
-  }else if(pending&&App.isAdmin){
-   body='<p class="dom-muted">Așteaptă alegerea lui '+dEsc(r.playerId)+'.</p>'+(cards.length?cards.map(function(x){return dRewardDetailsHtml(Object.assign({},x,{type:r.category}))}).join(''):'');
-  }else if(r.status==="exhausted"){body='<p class="dom-muted">Pachetul nu mai are cărți disponibile pentru această tragere.</p>';}
+   body='<div class="dom-reward-choice">'+(cards.length>1?'<label class="opt">Alege cartea pe care o păstrezi<select id="domRewardCard_'+dEsc(r.id)+'">'+options+'</select></label>':'<p class="dom-muted">Cartea trasă: <b>'+dEsc(cards[0]&&cards[0].name||"—")+'</b></p>')+(needsUnit?'<label class="opt">Unitatea / modelul care primește upgrade-ul<input id="domRewardUnit_'+dEsc(r.id)+'" maxlength="100" placeholder="Ex. Captain in Terminator Armour" required></label>':'')+'<button class="primary sm" data-dom-keep-reward="'+dEsc(r.id)+'">Păstrează cartea</button></div>';
+  }else if(selected){var kept=dRewardCardById(r.category,r.selectedCardId);body='<p class="dom-success">Păstrată: <b>'+dEsc(kept?kept.name:r.selectedCardId)+'</b>'+(r.assignedUnit?' · '+dEsc(r.assignedUnit):'')+'</p>'+(kept?'<p>'+dEsc(kept.effectRo||kept.effect||'')+'</p>':'');}
+  else if(pending&&App.isAdmin){body='<p class="dom-muted">Așteaptă alegerea lui '+dEsc(r.playerId)+'. Cărți disponibile: '+dEsc(cards.map(function(x){return x.name}).join(", "))+'</p>';}
+  else if(r.status==="exhausted"){body='<p class="dom-muted">Pachetul nu mai are cărți disponibile pentru această tragere.</p>';}
   return '<article class="dom-reward-card"><div class="dom-battle-top"><span class="dom-kicker">'+dEsc(dRewardTypeLabel(r.category))+' · PHASE '+dEsc(r.phase)+'</span><span class="dom-status '+(selected?'is-active':'')+'">'+(selected?'Kept':pending?'Awaiting choice':dEsc(r.status||"—"))+'</span></div><b>'+dEsc(r.playerId)+'</b>'+(r.reason?'<p class="dom-muted">'+dEsc(r.reason)+'</p>':'')+body+'</article>';
  }).join("");
- el.querySelectorAll('[id^="domRewardCard_"]').forEach(function(select){select.onchange=function(){var rewardId=select.id.substring('domRewardCard_'.length),reward=DOM_REWARDS.filter(function(x){return x.id===rewardId})[0],card=reward&&(reward.candidates||[]).filter(function(x){return x.id===select.value})[0],preview=document.getElementById('domRewardPreview_'+rewardId);if(preview)preview.innerHTML=dRewardDetailsHtml(card);};});
  el.querySelectorAll('[data-dom-keep-reward]').forEach(function(b){b.onclick=function(){dKeepReward(c,b.getAttribute('data-dom-keep-reward'))}});
 }
 async function dKeepReward(c,rewardId){
@@ -110,21 +96,8 @@ async function dKeepReward(c,rewardId){
  if(needsUnit&&!unit){alert("Introdu unitatea/modelul care primește upgrade-ul.");return;}
  if(dSelectedRewardIds(App.me).indexOf(card.id)>=0||((c.upgrades||{})[App.me]||[]).some(function(u){return u.id===card.id})){alert("Deții deja această carte. Alege altă carte din tragere.");return;}
  if(unit&&dSelectedUnitUsed(c,App.me,unit,rewardId)){alert("Această unitate are deja un Upgrade. Regulile permit un singur Upgrade per unitate.");return;}
- try{
-  await App.db.collection(DOM_COLL).doc(c.id).collection("rewards").doc(rewardId).update({selectedCardId:card.id,selectedCardName:card.name,assignedUnit:unit,status:"selected",selectedAt:firebase.firestore.FieldValue.serverTimestamp()});
-  if(r.battleId){
-   var all=await App.db.collection(DOM_COLL).doc(c.id).collection("rewards").where("battleId","==",r.battleId).get();
-   var stillPending=all.docs.some(function(d){var x=d.data();return x.playerId===App.me&&x.status==="pending"});
-   if(!stillPending){
-    var matchId="camp_"+String(c.id).replace(/[^a-zA-Z0-9_-]/g,"_")+"_"+String(r.battleId).replace(/[^a-zA-Z0-9_-]/g,"_");
-    var patch={};patch["campaignRewardsDone."+App.me]=true;
-    var selected=all.docs.map(function(d){return d.data()}).filter(function(x){return x.playerId===App.me&&x.status==="selected"}).map(function(x){var ccard=(x.candidates||[]).filter(function(z){return z.id===x.selectedCardId})[0]||{};return {id:x.selectedCardId,name:x.selectedCardName||ccard.name||x.selectedCardId,type:x.category,unit:x.assignedUnit||"",effect:ccard.effectRo||ccard.effect||""}});
-    var battle=(c.battles||[]).filter(function(x){return x.id===r.battleId})[0]||{},playerSide=App.me===battle.a?"a":"b";
-    patch["campaignContext.campaignPlayers."+playerSide+".upgrades"]=selected;
-    await App.db.collection("matches").doc(matchId).update(patch);
-   }
-  }
- }catch(e){fail(e)}
+ try{await App.db.collection(DOM_COLL).doc(c.id).collection("rewards").doc(rewardId).update({selectedCardId:card.id,assignedUnit:unit,status:"selected",selectedAt:firebase.firestore.FieldValue.serverTimestamp()});}
+ catch(e){fail(e)}
 }
 async function dCreateRewardDraw(c,playerId,category,phase,battleId,drawCount,reason){
  var rewardId=(battleId||("phase"+phase))+"_"+playerId+"_"+category.toLowerCase().replace(/[^a-z]+/g,"_");
@@ -153,7 +126,7 @@ async function dCreatePhaseRelicDraws(c){
  var reservedByAlliance={},existingRewards=await App.db.collection(DOM_COLL).doc(c.id).collection("rewards").get();
  existingRewards.docs.map(function(d){return d.data()}).filter(function(x){return x.category==="Relic"&&(x.status==="selected"||x.status==="pending")}).forEach(function(x){var a=dPlayer(c,x.playerId).alliance;reservedByAlliance[a]= (reservedByAlliance[a]||[]).concat(x.status==="selected"?[x.selectedCardId]:(x.candidateIds||[]));});
  for(var i=0;i<(c.players||[]).length;i++){
-  var p=c.players[i],earnedCount=Number((c.agendaAchieved||{})[p.id]||0),withheld=Number(((c.relicWithheld||{})[String(phase)]||{})[p.id]||0),count=Math.max(0,earnedCount-withheld);if(count<=0)continue;
+  var p=c.players[i],count=Number((c.agendaAchieved||{})[p.id]||0);if(count<=0)continue;
   var rewardId="phase"+phase+"_relic_"+p.id,ref=App.db.collection(DOM_COLL).doc(c.id).collection("rewards").doc(rewardId),old=await ref.get();if(old.exists){var existing=old.data()||{};reservedByAlliance[p.alliance]=(reservedByAlliance[p.alliance]||[]).concat(existing.status==="selected"?[existing.selectedCardId]:(existing.candidateIds||[]));continue;}
   var held=(reservedByAlliance[p.alliance]||[]).concat((c.players||[]).reduce(function(a,pl){return a.concat(((c.upgrades||{})[pl.id]||[]).filter(function(u){return u.type==="Relic"&&pl.alliance===p.alliance}).map(function(u){return u.id}))},[]));
   var pool=(DOM_DATA.relics||[]).filter(function(x){return x.alliance===p.alliance&&held.indexOf(x.id)<0});
@@ -196,7 +169,6 @@ async function dDeleteCampaign(campaignId){
   var reports=await root.collection("reports").get(),rewards=await root.collection("rewards").get();
   reports.docs.concat(rewards.docs).forEach(function(d){refs.push(d.ref)});
   (campaign.players||[]).forEach(function(p){refs.push(App.db.collection("dominatusUsers").doc(p.id).collection("campaigns").doc(campaignId))});
-  (campaign.battles||[]).forEach(function(b){if(b.matchId)refs.push(App.db.collection("matches").doc(b.matchId))});
   await dDeleteDocsInBatches(refs);
   await root.delete();
   alert("Campania a fost ștearsă.");
@@ -218,42 +190,6 @@ function dShufflePlayers(list){
  var a=(list||[]).slice();
  for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;}
  return a;
-}
-function dCampaignMatchId(c,b){return "camp_"+String(c.id).replace(/[^a-zA-Z0-9_-]/g,"_")+"_"+String(b.id).replace(/[^a-zA-Z0-9_-]/g,"_")}
-function dCampaignMatchContext(c,b,rewardRows){
- var loc=dLocation(c),pa=dPlayer(c,b.a),pb=dPlayer(c,b.b),aa=dAgenda(b.agendaA),ab=dAgenda(b.agendaB);
- function agendaInfo(a){return a?{id:a.id,name:a.name,alliance:a.alliance,lore:a.loreTextRo||"",agendaAchieved:a.agendaAchieved||[],primaryMission:a.primaryMission||{}}:null}
- function upgrades(pid){
-  var list=(c.upgrades||{})[pid]||[];
-  var selected=(rewardRows||[]).filter(function(r){return r.playerId===pid&&r.status==="selected"}).map(function(r){
-   var pool=r.category==="Battle Honour"?DOM_DATA.battleHonours:r.category==="Battle Skill"?DOM_DATA.battleSkills:r.category==="Relic"?DOM_DATA.relics:[];
-   var card=dById(pool,r.selectedCardId);
-   return {id:r.selectedCardId,name:r.selectedCardName||(card&&card.name)||r.selectedCardId,type:r.category,unit:r.assignedUnit||"",effect:card&&(card.effectRo||card.effect)||""};
-  });
-  return list.map(function(u){return {id:u.id,name:u.name,type:u.type,unit:u.unit||"",effect:u.effectRo||u.effect||""}}).concat(selected);
- }
- return {campaignId:c.id,campaignName:c.name,campaignPhase:Number(b.phase||c.phase||1),campaignRound:Number(b.round||1),campaignBattleId:b.id,campaignLocation:loc?{id:loc.id,name:loc.name,lore:loc.loreTextRo||"",bonus:loc.bonus||{},warZoneRules:loc.warZoneRules||[]}:null,campaignPlayers:{a:{id:pa.id,alliance:pa.alliance,forceDisposition:(c.forceDispositions||{})[pa.id]||pa.fd||"",agenda:agendaInfo(aa),upgrades:upgrades(pa.id)},b:{id:pb.id,alliance:pb.alliance,forceDisposition:(c.forceDispositions||{})[pb.id]||pb.fd||"",agenda:agendaInfo(ab),upgrades:upgrades(pb.id)}},campaignBriefings:(DOM_DATA.briefings||[]).filter(function(x){return Number(x.phase)===Number(b.phase||c.phase)&&[pa.alliance,pb.alliance].indexOf(x.alliance)>=0}).map(function(x){return {id:x.id,alliance:x.alliance,phase:x.phase,lore:x.loreTextRo||x.narrativeSummary||"",strategicObjective:x.strategicObjective||""}})};
-}
-async function dEnsureCampaignMatchDocs(c,battles){
- var out=(battles||[]).map(function(b){return Object.assign({},b)}),batch=App.db.batch(),pending=0;
- var rewardSnap=await App.db.collection(DOM_COLL).doc(c.id).collection("rewards").get(),rewardRows=rewardSnap.docs.map(function(d){return d.data()}),existingSnap=await App.db.collection("matches").where("campaignId","==",c.id).get(),existingMatches=existingSnap.docs.map(function(d){return Object.assign({id:d.id},d.data())});
- function previousRoundDone(b){var round=Number(b.round||1);if(round<=1)return true;var prev=existingMatches.filter(function(x){return Number(x.campaignPhase||1)===Number(b.phase||c.phase||1)&&Number(x.campaignRound||1)===round-1});return [b.a,b.b].every(function(player){return prev.filter(function(x){return x.a===player||x.b===player}).every(function(x){return x.status==="done"})})}
- for(var i=0;i<out.length;i++){
-  var b=out[i];if(b.status==="completed")continue;
-  var matchId=b.matchId||dCampaignMatchId(c,b),ref=App.db.collection("matches").doc(matchId),old=await ref.get();
-  var context=dCampaignMatchContext(c,b,rewardRows);
-  if(!old.exists){
-   var payload=App.newMatch({type:"campaign",a:b.a,b:b.b,status:previousRoundDone(b)?"active":"campaign_locked",pa:App.snap(b.a),pb:App.snap(b.b),campaignId:c.id,campaignBattleId:b.id,campaignContext:context,campaignPhase:Number(b.phase||c.phase||1),campaignRound:Number(b.round||1),campaignAgendaA:b.agendaA||"",campaignAgendaB:b.agendaB||"",campaignLocationId:b.locationId||c.locationId||"",campaignName:c.name||""});
-   batch.set(ref,payload);pending++;
-  }else{
-   var oldData=old.data()||{},updates={campaignContext:context,campaignPhase:Number(b.phase||c.phase||1),campaignRound:Number(b.round||1),campaignAgendaA:b.agendaA||"",campaignAgendaB:b.agendaB||"",campaignLocationId:b.locationId||c.locationId||"",campaignName:c.name||""};
-   if(oldData.first==null&&oldData.status!=="done")updates.status=previousRoundDone(b)?"active":(Number(b.round||1)>1?"campaign_locked":"active");
-   batch.update(ref,updates);pending++;
-  }
-  b.matchId=matchId;
- }
- if(pending)await batch.commit();
- return out;
 }
 function dBuildPhaseMatches(c,phase,existing){
  var rounds=Number(phase)===3?1:2,players=(c.players||[]).slice(),used=(existing||[]).filter(function(b){return Number(b.phase)===Number(phase)}),created=[],stamp=Date.now();
@@ -280,15 +216,13 @@ async function dGeneratePhaseMatches(c,replaceScheduled){
  var fresh=dBuildPhaseMatches(c,phase,all);
  if(!fresh.length){alert("Nu există suficienți jucători pentru a genera meciuri.");return}
  if(!confirm("Generez "+fresh.length+" meciuri pentru Phase "+phase+"?"+(phase===3?" Faza finală va avea o singură rundă.":" Faza va avea două runde, câte un meci per jucător în fiecare rundă.")+(replaceScheduled?" Meciurile programate existente din fază vor fi înlocuite.":"")))return;
- var scheduled=await dEnsureCampaignMatchDocs(c,all.concat(fresh));
- await dUpdateCampaign(c,{battles:scheduled});
+ await dUpdateCampaign(c,{battles:all.concat(fresh)});
 }
 async function dDeleteScheduledBattle(c,battleId){
  var battles=(c.battles||[]).filter(function(b){return b.id!==battleId});
  var target=(c.battles||[]).filter(function(b){return b.id===battleId})[0];
  if(!target||target.status==="completed")return;
  if(!confirm("Ștergi acest meci programat?"))return;
- if(target.matchId){try{await App.db.collection("matches").doc(target.matchId).delete()}catch(e){console.warn("Campaign match cleanup:",e)}}
  await dUpdateCampaign(c,{battles:battles});
 }
 var DOM_ARMAGEDDON_LAYOUT={
@@ -324,18 +258,6 @@ function dMapLocationDetail(c,loc){
 }
 function dRenderArmageddonMap(c){
  var locations=DOM_DATA.locations||[],used=(c.phaseHistory||[]).map(function(x){return x.locationId}),current=c.locationId;
- var territoryShapes={
-  the_mannheim_gap:"8,12 29,8 36,24 27,39 10,34",
-  volcanus_archipelago:"31,4 52,5 57,22 45,31 34,22",
-  the_morpheon_line:"57,12 82,9 91,27 78,39 60,31",
-  cerbera_base:"31,39 55,34 66,52 55,70 34,64",
-  victorinius_spaceport:"5,37 26,34 33,53 21,68 6,59",
-  blackfire_death_pits:"69,48 94,42 98,67 83,79 68,66",
-  eyes_of_the_emperor_observatory:"53,2 75,3 81,17 66,25 54,17",
-  titangrave:"57,72 82,70 91,90 70,97 55,86",
-  hive_acheron_subsprawl:"26,70 49,69 58,88 39,97 23,85"
- };
- var territories=locations.map(function(loc){var rec=dMapLocationRecord(c,loc.id),owner=rec&&rec.controlAlliance,pts=territoryShapes[loc.id];if(!pts)return "";return '<polygon class="arm-map-territory '+(owner?'alliance-'+owner:'is-unclaimed')+'" points="'+pts+'" data-arm-territory="'+dEsc(loc.id)+'"/>';}).join("");
  var pins=locations.map(function(loc){
   var xy=DOM_ARMAGEDDON_LAYOUT[loc.id]||{x:50,y:50},rec=dMapLocationRecord(c,loc.id),isCurrent=loc.id===current,owner=rec&&rec.controlAlliance;
   var cls=owner?"is-controlled alliance-"+owner:isCurrent?"is-current":"is-available";
@@ -346,7 +268,7 @@ function dRenderArmageddonMap(c){
  return '<section class="dom-panel arm-map-section"><div class="dom-section-head"><div><span class="dom-kicker">THEATRE COMMAND · ARMAGEDDON PRIME & SECUNDUS</span><h3>Strategic War Map</h3></div><span class="arm-map-scale">SCHEMATIC · NOT TO SCALE</span></div>'+
  '<p class="arm-map-intro">Urmărește teatrele de operațiuni, locația fazei curente și controlul câștigat la încheierea fiecărei faze.</p>'+
  '<div class="arm-map-legend"><span><i class="pin-current"></i> Locație activă</span><span><i class="pin-imperium"></i> Liberators</span><span><i class="pin-orks"></i> Oppressors</span><span><i class="pin-raiders"></i> Raiders</span><span><i class="pin-neutral"></i> Nealocat</span></div>'+
- '<div class="arm-map-canvas"><img class="arm-map-art" src="images/armageddon-dominatus-map.jpg" alt="Hartă geografică Armageddon fără marcaje de campanie" loading="lazy"><svg class="arm-map-territories" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">'+territories+'</svg>'+pins+'</div>'+
+ '<div class="arm-map-canvas"><img class="arm-map-art" src="images/armageddon-dominatus-map.jpg" alt="Hartă geografică Armageddon fără marcaje de campanie" loading="lazy">'+pins+'</div>'+
  '<div class="arm-map-detail" id="armMapDetail">'+dMapLocationDetail(c,selected)+'</div>'+
  '<div class="arm-map-phase-history">'+timeline+'</div>'+
  '<p class="arm-map-footnote">Pozițiile pinurilor sunt orientative, pentru navigarea în campanie; harta este o schemă strategică originală, nu o reproducere cartografică oficială Games Workshop.</p></section>';
@@ -388,7 +310,7 @@ function dRenderDetail(c){
  h+='<section class="dom-panel"><div class="dom-section-head"><div><span class="dom-kicker">BATTLE OPERATIONS</span><h3>Battles</h3></div>'+(isAdmin&&c.phaseStatus==="active"?'<div class="dom-actions"><button id="domGeneratePhaseMatches" class="ghost">🎲 Generează meciurile fazei</button><button id="domAddBattle" class="primary">＋ Programează meci</button></div>':'')+'</div>';
  if(isAdmin)h+='<div id="domBattleForm" class="dom-battle-form" hidden><div class="dom-form-grid"><label class="opt">Player A<select id="domBattleA">'+(c.players||[]).map(function(p){return '<option value="'+dEsc(p.id)+'">'+dEsc(p.id)+' · '+dEsc(dAllianceName(p.alliance))+'</option>'}).join("")+'</select></label><label class="opt">Player B<select id="domBattleB">'+(c.players||[]).map(function(p){return '<option value="'+dEsc(p.id)+'">'+dEsc(p.id)+' · '+dEsc(dAllianceName(p.alliance))+'</option>'}).join("")+'</select></label><label class="opt">Agenda A<select id="domAgendaA"></select></label><label class="opt">Agenda B<select id="domAgendaB"></select></label><label class="opt">Battle Size<select id="domBattleSize"><option>Strike Force</option><option>Incursion</option><option>Onslaught</option></select></label></div><p class="dom-muted">Program implicit: 2 battles/player în Phase 1, 2 în Phase 2 și o bătălie finală în Phase 3. Warmaster poate ajusta numărul și dimensiunea în limitele regulilor. Agendele sunt selectate manual pe baza Briefing-ului și a Force Dispositions. Dacă un jucător refuză Agenda, alege „Chapter Approved / no Agenda”.</p><div class="dom-actions"><button id="domSaveBattle" class="primary">Salvează meciul</button><button id="domCancelBattle" class="ghost">Anulează</button></div></div>';
  var battles=c.battles||[];
- h+='<div class="dom-battle-list">'+(battles.map(function(b){var pa=dPlayer(c,b.a),pb=dPlayer(c,b.b),aa=dAgenda(b.agendaA),ab=dAgenda(b.agendaB);return '<article class="dom-battle-card"><div class="dom-battle-top"><span class="dom-kicker">PHASE '+dEsc(b.phase)+(b.round?' · ROUND '+dEsc(b.round):'')+' · '+dEsc(b.battleSize||"Strike Force")+(b.generated?' · AUTO':'')+'</span><span class="dom-status '+(b.status==="completed"?"is-active":"")+'">'+(b.status==="completed"?"Completed":"Scheduled")+'</span></div><div class="dom-versus"><b>'+dEsc(b.a)+'</b><span>VS</span><b>'+dEsc(b.b)+'</b></div><div class="dom-battle-agendas"><span>'+dEsc(aa?aa.name:"Chapter Approved / no Agenda")+'</span><span>'+dEsc(ab?ab.name:"Chapter Approved / no Agenda")+'</span></div>'+(b.matchId?'<a class="dom-open-match" href="match.html?id='+encodeURIComponent(b.matchId)+'">Deschide meciul ↗</a>':'<span class="dom-muted">Match disponibil după aprobarea fazei.</span>')+(b.status==="completed"?'<p class="dom-muted">Winner: '+dEsc(b.winner==="draw"?"Draw":b.winner)+' · '+dEsc(b.scoreA||0)+' – '+dEsc(b.scoreB||0)+'</p>':'')+((!b.matchId&&!isAdmin&&mine&&(mine.id===b.a||mine.id===b.b)&&b.status!=="completed")?'<button class="ghost sm" data-dom-report="'+dEsc(b.id)+'">Raportează rezultatul</button>':'')+(isAdmin&&b.status!=="completed"?'<button class="ghost sm" data-dom-delete-battle="'+dEsc(b.id)+'">Șterge meciul</button>':'')+'</article>'}).join("")||'<p class="empty">Nu au fost programate meciuri.</p>')+'</div><div id="domReportForm"></div></section>';
+ h+='<div class="dom-battle-list">'+(battles.map(function(b){var pa=dPlayer(c,b.a),pb=dPlayer(c,b.b),aa=dAgenda(b.agendaA),ab=dAgenda(b.agendaB);return '<article class="dom-battle-card"><div class="dom-battle-top"><span class="dom-kicker">PHASE '+dEsc(b.phase)+(b.round?' · ROUND '+dEsc(b.round):'')+' · '+dEsc(b.battleSize||"Strike Force")+(b.generated?' · AUTO':'')+'</span><span class="dom-status '+(b.status==="completed"?"is-active":"")+'">'+(b.status==="completed"?"Completed":"Scheduled")+'</span></div><div class="dom-versus"><b>'+dEsc(b.a)+'</b><span>VS</span><b>'+dEsc(b.b)+'</b></div><div class="dom-battle-agendas"><span>'+dEsc(aa?aa.name:"Chapter Approved / no Agenda")+'</span><span>'+dEsc(ab?ab.name:"Chapter Approved / no Agenda")+'</span></div>'+(b.status==="completed"?'<p class="dom-muted">Winner: '+dEsc(b.winner==="draw"?"Draw":b.winner)+' · '+dEsc(b.scoreA||0)+' – '+dEsc(b.scoreB||0)+'</p>':'')+((!isAdmin&&mine&&(mine.id===b.a||mine.id===b.b)&&b.status!=="completed")?'<button class="ghost sm" data-dom-report="'+dEsc(b.id)+'">Raportează rezultatul</button>':'')+(isAdmin&&b.status!=="completed"?'<button class="ghost sm" data-dom-delete-battle="'+dEsc(b.id)+'">Șterge meciul</button>':'')+'</article>'}).join("")||'<p class="empty">Nu au fost programate meciuri.</p>')+'</div><div id="domReportForm"></div></section>';
  h+='<section class="dom-panel"><div class="dom-section-head"><div><span class="dom-kicker">ORDER OF BATTLE</span><h3>Players & Alliances</h3></div></div><div class="dom-roster">'+(c.players||[]).map(function(p){var achieved=(c.agendaAchieved||{})[p.id]||0,ups=(c.upgrades||{})[p.id]||[],earned=DOM_REWARDS.filter(function(r){return r.playerId===p.id&&r.status==='selected'});return '<article><div><b>'+dEsc(p.id)+'</b><small>'+dEsc(p.army||"Army not configured")+' · '+dEsc((c.forceDispositions||{})[p.id]||p.fd||"Force Disposition not set")+'</small></div><span class="dom-alliance '+dEsc(p.alliance)+'">'+dEsc(dAllianceName(p.alliance))+'</span><span class="dom-count">'+achieved+'/3 Agenda Achieved</span><small>'+(ups.length+earned.length)+' upgrades</small></article>'}).join("")+'</div></section>';
  h+='<section class="dom-panel"><div class="dom-section-head"><div><span class="dom-kicker">STRATEGIC OVERVIEW</span><h3>Alliance Standings</h3></div></div><div class="dom-standings">'+alliances.map(function(a){var members=(c.players||[]).filter(function(p){return p.alliance===a}),ach=members.reduce(function(n,p){return n+((c.agendaAchieved||{})[p.id]||0)},0),honours=members.reduce(function(n,p){return n+(((c.upgrades||{})[p.id]||[]).filter(function(u){return u.type==="Battle Honour"&&Number(u.phase||c.phase)===Number(c.phase)}).length)+DOM_REWARDS.filter(function(r){return r.playerId===p.id&&r.category==="Battle Honour"&&r.status==="selected"&&Number(r.phase)===Number(c.phase)}).length},0);return '<article><b>'+dEsc(dAllianceName(a))+'</b><span>'+ach+' Agenda Achieved</span><span>'+honours+' Battle Honours this phase</span></article>'}).join("")+'</div><p class="dom-muted">Ascendancy: alianța cu cele mai multe Agenda Achieved în faza curentă. Controlul locației: alianța cu cele mai multe Battle Honours câștigate în fază; egalitățile se rezolvă după totalul campaniei, apoi de Warmaster.</p></section>';
  h+='<section class="dom-panel"><div class="dom-section-head"><div><span class="dom-kicker">CAMPAIGN PROGRESSION</span><h3>Campaign Deck & Rewards</h3></div></div><div id="domRewardDecks"><p class="empty">Se încarcă pachetele de cărți…</p></div>'; 
@@ -397,8 +319,31 @@ function dRenderDetail(c){
  h+='</section>';
  if(isAdmin)h+='<section class="dom-panel"><div class="dom-section-head"><div><span class="dom-kicker">SUBMITTED BATTLE REPORTS</span><h3>Reports awaiting validation</h3></div></div><div id="domReports"><p class="empty">Se verifică rapoartele…</p></div></section>';
  el.innerHTML=h;
- el.querySelectorAll("[data-arm-location]").forEach(function(pin){pin.onclick=function(){var id=pin.getAttribute("data-arm-location"),loc=dById(DOM_DATA.locations,id),panel=document.getElementById("armMapDetail");el.querySelectorAll("[data-arm-location]").forEach(function(x){x.classList.toggle("is-selected",x===pin)});if(panel)panel.innerHTML=dMapLocationDetail(c,loc)}});
- var initialPin=c.locationId?el.querySelector('[data-arm-location="'+c.locationId+'"]'):null;if(initialPin)initialPin.classList.add("is-selected");
+ el.querySelectorAll('[data-arm-location]').forEach(function(pin){pin.onclick=function(){var id=pin.getAttribute('data-arm-location'),mapLoc=dById(DOM_DATA.locations,id),panel=document.getElementById('armMapDetail');el.querySelectorAll('[data-arm-location]').forEach(function(x){x.classList.toggle('is-selected',x===pin)});if(panel)panel.innerHTML=dMapLocationDetail(c,mapLoc)}});
+ var initialPin=c.locationId?el.querySelector('[data-arm-location="'+c.locationId+'"]'):null;if(initialPin)initialPin.classList.add('is-selected');
+ /* Compact top navigation; existing campaign sections and controls remain intact. */
+ var campaignSections=Array.prototype.slice.call(el.querySelectorAll(':scope > section'));
+ campaignSections.forEach(function(sec){
+  var t=(sec.innerText||'').toLowerCase(),tab='overview';
+  if(sec.classList.contains('arm-map-section'))tab='map';
+  else if(sec.id==='domRewardsSection'||t.indexOf('campaign deck')>=0||t.indexOf('campaign progression')>=0)tab='rewards';
+  else if(t.indexOf('battle operations')>=0||t.indexOf('battles')>=0||t.indexOf('submitted battle reports')>=0)tab='battles';
+  else if(t.indexOf('briefings & agendas')>=0||t.indexOf('alliance intelligence')>=0)tab='briefings';
+  sec.setAttribute('data-dom-tab-panel',tab);
+ });
+ var pendingMine=DOM_REWARDS.filter(function(r){return r.playerId===App.me&&r.status==='pending'}).length;
+ var pendingAdmin=DOM_REPORTS.filter(function(r){return r.status==='pending'||r.status==='submitted'}).length;
+ var setupAction=App.isAdmin&&c.phaseStatus==='setup'?1:0;
+ var nav=document.createElement('nav');nav.className='dom-top-tabs';nav.setAttribute('aria-label','Campaign sections');
+ var tabs=[['overview','Overview',setupAction],['battles','Battles',pendingAdmin],['rewards','Rewards',pendingMine],['map','Strategic Map',0],['briefings','Briefings',0]];
+ nav.innerHTML=tabs.map(function(x){return '<button type="button" class="dom-top-tab" data-dom-tab="'+x[0]+'">'+x[1]+(x[2]?'<span class="dom-tab-count">'+x[2]+'</span>':'')+'</button>'}).join('');
+ var hero=el.querySelector('.dom-hero');if(hero)hero.insertAdjacentElement('afterend',nav);else el.insertBefore(nav,el.firstChild);
+ function activateCampaignTab(name){
+  campaignSections.forEach(function(sec){sec.hidden=sec.getAttribute('data-dom-tab-panel')!==name});
+  nav.querySelectorAll('[data-dom-tab]').forEach(function(b){var active=b.getAttribute('data-dom-tab')===name;b.classList.toggle('is-active',active);b.setAttribute('aria-current',active?'page':'false')});
+ }
+ nav.querySelectorAll('[data-dom-tab]').forEach(function(b){b.onclick=function(){var name=b.getAttribute('data-dom-tab');activateCampaignTab(name);if(history.replaceState)history.replaceState(null,'','#'+name)}});
+ var requested=(location.hash||'').replace('#','');activateCampaignTab(['overview','battles','rewards','map','briefings'].indexOf(requested)>=0?requested:'overview');
  dLoadRewards(c);
  if(isAdmin){var approve=document.getElementById("domApproveSetup");if(approve)approve.onclick=function(){dApproveRandomSetup(c)};var reroll=document.getElementById("domRerollSetup");if(reroll)reroll.onclick=function(){dRerollRandomSetup(c)};document.getElementById("domRollLocation").onclick=function(){dRollLocation(c)};document.getElementById("domNextPhase").onclick=function(){dAdvancePhase(c)};document.getElementById("domToggleStatus").onclick=function(){dUpdateCampaign(c,{status:c.status==="active"?"completed":"active"})};var delCampaign=document.getElementById("domDeleteCampaignDetail");if(delCampaign)delCampaign.onclick=function(){dDeleteCampaign(c.id)};var addBattle=document.getElementById("domAddBattle");if(addBattle)addBattle.onclick=function(){var f=document.getElementById("domBattleForm");f.hidden=!f.hidden;dRefreshAgendaSelects(c)};var genMatches=document.getElementById("domGeneratePhaseMatches");if(genMatches)genMatches.onclick=function(){dGeneratePhaseMatches(c,false)};document.querySelectorAll("[data-dom-delete-battle]").forEach(function(b){b.onclick=function(){dDeleteScheduledBattle(c,b.getAttribute("data-dom-delete-battle"))}});document.getElementById("domCancelBattle").onclick=function(){document.getElementById("domBattleForm").hidden=true};document.getElementById("domBattleA").onchange=function(){dRefreshAgendaSelects(c)};document.getElementById("domBattleB").onchange=function(){dRefreshAgendaSelects(c)};document.getElementById("domSaveBattle").onclick=function(){dSaveBattle(c)};document.getElementById("domGrantUpgrade").onclick=function(){var f=document.getElementById("domUpgradeForm");f.hidden=!f.hidden;dRefreshUpgradeCards(c)};document.getElementById("domUpgradeType").onchange=function(){dRefreshUpgradeCards(c)};document.getElementById("domSaveUpgrade").onclick=function(){dSaveUpgrade(c)};dLoadReports(c)}
  else {document.querySelectorAll("[data-dom-report]").forEach(function(b){b.onclick=function(){dShowReportForm(c,b.getAttribute("data-dom-report"))}})}
@@ -411,7 +356,6 @@ async function dSaveBattle(c){
  if(!a||!b||a===b){alert("Alege doi jucători diferiți.");return}
  var battles=(c.battles||[]).slice(),id="battle_"+Date.now();
  battles.push({id:id,phase:Number(c.phase||1),a:a,b:b,agendaA:document.getElementById("domAgendaA").value||"",agendaB:document.getElementById("domAgendaB").value||"",locationId:c.locationId||"",battleSize:document.getElementById("domBattleSize").value||"Strike Force",status:"scheduled",createdAt:Date.now()});
- battles=await dEnsureCampaignMatchDocs(c,battles);
  await dUpdateCampaign(c,{battles:battles});
 }
 async function dRollLocation(c){
@@ -429,24 +373,16 @@ async function dApproveRandomSetup(c){
  document.querySelectorAll("[data-dom-agenda-choice]").forEach(function(x){agendas[x.getAttribute("data-dom-agenda-choice")]=x.value||""});
  document.querySelectorAll("[data-dom-fd-choice]").forEach(function(x){fds[x.getAttribute("data-dom-fd-choice")]=x.value});
  var oldBattles=(c.battles||[]).filter(function(b){return Number(b.phase)!==Number(c.phase)||b.status==="completed"}),generated=dBuildPhaseMatches(Object.assign({},c,{locationId:locationId,agendaSelections:agendas}),Number(c.phase||1),oldBattles);
- var phaseBattles=await dEnsureCampaignMatchDocs(Object.assign({},c,{locationId:locationId,agendaSelections:agendas,forceDispositions:fds}),oldBattles.concat(generated));
- await dUpdateCampaign(c,{locationId:locationId,agendaSelections:agendas,forceDispositions:fds,battles:phaseBattles,status:"active",phaseStatus:"active",approvedAt:firebase.firestore.FieldValue.serverTimestamp(),approvedBy:App.me});
+ await dUpdateCampaign(c,{locationId:locationId,agendaSelections:agendas,forceDispositions:fds,battles:oldBattles.concat(generated),status:"active",phaseStatus:"active",approvedAt:firebase.firestore.FieldValue.serverTimestamp(),approvedBy:App.me});
 }
 async function dAdvancePhase(c){
  if(c.phaseStatus!=="active"){alert("Aprobă mai întâi configurarea aleatorie a fazei curente.");return}
- var phase=Number(c.phase||1),control=await dResolvePhaseControl(c,phase);if(!control)return;
- if(phase>=3){
-  if(!confirm("Phase 3 este finalul campaniei. Locația "+(dLocation(c)?dLocation(c).name:"curentă")+" va fi marcată ca fiind controlată de "+dAllianceName(control.controlAlliance)+". Marchezi campania ca încheiată?"))return;
-  var finalHistory=(c.phaseHistory||[]).slice();
-  finalHistory.push({phase:phase,locationId:c.locationId,locationRoll:c.locationRoll,controlAlliance:control.controlAlliance,controlMethod:control.controlMethod,controlBattleHonours:control.controlBattleHonours,totalBattleHonours:control.totalBattleHonours,agendaAchieved:Object.assign({},c.agendaAchieved||{}),closedAt:Date.now()});
-  await dUpdateCampaign(c,{phaseHistory:finalHistory,status:"completed",phaseStatus:"completed"});
-  return;
- }
- var relicSummary=(c.players||[]).map(function(p){return p.id+": "+((c.agendaAchieved||{})[p.id]||0)+" Relics de tras"}).join("\\n");
- if(!confirm("Închei Phase "+phase+" și treci la Phase "+(phase+1)+"?\\n\\nControlul locației: "+dAllianceName(control.controlAlliance)+".\\n\\nTragerile de Relics:\\n"+relicSummary+"\\n\\nAgenda Achieved din faza curentă va fi arhivată și resetată."))return;
- var next=phase+1,r=dRandomLocation(next),hist=(c.phaseHistory||[]).slice(),agendaSelections=dRandomAgendaAssignments(c.players,next),forceDispositions=dRandomForceDispositions(c.players);
- try{await dCreatePhaseRelicDraws(c)}catch(e){fail(e);return}
- hist.push({phase:phase,locationId:c.locationId,locationRoll:c.locationRoll,controlAlliance:control.controlAlliance,controlMethod:control.controlMethod,controlBattleHonours:control.controlBattleHonours,totalBattleHonours:control.totalBattleHonours,agendaAchieved:Object.assign({},c.agendaAchieved||{}),upgradesByPlayer:Object.keys(c.upgrades||{}).reduce(function(o,k){o[k]=(c.upgrades[k]||[]).filter(function(u){return Number(u.phase||1)===phase}).length;return o},{}),closedAt:Date.now()});
+ if(Number(c.phase)>=3){if(!confirm("Phase 3 este finalul campaniei. Marchezi campania ca încheiată?"))return;await dUpdateCampaign(c,{status:"completed",phaseStatus:"completed"});return}
+ var relicSummary=Number(c.phase)<3?(c.players||[]).map(function(p){return p.id+": "+((c.agendaAchieved||{})[p.id]||0)+" Relics de tras"}).join("\\n"):"Phase 3 nu acordă tragere normală de Relics.";
+ if(!confirm("Închei Phase "+c.phase+" și treci la Phase "+(Number(c.phase)+1)+"?\\n\\nTragerile de Relics vor fi generate automat pentru fiecare jucător în funcție de Agenda Achieved:\\n"+relicSummary+"\\n\\nAgenda Achieved din faza curentă va fi arhivată și resetată."))return;
+ var next=Number(c.phase)+1,r=dRandomLocation(next),hist=(c.phaseHistory||[]).slice(),agendaSelections=dRandomAgendaAssignments(c.players,next),forceDispositions=dRandomForceDispositions(c.players);
+ try{await dCreatePhaseRelicDraws(c);}catch(e){fail(e);return}
+ hist.push({phase:c.phase,locationId:c.locationId,locationRoll:c.locationRoll,agendaAchieved:Object.assign({},c.agendaAchieved||{}),upgradesByPlayer:Object.keys(c.upgrades||{}).reduce(function(o,k){o[k]=(c.upgrades[k]||[]).filter(function(u){return Number(u.phase||1)===Number(c.phase)}).length;return o},{}),closedAt:Date.now()});
  await dUpdateCampaign(c,{phase:next,phaseStatus:"setup",status:"setup",locationId:r.location?r.location.id:"",locationRoll:r.roll,agendaSelections:agendaSelections,forceDispositions:forceDispositions,phaseHistory:hist,agendaAchieved:{}});
 }
 async function dUpdateCampaign(c,patch){
@@ -467,56 +403,37 @@ async function dLoadReports(c){
  var el=document.getElementById("domReports");if(!el)return;
  try{
   var snap=await App.db.collection(DOM_COLL).doc(c.id).collection("reports").where("status","==","pending").get();
-  var raw=snap.docs.map(function(d){return Object.assign({id:d.id},d.data())}),groups={};
-  raw.forEach(function(x){var key=x.battleId||x.id;(groups[key]||(groups[key]=[])).push(x)});
-  DOM_REPORTS=Object.keys(groups).map(function(key){var rows=groups[key],modern=rows.filter(function(x){return x.reportType==="single_match_report"})[0];if(modern)return modern;var first=rows[0],by={};rows.forEach(function(x){by[x.playerId]=!!x.agendaAchieved});return Object.assign({},first,{id:first.id,legacyIds:rows.map(function(x){return x.id}),scoreA:first.playerId===first.playerA?first.score:first.opponentScore,scoreB:first.playerId===first.playerB?first.score:first.opponentScore,agendaAchievedBy:by,reportType:"legacy_combined"})});
-  el.innerHTML=DOM_REPORTS.map(function(r){
-   var battle=(c.battles||[]).filter(function(x){return x.id===r.battleId})[0]||{},winner=r.winner==="draw"?"Remiză":r.winner;
-   function verdict(pid,cat,checked){return '<label class="dom-check"><input type="checkbox" id="wv_'+dEsc(r.id)+'_'+dEsc(pid)+'_'+cat+'" '+(checked?'checked':'')+'> '+dEsc(pid)+' · '+cat+'</label>'}
-   return '<article class="dom-report-card"><b>Raport unic · '+dEsc(r.playerA)+' vs '+dEsc(r.playerB)+'</b><p>'+dEsc(r.scoreA)+' – '+dEsc(r.scoreB)+' · Winner: '+dEsc(winner)+'</p><div class="dom-report-achievements"><b>Agenda Achieved – verificare Warmaster</b>'+[r.playerA,r.playerB].map(function(pid){return '<label class="dom-check"><input type="checkbox" id="da_'+dEsc(r.id)+'_'+dEsc(pid)+'" '+(r.agendaAchievedBy&&r.agendaAchievedBy[pid]?'checked':'')+'> '+dEsc(pid)+'</label>'}).join('')+'</div><div class="dom-report-achievements"><b>Warmaster’s Verdict · recompense aprobate</b>'+[r.playerA,r.playerB].map(function(pid){var cat=Number(battle.phase||c.phase||1)===3?(r.winner===pid?'Path to Conquest':''):(r.winner===pid?'Battle Honour':'Battle Skill');if(r.winner==='draw')cat='Battle Skill';return '<div class="dom-verdict-player"><b>'+dEsc(pid)+'</b>'+(cat?verdict(pid,cat,true):'<span class="dom-muted">No battle reward in final phase for this result</span>')+(Number(battle.phase||c.phase||1)<3?verdict(pid,'Relic',true):'')+'<label class="opt">Motiv pentru orice refuz<textarea id="wr_'+dEsc(r.id)+'_'+dEsc(pid)+'" rows="2" maxlength="300" placeholder="Obligatoriu dacă debifezi o recompensă"></textarea></label></div>'}).join('')+'</div><button class="primary sm" data-dom-approve="'+dEsc(r.id)+'">Confirmă Verdict & generează recompense</button> <button class="ghost sm" data-dom-reject="'+dEsc(r.id)+'">Respinge raportul</button></article>'
-  }).join("")||'<p class="empty">Nu există rapoarte în așteptare.</p>';
+  DOM_REPORTS=snap.docs.map(function(d){return Object.assign({id:d.id},d.data())});
+  var battleTab=document.querySelector('[data-dom-tab="battles"]');if(battleTab){var count=battleTab.querySelector('.dom-tab-count');if(DOM_REPORTS.length){if(!count){count=document.createElement('span');count.className='dom-tab-count';battleTab.appendChild(count)}count.textContent=DOM_REPORTS.length}else if(count)count.remove()}
+  el.innerHTML=DOM_REPORTS.map(function(r){var battle=(c.battles||[]).filter(function(x){return x.id===r.battleId})[0]||{},ra=DOM_REPORTS.filter(function(x){return x.battleId===r.battleId&&x.playerId===battle.a})[0],rb=DOM_REPORTS.filter(function(x){return x.battleId===r.battleId&&x.playerId===battle.b})[0];return '<article class="dom-report-card"><b>'+dEsc(r.playerId)+'</b> vs '+dEsc(r.opponent)+'<p>'+dEsc(r.score)+' – '+dEsc(r.opponentScore)+' · Winner: '+dEsc(r.winner)+'</p><p class="dom-muted">'+dEsc(r.notes||"")+'</p><div class="dom-report-achievements"><b>Warmaster validation · Agenda Achieved</b><label class="dom-check"><input type="checkbox" id="domAchievedA_'+dEsc(r.id)+'" '+(ra&&ra.agendaAchieved?'checked':'')+'> '+dEsc(battle.a||'Player A')+'</label><label class="dom-check"><input type="checkbox" id="domAchievedB_'+dEsc(r.id)+'" '+(rb&&rb.agendaAchieved?'checked':'')+'> '+dEsc(battle.b||'Player B')+'</label></div><button class="primary sm" data-dom-approve="'+dEsc(r.id)+'">Validează raportul și recompensele</button> <button class="ghost sm" data-dom-reject="'+dEsc(r.id)+'">Respinge</button></article>'}).join("")||'<p class="empty">Nu există rapoarte în așteptare.</p>';
   el.querySelectorAll("[data-dom-approve]").forEach(function(b){b.onclick=function(){dApproveReport(c,b.getAttribute("data-dom-approve"))}});
   el.querySelectorAll("[data-dom-reject]").forEach(function(b){b.onclick=function(){dRejectReport(c,b.getAttribute("data-dom-reject"))}});
  }catch(e){el.innerHTML='<p class="err">Nu pot încărca rapoartele: '+dEsc(e.message||e)+'</p>'}
 }
 async function dApproveReport(c,reportId){
  var r=DOM_REPORTS.filter(function(x){return x.id===reportId})[0];if(!r)return;
- var battles=(c.battles||[]).slice(),idx=battles.findIndex(function(x){return x.id===r.battleId});if(idx<0){alert("Meciul nu mai există.");return}
- var b=Object.assign({},battles[idx]);if(b.status==="completed"){alert("Meciul a fost deja validat.");return}
- var achieved={},verdict={},reasons={},players=[b.a,b.b];
- for(var i=0;i<players.length;i++){
-  var pid=players[i],agendaEl=document.getElementById("da_"+reportId+"_"+pid);achieved[pid]=agendaEl?!!agendaEl.checked:!!(r.agendaAchievedBy&&r.agendaAchievedBy[pid]);
-  var category=Number(b.phase||c.phase||1)===3?(r.winner===pid?"Path to Conquest":""):(r.winner===pid?"Battle Honour":"Battle Skill");if(r.winner==="draw")category="Battle Skill";
-  var battleEl=category?document.getElementById("wv_"+reportId+"_"+pid+"_"+category):null,relicEl=document.getElementById("wv_"+reportId+"_"+pid+"_Relic"),reasonEl=document.getElementById("wr_"+reportId+"_"+pid);
-  verdict[pid]={battleCategory:category,battleAward:!!(battleEl&&battleEl.checked),relicAward:!relicEl||!!relicEl.checked};
-  reasons[pid]=(reasonEl&&reasonEl.value||"").trim();
-  if(((!verdict[pid].battleAward&&category)||!verdict[pid].relicAward)&&!reasons[pid]){alert("Adaugă motiv pentru fiecare recompensă refuzată. Jucător: "+pid);return;}
- }
- if(!confirm("Aprobi raportul unic și Verdict-ul Warmaster pentru ambii jucători?"))return;
- b.status="completed";b.winner=r.winner;b.scoreA=Number(r.scoreA||0);b.scoreB=Number(r.scoreB||0);b.completedAt=Date.now();b.agendaAchieved=achieved;b.reports=[r.id];battles[idx]=b;
- var achievements=Object.assign({},c.agendaAchieved||{}),earned={};players.forEach(function(pid){if(achieved[pid]&&(achievements[pid]||0)<3){achievements[pid]=Math.min(3,(achievements[pid]||0)+1);earned[pid]=true;}});
- var relicWithheld=Object.assign({},c.relicWithheld||{}),phaseKey=String(b.phase||c.phase||1);relicWithheld[phaseKey]=Object.assign({},relicWithheld[phaseKey]||{});players.forEach(function(pid){if(Number(phaseKey)<3&&!verdict[pid].relicAward)relicWithheld[phaseKey][pid]=Number(relicWithheld[phaseKey][pid]||0)+1;});
- var matchId=r.matchId||"camp_"+String(c.id).replace(/[^a-zA-Z0-9_-]/g,"_")+"_"+String(r.battleId).replace(/[^a-zA-Z0-9_-]/g,"_"),matchPatch={campaignWarmasterConfirmed:true,campaignWarmasterConfirmedAt:Date.now(),campaignReportStatus:"approved",campaignReportId:r.id};
- players.forEach(function(pid){matchPatch["campaignReportsSubmitted."+pid]=true;});
+ var battles=(c.battles||[]).slice(),idx=battles.findIndex(function(b){return b.id===r.battleId});if(idx<0){alert("Meciul nu mai există.");return}
+ var b=Object.assign({},battles[idx]),other=(r.playerId===b.a?b.b:b.a);
+ if(b.status==="completed"){alert("Meciul a fost deja validat. Respinge raportul duplicat sau corectează rezultatul ca Warmaster.");return}
+ if(!confirm("Validezi raportul "+r.playerId+" vs "+r.opponent+"?"))return;
+ var achievedA=!!((document.getElementById("domAchievedA_"+reportId)||{}).checked),achievedB=!!((document.getElementById("domAchievedB_"+reportId)||{}).checked);
+ if(!document.getElementById("domAchievedA_"+reportId)&&r.playerId===b.a)achievedA=!!r.agendaAchieved;
+ if(!document.getElementById("domAchievedB_"+reportId)&&r.playerId===b.b)achievedB=!!r.agendaAchieved;
+ b.status="completed";b.winner=r.winner;b.scoreA=r.playerId===b.a?r.score:r.opponentScore;b.scoreB=r.playerId===b.b?r.score:r.opponentScore;b.reports=DOM_REPORTS.filter(function(x){return x.battleId===r.battleId}).map(function(x){return x.playerId});b.completedAt=Date.now();b.agendaAchieved={};b.agendaAchieved[b.a]=achievedA;b.agendaAchieved[b.b]=achievedB;battles[idx]=b;
+ var achievements=Object.assign({},c.agendaAchieved||{}),earned={};
+ [[b.a,achievedA],[b.b,achievedB]].forEach(function(pair){var pid=pair[0],achieved=pair[1];if(achieved&&(achievements[pid]||0)<3){achievements[pid]=Math.min(3,(achievements[pid]||0)+1);earned[pid]=true;}});
+ var updates={battles:battles,agendaAchieved:achievements};
  try{
-  for(var j=0;j<players.length;j++){
-   var playerId=players[j],v=verdict[playerId];
-   if(v.battleAward&&v.battleCategory)await dCreateRewardDraw(c,playerId,v.battleCategory,Number(b.phase||c.phase||1),b.id,1+(earned[playerId]&&v.battleCategory!=="Path to Conquest"?1:0),"Warmaster verdict: approved. "+(earned[playerId]?"Agenda Achieved: additional draw.":""));
-   if(!v.battleAward)await App.db.collection(DOM_COLL).doc(c.id).collection("reports").doc(reportId).update({["verdictReasons."+playerId]:reasons[playerId]});
-  }
-  await App.db.collection(DOM_COLL).doc(c.id).update({battles:battles,agendaAchieved:achievements,relicWithheld:relicWithheld,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
-  var reportIds=r.legacyIds||[reportId];await Promise.all(reportIds.map(function(rid){return App.db.collection(DOM_COLL).doc(c.id).collection("reports").doc(rid).update({status:"approved",agendaAchievedBy:achieved,warmasterVerdict:verdict,verdictReasons:reasons,approvedBy:App.me,approvedAt:firebase.firestore.FieldValue.serverTimestamp(),mergedInto:reportId})}));
-  await App.db.collection("matches").doc(matchId).update(matchPatch);
-  var rewardSnap=await App.db.collection(DOM_COLL).doc(c.id).collection("rewards").where("battleId","==",b.id).get(),rewardRows=rewardSnap.docs.map(function(x){return x.data()});
-  for(var k=0;k<players.length;k++){var pid2=players[k],pending=rewardRows.some(function(x){return x.playerId===pid2&&x.status==="pending"});if(!pending){var patch={};patch["campaignRewardsDone."+pid2]=true;await App.db.collection("matches").doc(matchId).update(patch);}}
-  alert("Raport unic aprobat. Verdict-ul și motivele au fost arhivate; recompensele aprobate sunt disponibile pentru selecție.");dLoadReports(c);
+  await dCreateBattleRewards(c,b,r,earned);
+  await App.db.collection(DOM_COLL).doc(c.id).update(Object.assign(updates,{updatedAt:firebase.firestore.FieldValue.serverTimestamp()}));
+  var reportsToClose=DOM_REPORTS.filter(function(x){return x.battleId===r.battleId});
+  await Promise.all(reportsToClose.map(function(x){return App.db.collection(DOM_COLL).doc(c.id).collection("reports").doc(x.id).update({status:x.id===reportId?"approved":"merged",approvedBy:App.me,approvedAt:firebase.firestore.FieldValue.serverTimestamp(),mergedInto:reportId})}));
+  alert("Raport validat. Agendas Achieved au fost confirmate pentru ambii jucători, iar cărțile au fost trase automat conform regulilor Dominatus.");
  }catch(e){fail(e)}
 }
 async function dRejectReport(c,reportId){
- var reason=prompt("Motivul respingerii raportului:");if(reason===null)return;if(!reason.trim()){alert("Motivul este obligatoriu.");return;}
- try{await Promise.all((DOM_REPORTS.filter(function(x){return x.id===reportId})[0].legacyIds||[reportId]).map(function(rid){return App.db.collection(DOM_COLL).doc(c.id).collection("reports").doc(rid).update({status:"rejected",reviewedBy:App.me,reviewedAt:firebase.firestore.FieldValue.serverTimestamp(),rejectionReason:reason.trim()})}));dLoadReports(c)}catch(e){fail(e)}
+ try{await App.db.collection(DOM_COLL).doc(c.id).collection("reports").doc(reportId).update({status:"rejected",reviewedBy:App.me,reviewedAt:firebase.firestore.FieldValue.serverTimestamp()});dLoadReports(c)}catch(e){fail(e)}
 }
-
 function dRefreshUpgradeCards(c){
  var type=document.getElementById("domUpgradeType").value,player=document.getElementById("domUpgradePlayer").value,p=dPlayer(c,player),cards=[];
  if(type==="Battle Honour")cards=(DOM_DATA.battleHonours||[]).filter(function(x){return Number(x.phase)===Number(c.phase)});

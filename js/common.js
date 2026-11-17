@@ -133,4 +133,22 @@ App.watchInvites=function(){
     first=false;
   },function(){});
 };
+
+/* Dominatus Warmaster Orders: campaign-only battle effects, selected per player and round. */
+window.JH_ORDERS = [
+ {id:"rapid-deployment",name:"Rapid Deployment",type:"buff",effect:"One Infantry unit may make a Normal Move of up to 3\" after both armies finish deployment and before the first turn. It cannot end this move within Engagement Range."},
+ {id:"enhanced-supplies",name:"Enhanced Supplies",type:"buff",effect:"At the start of the selected Battle Round, gain 1 CP. The normal CP cap still applies."},
+ {id:"tactical-superiority",name:"Tactical Superiority",type:"buff",effect:"Once during this Battle Round, reroll one Hit roll for one of your units."},
+ {id:"fire-support",name:"Fire Support",type:"buff",effect:"One selected unit gets +1 to Hit for its ranged attacks during this Battle Round, subject to the normal modifier cap."},
+ {id:"scrambled-communications",name:"Scrambled Communications",type:"debuff",effect:"You cannot use Stratagems during this Battle Round."},
+ {id:"supply-shortage",name:"Supply Shortage",type:"debuff",effect:"At the start of this Battle Round, lose 1 CP if you have any CP."},
+ {id:"orbital-interference",name:"Orbital Interference",type:"debuff",effect:"Warmaster marks one objective. The first enemy unit that ends a move within 3\" of it this round suffers D3 mortal wounds."},
+ {id:"disrupted-deployment",name:"Disrupted Deployment",type:"debuff",effect:"One selected unit cannot be set up in Reserves this battle. Select it before deployment."},
+ {id:"desperate-assault",name:"Desperate Assault",type:"mixed",effect:"One selected unit gets +1 Attack for its melee weapons, but suffers -1 to its Save characteristic during this Battle Round."},
+ {id:"last-stand",name:"Last Stand",type:"mixed",effect:"One selected unit gains Feel No Pain 6+, but cannot Advance or Fall Back during this Battle Round."},
+ {id:"overextended-forces",name:"Overextended Forces",type:"mixed",effect:"One selected unit gains +2\" Move, but suffers -1 Leadership during this Battle Round."},
+ {id:"all-or-nothing",name:"All or Nothing",type:"mixed",effect:"One selected unit gets +1 to Hit. If it destroys no enemy unit this Battle Round, it suffers -1 OC until the end of the next Battle Round."}
+];
+window.jhOrderById = function(id){return (window.JH_ORDERS||[]).filter(function(x){return x.id===id})[0]||null};
+
 if("serviceWorker" in navigator)window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})});

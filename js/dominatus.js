@@ -388,7 +388,7 @@ async function dCleanupOrphanCampaignMatches(c){
  });
  if(changed)await batch.commit();
 }
-function dRenderDetail(c){
+function dRenderDetailUnsafe(c){
  var el=document.getElementById("domApp"),isAdmin=App.isAdmin,mine=(c.players||[]).filter(function(p){return p.id===App.me})[0],loc=dLocation(c);
  // Alliance sections and standings are rendered from the campaign's actual participants.
  // Keep this local list explicit; the previous regression referenced an undefined variable,
@@ -486,6 +486,21 @@ function dRenderDetail(c){
  if(isAdmin){var approve=document.getElementById("domApproveSetup");if(approve)approve.onclick=function(){dApproveRandomSetup(c)};var reroll=document.getElementById("domRerollSetup");if(reroll)reroll.onclick=function(){dRerollRandomSetup(c)};document.getElementById("domRollLocation").onclick=function(){dRollLocation(c)};document.getElementById("domNextPhase").onclick=function(){dAdvancePhase(c)};document.getElementById("domToggleStatus").onclick=function(){dUpdateCampaign(c,{status:c.status==="active"?"completed":"active"})};var delCampaign=document.getElementById("domDeleteCampaignDetail");if(delCampaign)delCampaign.onclick=function(){dDeleteCampaign(c.id)};var addBattle=document.getElementById("domAddBattle");if(addBattle)addBattle.onclick=function(){var f=document.getElementById("domBattleForm");f.hidden=!f.hidden;dRefreshAgendaSelects(c)};var genMatches=document.getElementById("domGeneratePhaseMatches");if(genMatches)genMatches.onclick=function(){dGeneratePhaseMatches(c,false)};document.querySelectorAll("[data-dom-delete-battle]").forEach(function(b){b.onclick=function(){dDeleteScheduledBattle(c,b.getAttribute("data-dom-delete-battle"))}});document.querySelectorAll("[data-dom-start-match]").forEach(function(b){b.onclick=function(){dStartCampaignMatch(c,b.getAttribute("data-dom-start-match"))}});document.getElementById("domCancelBattle").onclick=function(){document.getElementById("domBattleForm").hidden=true};document.getElementById("domBattleA").onchange=function(){dRefreshAgendaSelects(c)};document.getElementById("domBattleB").onchange=function(){dRefreshAgendaSelects(c)};["A","B"].forEach(function(side){document.getElementById("domOrderType"+side).onchange=function(){var sel=document.getElementById("domOrderId"+side);sel.innerHTML=dOrderOptionsHtml(this.value,"")}});document.getElementById("domSaveBattle").onclick=function(){dSaveBattle(c).catch(function(e){alert(e.message||e)})};document.getElementById("domGrantUpgrade").onclick=function(){var f=document.getElementById("domUpgradeForm");f.hidden=!f.hidden;dRefreshUpgradeCards(c)};document.getElementById("domUpgradeType").onchange=function(){dRefreshUpgradeCards(c)};document.getElementById("domUpgradeCard").onchange=function(){dRenderUpgradeConditions(c)};document.getElementById("domSaveUpgrade").onclick=function(){dSaveUpgrade(c)};dLoadReports(c)}
  else {document.querySelectorAll("[data-dom-report]").forEach(function(b){b.onclick=function(){dShowReportForm(c,b.getAttribute("data-dom-report"))}})}
 }
+
+function dRenderDetail(c){
+ try{
+  return dRenderDetailUnsafe(c);
+ }catch(e){
+  console.error("Dominatus render detail failed:",e);
+  var el=document.getElementById("domApp");
+  if(el){
+   var msg=(e&&e.message)?e.message:String(e);
+   var stack=(e&&e.stack)?String(e.stack).split("\n").slice(0,5).join("\n"):"";
+   el.innerHTML='<section class="dom-panel"><h3>Eroare la afișarea campaniei</h3><p class="err">'+dEsc(msg)+'</p><pre style="white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;opacity:.8">'+dEsc(stack)+'</pre><button class="btn" onclick="location.reload()">Reîncarcă</button></section>';
+  }
+ }
+}
+
 function dRefreshAgendaSelects(c){
  ["A","B"].forEach(function(side){var who=document.getElementById("domBattle"+side).value,p=dPlayer(c,who),sel=document.getElementById("domAgenda"+side),opts=dAgendaOptions(p.alliance,c.phase||1),suggested=(c.agendaSelections||{})[who];sel.innerHTML='<option value="">Chapter Approved / no Agenda</option>'+opts.map(function(a){return '<option value="'+dEsc(a.id)+'" '+(a.id===suggested?'selected':'')+'>'+dEsc(a.name)+(a.id===suggested?' · Random':'')+'</option>'}).join("")});
 }
@@ -611,8 +626,13 @@ function dLoadCampaigns(){
  var id=new URLSearchParams(location.search).get("id");
  function render(campaigns){
   DOM_CAMPAIGNS=campaigns;
-  if(id){var c=DOM_CAMPAIGNS.filter(function(x){return x.id===id})[0];if(c){DOM_CURRENT=c;dRenderDetail(c)}else document.getElementById("domApp").innerHTML='<p class="empty">Campania nu a fost găsită sau nu ai acces. Dacă este o campanie veche, cere Warmaster-ului să deschidă o dată arhiva pentru sincronizarea accesului.</p>'}
-  else dRenderHome();
+  try{
+   if(id){var c=DOM_CAMPAIGNS.filter(function(x){return x.id===id})[0];if(c){DOM_CURRENT=c;dRenderDetail(c)}else document.getElementById("domApp").innerHTML='<p class="empty">Campania nu a fost găsită sau nu ai acces. Dacă este o campanie veche, cere Warmaster-ului să deschidă o dată arhiva pentru sincronizarea accesului.</p>'}
+   else dRenderHome();
+  }catch(e){
+   console.error("Dominatus campaign render failed:",e);
+   document.getElementById("domApp").innerHTML='<p class="err">Eroare la încărcarea campaniei: '+dEsc(e&&e.message||e)+'</p>';
+  }
  }
  if(App.isAdmin){
   App.db.collection(DOM_COLL).onSnapshot(function(s){

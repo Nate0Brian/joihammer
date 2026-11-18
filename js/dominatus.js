@@ -268,7 +268,7 @@ async function dStartCampaignMatch(c,battleId){
  if(battle.matchId){location.href="match.html?id="+encodeURIComponent(battle.matchId);return}
  if(!App.isAdmin){alert("Warmaster-ul trebuie să deschidă setup-ul inițial al meciului.");return}
  var ref=App.db.collection("matches").doc();
- var match=App.newMatch({type:"campaign",a:battle.a,b:battle.b,status:"active",pa:App.snap(battle.a),pb:App.snap(battle.b),campaignId:c.id,campaignBattleId:battle.id,campaignPhase:Number(battle.phase||c.phase||1),campaignLocationId:battle.locationId||c.locationId||"",campaignLocationName:(dLocation(c)||{}).name||"",campaignBattleSize:battle.battleSize||"Strike Force",campaignAgendaA:battle.agendaA||"",campaignAgendaB:battle.agendaB||"",campaignUpgradeLimit:dBattleUpgradeLimit(c),campaignOrders:battle.orders||{}});
+ var match=App.newMatch({type:"campaign",a:battle.a,b:battle.b,status:"active",pa:App.snap(battle.a),pb:App.snap(battle.b),campaignId:c.id,campaignBattleId:battle.id,campaignPhase:Number(battle.phase||c.phase||1),campaignRound:Number(battle.round||1),campaignLocationId:battle.locationId||c.locationId||"",campaignLocationName:(dLocation(c)||{}).name||"",campaignBattleSize:battle.battleSize||"Strike Force",campaignAgendaA:battle.agendaA||"",campaignAgendaB:battle.agendaB||"",campaignUpgradeLimit:dBattleUpgradeLimit(c),campaignOrders:battle.orders||{}});
  try{await ref.set(match);var battles=(c.battles||[]).map(function(x){return x.id===battleId?Object.assign({},x,{matchId:ref.id,status:"in_progress"}):x});await dUpdateCampaign(c,{battles:battles});location.href="match.html?id="+encodeURIComponent(ref.id)}catch(e){fail(e)}
 }
 async function dDeleteScheduledBattle(c,battleId){
@@ -363,16 +363,30 @@ async function dResolvePhaseControl(c,phase){
 }
 async function dCleanupOrphanCampaignMatches(c){
  if(!App.isAdmin)return;
- var known={};(c.battles||[]).forEach(function(b){known[b.id]=true;if(b.matchId)known["match:"+b.matchId]=true;});
+ var byBattle={},known={};
+ (c.battles||[]).forEach(function(b){
+  known[b.id]=true;byBattle[b.id]=b;
+  if(b.matchId)known["match:"+b.matchId]=true;
+ });
  var snap=await App.db.collection("matches").where("campaignId","==",c.id).get();
- var batch=App.db.batch(),count=0;
+ var batch=App.db.batch(),count=0,changed=false;
  snap.docs.forEach(function(doc){
-  var data=doc.data()||{},battleId=data.campaignBattleId||"";
+  var data=doc.data()||{},battleId=data.campaignBattleId||"",battle=byBattle[battleId];
   if((battleId&&!known[battleId])||(!battleId&&!known["match:"+doc.id])){
-   batch.delete(doc.ref);count++;
+   batch.delete(doc.ref);count++;changed=true;return;
+  }
+  // Backfill campaign round/phase metadata on older match documents so Home
+  // can apply the same sequential progression as Campaign HQ.
+  if(battle){
+   var patch={};
+   var phase=Number(battle.phase||c.phase||1),round=Number(battle.round||1);
+   if(Number(data.campaignPhase||0)!==phase)patch.campaignPhase=phase;
+   if(Number(data.campaignRound||0)!==round)patch.campaignRound=round;
+   if(!data.campaignBattleId)patch.campaignBattleId=battle.id;
+   if(Object.keys(patch).length){batch.update(doc.ref,patch);changed=true}
   }
  });
- if(count)await batch.commit();
+ if(changed)await batch.commit();
 }
 function dRenderDetail(c){
  var el=document.getElementById("domApp"),isAdmin=App.isAdmin,mine=(c.players||[]).filter(function(p){return p.id===App.me})[0],loc=dLocation(c);
@@ -384,9 +398,31 @@ function dRenderDetail(c){
  if(!isAdmin&&c.phaseStatus==="setup")h+='<section class="dom-panel"><b>Phase în curs de configurare</b><p>Warmaster verifică selecțiile aleatorii înainte de activarea fazei.</p></section>';
  if(isAdmin)h+='<section class="dom-panel"><div class="dom-section-head"><div><span class="dom-kicker">WARMASTER CONTROL</span><h3>Campaign Administration</h3></div><span class="dom-admin-mark">ADMIN</span></div><div class="dom-admin-actions"><button id="domRollLocation" class="ghost">Roll / reroll location</button><button id="domNextPhase" class="ghost">Advance phase</button><button id="domToggleStatus" class="ghost" '+(c.phaseStatus==="setup"?"disabled":"")+'>'+(c.status==="active"?"Închide campania":"Reactivează campania")+'</button><button id="domDeleteCampaignDetail" class="ghost">Șterge campania</button></div><p class="dom-muted">Warmaster este contul Admin existent al JoiHammer. Administrarea Dominatus nu creează un rol global nou.</p></section>';
  if(loc)h+='<section class="dom-location"><div class="dom-section-head"><div><span class="dom-kicker">CURRENT WAR ZONE</span><h3>'+dEsc(loc.name)+'</h3></div><span class="dom-dice">D6 · '+dEsc(c.locationRoll||"—")+'</span></div><p>'+dEsc(loc.loreTextRo||"")+'</p><div class="dom-bonus"><b>'+dEsc(loc.bonus&&loc.bonus.name||"Location bonus")+'</b><span>'+dEsc(loc.bonus&&loc.bonus.summary||"")+'</span></div><h4>War Zone Rules</h4><div class="dom-rule-grid">'+(loc.warZoneRules||[]).map(function(r){return '<article><b>'+dEsc(r.name)+'</b><p>'+dEsc(r.summary)+'</p></article>'}).join("")+'</div></section>';
- h+='<section class="dom-panel"><div class="dom-section-head"><div><span class="dom-kicker">ALLIANCE INTELLIGENCE</span><h3>Briefings & Agendas</h3></div></div>';
- var alliances=[]; (c.players||[]).forEach(function(p){if(alliances.indexOf(p.alliance)<0)alliances.push(p.alliance)});
- alliances.forEach(function(a){var b=dBriefing(a,c.phase||1),ag=dAgendaOptions(a,c.phase||1);if(!b)return;h+='<details class="dom-briefing" '+(mine&&mine.alliance===a?'open':'')+'><summary><b>'+dEsc(dAllianceName(a))+'</b><span>'+ag.length+' Agendas · Phase '+dEsc(c.phase||1)+'</span></summary><p class="dom-lore">'+dEsc(b.loreTextRo||b.narrativeSummary||"")+'</p><p class="dom-muted">'+dEsc(b.strategicObjective||"")+'</p><div class="dom-agenda-grid">'+ag.map(function(x){return '<article><span class="dom-kicker">AGENDA</span><h4>'+dEsc(x.name)+'</h4><p>'+dEsc(x.loreTextRo||"")+'</p><b>Agenda Achieved</b><ul>'+((x.agendaAchieved||[]).map(function(q){return '<li>'+dEsc((q.any||[]).join(" OR "))+'</li>'}).join(""))+'</ul><details><summary>Primary Mission scoring</summary><ul>'+((x.primaryMission&&x.primaryMission.scoring)||[]).map(function(q){return '<li><b>'+dEsc(q.vp)+' VP</b> · '+dEsc(q.when)+' — '+dEsc(q.condition)+'</li>'}).join("")+'</ul></details></article>'}).join("")+'</div><p class="dom-matrix-note">Selecția automată după Force Disposition este dezactivată până la verificarea exactă a celulelor matricei. Warmaster-ul confirmă Agenda manual folosind Briefing-ul oficial.</p></details>'});
+ h+='<section id="domBriefingsSection" class="dom-panel"><div class="dom-section-head"><div><span class="dom-kicker">ALLIANCE INTELLIGENCE</span><h3>Briefings</h3></div></div>';
+ alliances.forEach(function(a){
+  var b=dBriefing(a,c.phase||1);
+  if(!b)return;
+  h+='<article class="dom-briefing"><div class="dom-section-head"><div><b>'+dEsc(dAllianceName(a))+'</b><p class="dom-muted">Phase '+dEsc(c.phase||1)+'</p></div></div><p class="dom-lore">'+dEsc(b.loreTextRo||b.narrativeSummary||"")+'</p><p class="dom-muted">'+dEsc(b.strategicObjective||"")+'</p></article>';
+ });
+ h+='</section>';
+ h+='<section id="domAgendasSection" class="dom-panel"><div class="dom-section-head"><div><span class="dom-kicker">CAMPAIGN OBJECTIVES</span><h3>Agendas</h3></div></div>';
+ alliances.forEach(function(a){
+  var ag=dAgendaOptions(a,c.phase||1);
+  if(!ag.length)return;
+  h+='<div class="dom-briefing"><h4>'+dEsc(dAllianceName(a))+'</h4><div class="dom-agenda-grid">'+ag.map(function(x){
+   return '<article><span class="dom-kicker">AGENDA</span><h4>'+dEsc(x.name)+'</h4><p>'+dEsc(x.loreTextRo||"")+'</p><b>Agenda Achieved</b><ul>'+((x.agendaAchieved||[]).map(function(q){return '<li>'+dEsc((q.any||[]).join(" OR "))+'</li>'}).join(""))+'</ul></article>';
+  }).join("")+'</div></div>';
+ });
+ h+='</section>';
+ h+='<section id="domMissionsSection" class="dom-panel"><div class="dom-section-head"><div><span class="dom-kicker">PRIMARY MISSION INTELLIGENCE</span><h3>Missions</h3></div></div>';
+ alliances.forEach(function(a){
+  var ag=dAgendaOptions(a,c.phase||1);
+  if(!ag.length)return;
+  h+='<div class="dom-briefing"><h4>'+dEsc(dAllianceName(a))+'</h4><div class="dom-agenda-grid">'+ag.map(function(x){
+   var scoring=x.primaryMission&&x.primaryMission.scoring||[];
+   return '<article><span class="dom-kicker">PRIMARY MISSION</span><h4>'+dEsc(x.name)+'</h4>'+(scoring.length?'<ul class="dom-mission-scoring">'+scoring.map(function(q){return '<li><b>'+dEsc(q.vp)+' VP</b> · '+dEsc(q.when)+' — '+dEsc(q.condition)+'</li>'}).join("")+'</ul>':'<p class="dom-muted">Nu există detalii de scoring pentru această misiune.</p>')+'</article>';
+  }).join("")+'</div></div>';
+ });
  h+='</section>';
  h+='<section class="dom-panel"><div class="dom-section-head"><div><span class="dom-kicker">BATTLE OPERATIONS</span><h3>Battles</h3></div>'+(isAdmin&&c.phaseStatus==="active"?'<div class="dom-actions"><button id="domGeneratePhaseMatches" class="ghost">🎲 Generează meciurile fazei</button><button id="domAddBattle" class="primary">＋ Programează meci</button></div>':'')+'</div>';
  if(isAdmin)h+='<div id="domBattleForm" class="dom-battle-form" hidden><div class="dom-form-grid"><label class="opt">Player A<select id="domBattleA">'+(c.players||[]).map(function(p){return '<option value="'+dEsc(p.id)+'">'+dEsc(p.id)+' · '+dEsc(dAllianceName(p.alliance))+'</option>'}).join("")+'</select></label><label class="opt">Player B<select id="domBattleB">'+(c.players||[]).map(function(p){return '<option value="'+dEsc(p.id)+'">'+dEsc(p.id)+' · '+dEsc(dAllianceName(p.alliance))+'</option>'}).join("")+'</select></label><label class="opt">Agenda A<select id="domAgendaA"></select></label><label class="opt">Agenda B<select id="domAgendaB"></select></label><label class="opt">Battle Size<select id="domBattleSize"><option>Strike Force</option><option>Incursion</option><option>Onslaught</option></select></label></div><div class="dom-order-form"><h4>WARMMASTER&#39;S ORDERS</h4><p class="dom-muted">Alege independent un Order pentru fiecare jucător. Poți lăsa unul sau ambii fără Order.</p><div class="dom-form-grid">'+dOrderSetupHtml('A')+dOrderSetupHtml('B')+'</div></div><p class="dom-muted">Program implicit: 2 battles/player în Phase 1, 2 în Phase 2 și o bătălie finală în Phase 3. Warmaster poate ajusta numărul și dimensiunea în limitele regulilor. Agendele sunt selectate manual pe baza Briefing-ului și a Force Dispositions. Dacă un jucător refuză Agenda, alege „Chapter Approved / no Agenda”.</p><div class="dom-actions"><button id="domSaveBattle" class="primary">Salvează meciul</button><button id="domCancelBattle" class="ghost">Anulează</button></div></div>';
@@ -420,16 +456,18 @@ function dRenderDetail(c){
  campaignSections.forEach(function(sec){
   var t=(sec.innerText||'').toLowerCase(),tab='overview';
   if(sec.classList.contains('arm-map-section'))tab='map';
+  else if(sec.id==='domMissionsSection')tab='missions';
+  else if(sec.id==='domAgendasSection')tab='agendas';
+  else if(sec.id==='domBriefingsSection')tab='briefings';
   else if(sec.id==='domRewardsSection'||t.indexOf('campaign deck')>=0||t.indexOf('campaign progression')>=0)tab='rewards';
   else if(t.indexOf('battle operations')>=0||t.indexOf('battles')>=0||t.indexOf('submitted battle reports')>=0||t.indexOf('pre-battle loadout')>=0)tab='battles';
-  else if(t.indexOf('briefings & agendas')>=0||t.indexOf('alliance intelligence')>=0)tab='briefings';
   sec.setAttribute('data-dom-tab-panel',tab);
  });
  var pendingMine=DOM_REWARDS.filter(function(r){return r.playerId===App.me&&r.status==='pending'}).length;
  var pendingAdmin=DOM_REPORTS.filter(function(r){return r.status==='pending'||r.status==='submitted'}).length;
  var setupAction=App.isAdmin&&c.phaseStatus==='setup'?1:0;
  var nav=document.createElement('nav');nav.className='dom-top-tabs';nav.setAttribute('aria-label','Campaign sections');
- var tabs=[['overview','Overview',setupAction],['battles','Battles',pendingAdmin],['rewards','Rewards',pendingMine],['map','Strategic Map',0],['briefings','Briefings',0]];
+ var tabs=[['overview','Overview',setupAction],['battles','Battles',pendingAdmin],['missions','Missions',0],['agendas','Agendas',0],['briefings','Briefings',0],['rewards','Rewards',pendingMine],['map','Strategic Map',0]];
  nav.innerHTML=tabs.map(function(x){return '<button type="button" class="dom-top-tab" data-dom-tab="'+x[0]+'">'+x[1]+(x[2]?'<span class="dom-tab-count">'+x[2]+'</span>':'')+'</button>'}).join('');
  var hero=el.querySelector('.dom-hero');if(hero)hero.insertAdjacentElement('afterend',nav);else el.insertBefore(nav,el.firstChild);
  function activateCampaignTab(name){
@@ -437,7 +475,7 @@ function dRenderDetail(c){
   nav.querySelectorAll('[data-dom-tab]').forEach(function(b){var active=b.getAttribute('data-dom-tab')===name;b.classList.toggle('is-active',active);b.setAttribute('aria-current',active?'page':'false')});
  }
  nav.querySelectorAll('[data-dom-tab]').forEach(function(b){b.onclick=function(){var name=b.getAttribute('data-dom-tab');activateCampaignTab(name);if(history.replaceState)history.replaceState(null,'','#'+name)}});
- var requested=(location.hash||'').replace('#','');activateCampaignTab(['overview','battles','rewards','map','briefings'].indexOf(requested)>=0?requested:'overview');
+ var requested=(location.hash||'').replace('#','');activateCampaignTab(['overview','battles','missions','agendas','briefings','rewards','map'].indexOf(requested)>=0?requested:'overview');
  dLoadRewards(c);
  if(isAdmin){var approve=document.getElementById("domApproveSetup");if(approve)approve.onclick=function(){dApproveRandomSetup(c)};var reroll=document.getElementById("domRerollSetup");if(reroll)reroll.onclick=function(){dRerollRandomSetup(c)};document.getElementById("domRollLocation").onclick=function(){dRollLocation(c)};document.getElementById("domNextPhase").onclick=function(){dAdvancePhase(c)};document.getElementById("domToggleStatus").onclick=function(){dUpdateCampaign(c,{status:c.status==="active"?"completed":"active"})};var delCampaign=document.getElementById("domDeleteCampaignDetail");if(delCampaign)delCampaign.onclick=function(){dDeleteCampaign(c.id)};var addBattle=document.getElementById("domAddBattle");if(addBattle)addBattle.onclick=function(){var f=document.getElementById("domBattleForm");f.hidden=!f.hidden;dRefreshAgendaSelects(c)};var genMatches=document.getElementById("domGeneratePhaseMatches");if(genMatches)genMatches.onclick=function(){dGeneratePhaseMatches(c,false)};document.querySelectorAll("[data-dom-delete-battle]").forEach(function(b){b.onclick=function(){dDeleteScheduledBattle(c,b.getAttribute("data-dom-delete-battle"))}});document.querySelectorAll("[data-dom-start-match]").forEach(function(b){b.onclick=function(){dStartCampaignMatch(c,b.getAttribute("data-dom-start-match"))}});document.getElementById("domCancelBattle").onclick=function(){document.getElementById("domBattleForm").hidden=true};document.getElementById("domBattleA").onchange=function(){dRefreshAgendaSelects(c)};document.getElementById("domBattleB").onchange=function(){dRefreshAgendaSelects(c)};["A","B"].forEach(function(side){document.getElementById("domOrderType"+side).onchange=function(){var sel=document.getElementById("domOrderId"+side);sel.innerHTML=dOrderOptionsHtml(this.value,"")}});document.getElementById("domSaveBattle").onclick=function(){dSaveBattle(c).catch(function(e){alert(e.message||e)})};document.getElementById("domGrantUpgrade").onclick=function(){var f=document.getElementById("domUpgradeForm");f.hidden=!f.hidden;dRefreshUpgradeCards(c)};document.getElementById("domUpgradeType").onchange=function(){dRefreshUpgradeCards(c)};document.getElementById("domUpgradeCard").onchange=function(){dRenderUpgradeConditions(c)};document.getElementById("domSaveUpgrade").onclick=function(){dSaveUpgrade(c)};dLoadReports(c)}
  else {document.querySelectorAll("[data-dom-report]").forEach(function(b){b.onclick=function(){dShowReportForm(c,b.getAttribute("data-dom-report"))}})}

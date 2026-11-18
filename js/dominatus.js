@@ -272,11 +272,33 @@ async function dStartCampaignMatch(c,battleId){
  try{await ref.set(match);var battles=(c.battles||[]).map(function(x){return x.id===battleId?Object.assign({},x,{matchId:ref.id,status:"in_progress"}):x});await dUpdateCampaign(c,{battles:battles});location.href="match.html?id="+encodeURIComponent(ref.id)}catch(e){fail(e)}
 }
 async function dDeleteScheduledBattle(c,battleId){
- var battles=(c.battles||[]).filter(function(b){return b.id!==battleId});
  var target=(c.battles||[]).filter(function(b){return b.id===battleId})[0];
  if(!target||target.status==="completed")return;
- if(!confirm("Ștergi acest meci programat?"))return;
- await dUpdateCampaign(c,{battles:battles});
+ if(!confirm("Ștergi acest meci și înregistrarea lui din Home / Live Battles? Acțiunea este definitivă."))return;
+ try{
+  // A campaign battle has a separate document in /matches once it has been started.
+  // Find by both the saved matchId and campaignBattleId so older/orphaned links are cleaned too.
+  var refs=[],seen={};
+  function addMatchRef(ref){if(ref&&!seen[ref.id]){seen[ref.id]=true;refs.push(ref)}}
+  if(target.matchId)addMatchRef(App.db.collection("matches").doc(target.matchId));
+  var linked=await App.db.collection("matches").where("campaignId","==",c.id).where("campaignBattleId","==",battleId).get();
+  linked.docs.forEach(function(d){addMatchRef(d.ref)});
+  // Delete the match document(s) and remove the campaign battle in one atomic batch.
+  var batch=App.db.batch();
+  refs.forEach(function(ref){batch.delete(ref)});
+  batch.update(App.db.collection(DOM_COLL).doc(c.id),{
+   battles:(c.battles||[]).filter(function(b){return b.id!==battleId}),
+   updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+  });
+  await batch.commit();
+  // Home and Live Battles listen to /matches; a full reload also clears any stale local view.
+  if(location.pathname.endsWith("dominatus.html")){
+   var url=new URL(location.href);url.searchParams.set("id",c.id);location.replace(url.toString());
+  }
+ }catch(e){
+  console.error("Campaign battle delete failed:",e);
+  alert("Nu am putut șterge complet meciul. Nu am eliminat bătălia din campanie. Eroare: "+(e.message||e));
+ }
 }
 var DOM_ARMAGEDDON_LAYOUT={
  the_mannheim_gap:{x:24,y:29,short:"Mannheim Gap"},

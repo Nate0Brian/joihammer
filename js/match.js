@@ -260,7 +260,7 @@ function setupHtml(s){
     h+='<label class="opt">Secundare <select data-act="mode" data-s="'+s+'"><option value=""'+(ps.mode?'':' selected')+'>Alege…</option><option value="T"'+(ps.mode==="T"?" selected":"")+'>Tactical (tragi cărți)</option><option value="F"'+(ps.mode==="F"?" selected":"")+'>Fixed (2 cărți fixe)</option></select></label>';
     if(ps.mode==="F")h+='<div class="vpb">'+SEC.filter(function(c){return c.fx}).map(function(c){return '<label class="opt"><input type="checkbox" data-act="fix" data-s="'+s+'" data-n="'+esc(c.n)+'"'+(ps.fixed.indexOf(c.n)>=0?' checked':'')+'> '+esc(c.n)+'</label>'}).join("")+'</div>';
     if(M.type==="campaign"){
-      var loadoutReady=Array.isArray(campaignSideLoadout(s));
+      var currentLoadout=campaignSideLoadout(s),loadoutReady=currentLoadout==null||Array.isArray(currentLoadout);
       h+=campaignUpgradeSetupHtml(s);
       okFix=okFix&&loadoutReady;
       if(!loadoutReady)h+='<div class="legend">Salvează selecția de upgrade-uri înainte să confirmi Beginning of Game.</div>';

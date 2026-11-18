@@ -231,7 +231,6 @@ function tag(L){
   return (L.w==="F"?"Final bătălie":L.w==="C"?"Command":"Final tură")+(L.w==="F"?"":" · "+r);
 }
 function fixedSum(ps,n){return ps.log.reduce(function(a,e){return a+(e.k==="sec"&&e.l===n?e.v:0)},0)}
-function fixedUiSelection(s){return Array.from(document.querySelectorAll('[data-act="fix"][data-s="'+s+'"]:checked')).map(function(el){return el.getAttribute("data-n")})}
 function cardHtml(c){return '<b class="t">'+esc(c.n)+'</b><ul>'+c.r.map(function(x){return '<li>'+esc(x)+'</li>'}).join("")+'</ul>'}
 
 function campaignSideLoadout(s){return M?(M[s==="a"?"campaignLoadoutA":"campaignLoadoutB"]||null):null}
@@ -247,7 +246,7 @@ function campaignUpgradesSummary(s){var list=campaignSideLoadout(s);if(!Array.is
 function setupHtml(s){
   var ps=PS(s),pl=P(s),mine=own(s),live=M.status==="active";
   var fo=Data.fdsFor(pl.army,pl.dets),fdOk=fo.indexOf(pl.fd)>=0;
-  var uiFixed=fixedUiSelection(s),okFix=fdOk&&(ps.mode==="T"||(ps.mode==="F"&&uiFixed.length===2));
+  var okFix=fdOk&&(ps.mode==="T"||(ps.mode==="F"&&ps.fixed.length===2));
   var pn=primOf(s),pr=PRI[pn];
   var h='<section class="side setup"><h2>'+esc(pl.name)+(App.me===M[s]?' <small>(tu)</small>':'')+(M.atk?' <span class="role">'+(M.atk===s?'Atacator':'Defender')+'</span>':'')+(ps.ready?' <span class="ok">✓ salvat</span>':'')+'</h2><div class="info">'+esc([pl.army,pl.det].filter(Boolean).join(" · ")||"Armata nu e aleasă")+'</div>';
   if(mine&&live&&!ps.ready){
@@ -261,7 +260,7 @@ function setupHtml(s){
     h+='<label class="opt">Secundare <select data-act="mode" data-s="'+s+'"><option value=""'+(ps.mode?'':' selected')+'>Alege…</option><option value="T"'+(ps.mode==="T"?" selected":"")+'>Tactical (tragi cărți)</option><option value="F"'+(ps.mode==="F"?" selected":"")+'>Fixed (2 cărți fixe)</option></select></label>';
     if(ps.mode==="F")h+='<div class="vpb">'+SEC.filter(function(c){return c.fx}).map(function(c){return '<label class="opt"><input type="checkbox" data-act="fix" data-s="'+s+'" data-n="'+esc(c.n)+'"'+(ps.fixed.indexOf(c.n)>=0?' checked':'')+'> '+esc(c.n)+'</label>'}).join("")+'</div>';
     if(M.type==="campaign"){
-      var currentLoadout=campaignSideLoadout(s),loadoutReady=currentLoadout==null||Array.isArray(currentLoadout);
+      var loadoutReady=Array.isArray(campaignSideLoadout(s));
       h+=campaignUpgradeSetupHtml(s);
       okFix=okFix&&loadoutReady;
       if(!loadoutReady)h+='<div class="legend">Salvează selecția de upgrade-uri înainte să confirmi Beginning of Game.</div>';
@@ -476,7 +475,8 @@ function campaignMatchHtml(m){
   (up.length?'<div class="campaign-upgrades"><b>Campaign Upgrades</b>'+up.map(function(u){return '<div><strong>'+esc(u.name)+'</strong> · '+esc(u.type)+(u.unit?' · '+esc(u.unit):'')+(u.effect?'<p>'+esc(u.effect)+'</p>':'')+'</div>'}).join('')+'</div>':'<p class="legend">Niciun Upgrade înregistrat pentru acest jucător.</p>')+'</article>';
  }
  var achievedControl=mine?'<label class="campaign-achieved-check"><input type="checkbox" id="campaignAgendaAchieved"> Am îndeplinit condiția Agenda Achieved pentru Agenda mea.</label>':'';
- var reportButton=m.status==="done"&&mine?'<div class="campaign-report-action"><button type="button" class="primary" data-act="campaignReport">Trimite raportul către Warmaster</button><small>Trimite scorul final și confirmarea Agenda Achieved în arhiva campaniei.</small></div>':'';
+ var submitted=!!((m.campaignReportSubmitted||{})[App.me]);
+ var reportButton=m.status==="done"&&mine?(submitted?'<div class="campaign-report-action"><b>Raport trimis · Așteaptă validarea Warmaster-ului</b></div>':'<div class="campaign-report-action"><button type="button" class="primary" data-act="campaignReport">Trimite raportul către Warmaster</button><small>Trimite scorul final și confirmarea Agenda Achieved în arhiva campaniei.</small></div>'):'';
  var rules=(loc.warZoneRules||[]).map(function(r){return '<li><b>'+esc(r.name)+'</b> — '+esc(r.summary)+'</li>'}).join('');
  var allianceLabels={liberators:'Liberators',oppressors:'Oppressors',raiders:'Raiders'};
  var briefs=(c.campaignBriefings||[]).map(function(b){return '<article class="campaign-briefing-card"><b>'+esc(allianceLabels[b.alliance]||b.alliance)+'</b><span>Phase '+esc(b.phase||phase)+'</span>'+(b.lore?'<p>'+esc(b.lore)+'</p>':'')+(b.strategicObjective?'<small><strong>Strategic Objective:</strong> '+esc(b.strategicObjective)+'</small>':'')+'</article>'}).join('');
@@ -498,6 +498,7 @@ async function submitCampaignReport(){
   var own=side==="a"?(M.fta||0):(M.ftb||0),opp=side==="a"?(M.ftb||0):(M.fta||0),winner=M.winner==="draw"?"draw":M[M.winner];
   var achieved=!!(document.getElementById("campaignAgendaAchieved")||{}).checked;
   await ref.set({battleId:M.campaignBattleId,matchId:mid,playerId:App.me,playerA:M.a,playerB:M.b,opponent:side==="a"?M.b:M.a,winner:winner,score:own,opponentScore:opp,agendaAchieved:achieved,notes:"Raport generat din Campaign Match.",status:"pending",submittedAt:firebase.firestore.FieldValue.serverTimestamp()});
+  var flags=Object.assign({},M.campaignReportSubmitted||{});flags[App.me]=true;await App.db.collection("matches").doc(mid).update({campaignReportSubmitted:flags});
   alert("Raport trimis către Warmaster pentru validare.");
  }catch(e){fail(e)}
 }
@@ -586,7 +587,7 @@ function go(a,el){
   }
   if(a==="acc"){upd({status:"active",pa:App.snapOr(M.a,M.pa),pb:App.snapOr(M.b,M.pb)});return}
   if(a==="dec"){upd({status:"declined"});return}
-  if(a==="ready"){if(M.type==="combat-patrol"&&(!PS(s).cpEdition||!PS(s).cpPatrolId))return;var selectedFixed=fixedUiSelection(s);if(PS(s).mode==="F"&&selectedFixed.length!==2){alert("Alege exact 2 cărți Fixed.");return}if(M.type==="campaign"&&!Array.isArray(campaignSideLoadout(s))&&campaignSideLoadout(s)!=null){alert("Salvează mai întâi upgrade-urile de campanie.");return}mut(s,function(ps){if(ps.mode==="F")ps.fixed=selectedFixed;ps.ready=true});return}
+  if(a==="ready"){if(M.type==="combat-patrol"&&(!PS(s).cpEdition||!PS(s).cpPatrolId))return;if(M.type==="campaign"&&!Array.isArray(campaignSideLoadout(s))){alert("Salvează mai întâi upgrade-urile de campanie.");return}mut(s,function(ps){ps.ready=true});return}
   if(a==="unready"){mut(s,function(ps){ps.ready=false});return}
   if(a==="cpvp"){var reason=document.querySelector('[data-cp-reason="'+s+'"]'),label=n||reason&&reason.value.trim()||"Punctaj misiune";if(v<0){var bal=(PS(s).log||[]).filter(function(e){return e.k==="cpvp"}).reduce(function(t,e){return t+e.v},0);if(bal<=0)return}mut(s,function(ps){logAdd(ps,"cpvp",v,label)});return}
   if(a==="atk"){upd({atk:el.getAttribute("data-v")});return}
@@ -637,9 +638,9 @@ function onChange(el){
   if(a==="mode")mut(s,function(ps){ps.mode=el.value;if(el.value!=="F")ps.fixed=[]});
   if(a==="fd"){if(!el.value||Data.fdsFor(P(s).army,P(s).dets).indexOf(el.value)<0)return;var o={};o[s==="a"?"pa":"pb"]=Object.assign({},P(s),{fd:el.value});upd(o)}
   if(a==="fix"){
-    var selected=fixedUiSelection(s);
-    if(selected.length>2){el.checked=false;selected=fixedUiSelection(s);}
-    mut(s,function(ps){ps.fixed=selected});
+    var n=el.getAttribute("data-n"),ps=PS(s);
+    if(el.checked&&ps.fixed.length>=2){el.checked=false;return}
+    mut(s,function(ps){if(el.checked)ps.fixed.push(n);else rm(ps.fixed,n)});
   }
 }
 

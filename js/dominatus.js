@@ -141,8 +141,19 @@ async function dKeepReward(c,rewardId){
  var cardId=(r.candidates||[]).length===1?r.candidates[0].id:(document.getElementById("domRewardCard_"+rewardId)||{}).value;
  var card=(r.candidates||[]).filter(function(x){return x.id===cardId})[0];if(!card){alert("Alege o carte validă.");return;}
  if(dSelectedRewardIds(App.me).indexOf(card.id)>=0||((c.upgrades||{})[App.me]||[]).some(function(u){return u.id===card.id})){alert("Deții deja această carte. Alege altă carte din tragere.");return;}
- try{await App.db.collection(DOM_COLL).doc(c.id).collection("rewards").doc(rewardId).update({selectedCardId:card.id,assignedUnit:"",status:"selected",selectedAt:firebase.firestore.FieldValue.serverTimestamp()});}
- catch(e){fail(e)}
+ try{
+  await App.db.collection(DOM_COLL).doc(c.id).collection("rewards").doc(rewardId).update({selectedCardId:card.id,assignedUnit:"",status:"selected",selectedAt:firebase.firestore.FieldValue.serverTimestamp()});
+  // Synchronize this player's reward completion onto the campaign match for Home gating.
+  if(r.battleId){
+   var battle=(c.battles||[]).filter(function(x){return x.id===r.battleId})[0];
+   if(battle&&battle.matchId){
+    var all=await App.db.collection(DOM_COLL).doc(c.id).collection("rewards").get();
+    var rows=all.docs.map(function(d){return d.data()}).filter(function(x){return x.playerId===App.me&&x.battleId===r.battleId});
+    var done=rows.every(function(x){return x.status==="selected"||x.status==="exhausted"});
+    if(done){var ref=App.db.collection("matches").doc(battle.matchId),snap=await ref.get(),m=snap.data()||{},flags=Object.assign({},m.campaignRewardsDone||{});flags[App.me]=true;await ref.update({campaignRewardsDone:flags});}
+   }
+  }
+ }catch(e){fail(e)}
 }
 async function dCreateRewardDraw(c,playerId,category,phase,battleId,drawCount,reason){
  var rewardId=(battleId||("phase"+phase))+"_"+playerId+"_"+category.toLowerCase().replace(/[^a-z]+/g,"_");
@@ -548,6 +559,7 @@ async function dApproveReport(c,reportId){
  try{
   await dCreateBattleRewards(c,b,r,earned);
   await App.db.collection(DOM_COLL).doc(c.id).update(Object.assign(updates,{updatedAt:firebase.firestore.FieldValue.serverTimestamp()}));
+  if(b.matchId){await App.db.collection("matches").doc(b.matchId).update({campaignWarmasterConfirmed:true});}
   var reportsToClose=DOM_REPORTS.filter(function(x){return x.battleId===r.battleId});
   await Promise.all(reportsToClose.map(function(x){return App.db.collection(DOM_COLL).doc(c.id).collection("reports").doc(x.id).update({status:x.id===reportId?"approved":"merged",approvedBy:App.me,approvedAt:firebase.firestore.FieldValue.serverTimestamp(),mergedInto:reportId})}));
   alert("Raport validat. Agendas Achieved au fost confirmate pentru ambii jucători, iar cărțile au fost trase automat conform regulilor Dominatus.");

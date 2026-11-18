@@ -4,40 +4,24 @@ function draw(ms){
   MS=ms;
   var inv=ms.filter(function(m){return m.status==="invited"});
   var campaignMatches=ms.filter(function(m){
-    return (m.type==="campaign"||!!m.campaignId)&&
-      !(m.status==="done"&&m.campaignRewardsDone&&m.campaignRewardsDone[m.a]&&m.campaignRewardsDone[m.b]&&m.campaignWarmasterConfirmed);
+    return (m.type==="campaign"||!!m.campaignId)&&m.status!=="cancelled";
   });
-  function campaignRoundComplete(roundMatches){
-    return roundMatches.length>0&&roundMatches.every(function(x){
-      return x.status==="done"&&x.campaignRewardsDone&&
-        x.campaignRewardsDone[x.a]&&x.campaignRewardsDone[x.b]&&
-        x.campaignWarmasterConfirmed;
-    });
-  }
-  function currentRoundForPlayer(campaignId,phase,player){
-    var mine=campaignMatches.filter(function(x){
-      return (x.campaignId||"")===campaignId&&
-        Number(x.campaignPhase||1)===phase&&(x.a===player||x.b===player);
-    });
-    if(!mine.length)return 1;
-    var rounds=mine.map(function(x){return Number(x.campaignRound||1)});
-    var unique=rounds.filter(function(r,i,a){return a.indexOf(r)===i}).sort(function(a,b){return a-b});
-    for(var i=0;i<unique.length;i++){
-      var r=unique[i],items=mine.filter(function(x){return Number(x.campaignRound||1)===r});
-      if(!campaignRoundComplete(items))return r;
-    }
-    return unique.length?unique[unique.length-1]+1:1;
-  }
   var campaigns=campaignMatches.filter(function(m){
     if(App.isAdmin)return m.status!=="campaign_locked";
     if(m.a!==App.me&&m.b!==App.me)return false;
-    if(m.status==="campaign_locked")return false;
-    var phase=Number(m.campaignPhase||1),round=Number(m.campaignRound||1),cid=m.campaignId||"";
-    var aRound=currentRoundForPlayer(cid,phase,m.a);
-    var bRound=currentRoundForPlayer(cid,phase,m.b);
-    return round===Math.min(aRound,bRound)&&
-      !(m.status==="done"&&m.campaignRewardsDone&&m.campaignRewardsDone[m.a]&&
-        m.campaignRewardsDone[m.b]&&m.campaignWarmasterConfirmed);
+    var phase=Number(m.campaignPhase||1),cid=m.campaignId||"";
+    var myPhase=campaignMatches.filter(function(x){
+      return (x.campaignId||"")===cid&&Number(x.campaignPhase||1)===phase&&(x.a===App.me||x.b===App.me);
+    });
+    var openRounds=myPhase.filter(function(x){
+      var round=Number(x.campaignRound||1);
+      var roundMatches=myPhase.filter(function(y){return Number(y.campaignRound||1)===round});
+      return !roundMatches.every(function(y){
+        return y.status==="done"&&y.campaignWarmasterConfirmed&&y.campaignRewardsDone&&y.campaignRewardsDone[y.a]&&y.campaignRewardsDone[y.b];
+      });
+    }).map(function(x){return Number(x.campaignRound||1)});
+    var currentRound=openRounds.length?Math.min.apply(Math,openRounds):1;
+    return Number(m.campaignRound||1)===currentRound&&m.status!=="campaign_locked";
   });
   var regular=ms.filter(function(m){return m.type!=="campaign"&&!m.campaignId});
   var act=regular.filter(function(m){return m.status==="active"||m.status==="confirm"});

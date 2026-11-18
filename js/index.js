@@ -9,23 +9,24 @@ function draw(ms){
   var campaigns=campaignMatches.filter(function(m){
     if(App.isAdmin)return m.status!=="campaign_locked";
     if(m.a!==App.me&&m.b!==App.me)return false;
-    var phase=Number(m.campaignPhase||1),cid=m.campaignId||"";
-    var myPhase=campaignMatches.filter(function(x){
-      return (x.campaignId||"")===cid&&Number(x.campaignPhase||1)===phase&&(x.a===App.me||x.b===App.me);
-    });
-    var openRounds=myPhase.filter(function(x){
-      var round=Number(x.campaignRound||1);
-      var roundMatches=myPhase.filter(function(y){return Number(y.campaignRound||1)===round});
-      return !roundMatches.every(function(y){
-        return y.status==="done"&&y.campaignWarmasterConfirmed&&y.campaignRewardsDone&&y.campaignRewardsDone[y.a]&&y.campaignRewardsDone[y.b];
-      });
-    }).map(function(x){return Number(x.campaignRound||1)});
-    // Show only the earliest round that still has unfinished campaign work.
-    // If every round is complete, do not fall back to Round 1 (which resurfaces old battles).
-    if(!openRounds.length)return false;
-    var currentRound=Math.min.apply(Math,openRounds);
-    return Number(m.campaignRound||1)===currentRound&&m.status!=="campaign_locked";
+    return m.status!=="done"&&m.status!=="campaign_locked";
   });
+  // Per player, show the highest phase/round with unfinished campaign matches.
+  // Completed earlier rounds must not remain on Home merely because their
+  // reward/confirmation flags are inconsistent or missing in a legacy record.
+  if(!App.isAdmin){
+    var groups={};
+    campaigns.forEach(function(m){
+      var key=(m.campaignId||"")+"::"+Number(m.campaignPhase||1);
+      (groups[key]||(groups[key]=[])).push(m);
+    });
+    var selected={};
+    Object.keys(groups).forEach(function(key){
+      var rows=groups[key],maxRound=Math.max.apply(Math,rows.map(function(x){return Number(x.campaignRound||1)}));
+      rows.filter(function(x){return Number(x.campaignRound||1)===maxRound}).forEach(function(x){selected[x.id]=true});
+    });
+    campaigns=campaigns.filter(function(m){return !!selected[m.id]});
+  }
   var regular=ms.filter(function(m){return m.type!=="campaign"&&!m.campaignId});
   var act=regular.filter(function(m){return m.status==="active"||m.status==="confirm"});
   var done=regular.filter(function(m){return m.status==="done"}).slice(0,8);

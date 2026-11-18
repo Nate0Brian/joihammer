@@ -20,7 +20,10 @@ function draw(ms){
         return y.status==="done"&&y.campaignWarmasterConfirmed&&y.campaignRewardsDone&&y.campaignRewardsDone[y.a]&&y.campaignRewardsDone[y.b];
       });
     }).map(function(x){return Number(x.campaignRound||1)});
-    var currentRound=openRounds.length?Math.min.apply(Math,openRounds):1;
+    // Show only the earliest round that still has unfinished campaign work.
+    // If every round is complete, do not fall back to Round 1 (which resurfaces old battles).
+    if(!openRounds.length)return false;
+    var currentRound=Math.min.apply(Math,openRounds);
     return Number(m.campaignRound||1)===currentRound&&m.status!=="campaign_locked";
   });
   var regular=ms.filter(function(m){return m.type!=="campaign"&&!m.campaignId});

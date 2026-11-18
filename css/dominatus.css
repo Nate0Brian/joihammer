@@ -202,3 +202,5 @@
 
 .dominatus-main .dom-battle-loadout-summary{display:grid;gap:5px;margin:10px 0;padding:9px 11px;border-left:2px solid #a9874d;background:rgba(0,0,0,.2);font-size:.82rem}
 .dominatus-main .dom-battle-loadout-summary>div{display:flex;flex-wrap:wrap;align-items:center;gap:5px}
+
+.dom-reward-detail{padding:12px;margin-top:10px;border:1px solid rgba(190,160,100,.25);border-radius:10px;background:rgba(15,12,9,.28)}.dom-reward-detail p{margin:6px 0}.dom-workflow-lines{padding:8px 12px;margin-top:10px;border-left:3px solid var(--brass,#c5a15a);background:rgba(15,12,9,.25)}.dom-workflow-lines p{margin:5px 0}

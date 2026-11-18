@@ -252,8 +252,11 @@ function setupHtml(s){
   if(mine&&live&&!ps.ready){
     if(!fo.length)h+='<div class="legend">Alege armata și detașamentul în <a href="profile.html">Profil</a>; se preiau automat aici.</div>';
     else h+='<label class="opt">Force Disposition <select data-act="fd" data-s="'+s+'">'+(fdOk?'':'<option value="">Alege…</option>')+fo.map(function(f){return '<option'+(f===pl.fd?' selected':'')+'>'+f+'</option>'}).join("")+'</select></label>';
-    h+='<div class="info">Misiune primară: <b>'+esc(pn)+'</b></div>';
-    h+='<details class="mis" data-k="pr'+s+'"'+(openS["pr"+s]?' open':'')+'><summary>Regulile misiunii</summary>'+(pr.a?'<div class="act">'+esc(pr.a)+'</div>':'')+'<ul>'+pr.r.map(function(l){var L=parseLine(l);return '<li><span class="tag">'+tag(L)+'</span> '+esc(L.text)+'</li>'}).join("")+'</ul></details>';
+    if(M.type==="campaign")h+=campaignPrimaryHtml(s,true);
+    else{
+      h+='<div class="info">Misiune primară: <b>'+esc(pn)+'</b></div>';
+      h+='<details class="mis" data-k="pr'+s+'"'+(openS["pr"+s]?' open':'')+'><summary>Regulile misiunii</summary>'+(pr.a?'<div class="act">'+esc(pr.a)+'</div>':'')+'<ul>'+pr.r.map(function(l){var L=parseLine(l);return '<li><span class="tag">'+tag(L)+'</span> '+esc(L.text)+'</li>'}).join("")+'</ul></details>';
+    }
     h+='<label class="opt">Secundare <select data-act="mode" data-s="'+s+'"><option value=""'+(ps.mode?'':' selected')+'>Alege…</option><option value="T"'+(ps.mode==="T"?" selected":"")+'>Tactical (tragi cărți)</option><option value="F"'+(ps.mode==="F"?" selected":"")+'>Fixed (2 cărți fixe)</option></select></label>';
     if(ps.mode==="F")h+='<div class="vpb">'+SEC.filter(function(c){return c.fx}).map(function(c){return '<label class="opt"><input type="checkbox" data-act="fix" data-s="'+s+'" data-n="'+esc(c.n)+'"'+(ps.fixed.indexOf(c.n)>=0?' checked':'')+'> '+esc(c.n)+'</label>'}).join("")+'</div>';
     if(M.type==="campaign"){
@@ -265,7 +268,7 @@ function setupHtml(s){
     h+='<div class="vpb">'+B("ready",s,"Salvează alegerea",'',!okFix)+'</div>';
     if(!okFix)h+='<div class="legend">'+(!fdOk?'Alege un Force Disposition permis de detașamentele tale.':!ps.mode?'Alege tipul de secundare.':'Alege exact 2 cărți Fixed.')+'</div>';
   }else{
-    h+='<div class="info">Force Disposition: <b>'+(fdOk?esc(pl.fd):'neales')+'</b></div><div class="info">Misiune primară: <b>'+esc(pn)+'</b></div>';
+    h+='<div class="info">Force Disposition: <b>'+(fdOk?esc(pl.fd):'neales')+'</b></div>'+(M.type==="campaign"?campaignPrimaryHtml(s,false):'<div class="info">Misiune primară: <b>'+esc(pn)+'</b></div>');
     h+=ps.ready?'<div class="info">Secundare: <b>'+(ps.mode==="T"?"Tactical":"Fixed – "+esc(ps.fixed.join(", ")))+'</b></div>':'<div class="info">Încă nu a salvat alegerile.</div>';
     if(ps.ready&&mine&&live)h+='<div class="vpb">'+B("unready",s,"Schimbă alegerea","",false,"ghost")+'</div>';
   }
@@ -443,13 +446,68 @@ function campaignOrderStatus(o){var r=rd();if(!M||M.first==null)return 'UPCOMING
 function campaignOrdersModalHtml(){var list=campaignOrdersForMatch();if(!list.length)return '<div class="orders-modal-empty">No Warmaster Orders assigned to this match.</div>';return list.map(function(o){var status=campaignOrderStatus(o),active=status==='ACTIVE THIS ROUND';return '<article class="orders-modal-card '+esc(o.item.type)+' '+(active?'active':'')+'"><small>'+esc(o.player)+(o.alliance?' · '+esc(o.alliance):'')+'</small><div class="campaign-order-choice-top"><h3>'+esc(o.item.name)+'</h3><em class="campaign-order-type '+esc(o.item.type)+'">'+campaignOrderTypeLabel(o.item.type)+'</em></div><p>'+esc(o.item.effect)+'</p><div class="orders-modal-meta"><span>Battle Round '+o.round+'</span><span>'+esc(campaignOrderTimingLabel(o.timing))+'</span><span>'+status+'</span></div>'+(active?'<div class="campaign-order-state">✦ CHECK THIS ORDER NOW · APPLY DURING '+esc(campaignOrderTimingLabel(o.timing).toUpperCase())+'</div>':'')+'</article>'}).join('')}
 function refreshCampaignOrdersModal(){var body=$('campaignOrdersModalBody');if(body)body.innerHTML=campaignOrdersModalHtml()}
 function campaignOrdersAlertHtml(){var active=campaignOrdersForMatch().filter(function(o){return campaignOrderStatus(o)==='ACTIVE THIS ROUND'});if(!active.length)return '';return '<section class="orders-live-alert '+(active.some(function(o){return o.item.type==='debuff'})?'urgent':'')+'"><small>✦ WARMASTER ORDERS · ROUND '+rd()+'</small><h3>ORDERS ACTIVE THIS BATTLE ROUND</h3>'+active.map(function(o){return '<p><b>'+esc(o.player)+(o.alliance?' · '+esc(o.alliance):'')+'</b> · '+esc(o.item.name)+' — apply during <b>'+esc(campaignOrderTimingLabel(o.timing))+'</b>.</p>'}).join('')+'<button type="button" class="sm" onclick="document.getElementById(\'openCampaignOrders\').click()">View Orders</button></section>'}
+
+function campaignAgendaFor(side){var c=M&&M.campaignContext,p=c&&c.campaignPlayers&&c.campaignPlayers[side];return p&&p.agenda||null}
+function campaignPrimaryHtml(side,setup){
+ var agenda=campaignAgendaFor(side),scoring=agenda&&agenda.primaryMission&&agenda.primaryMission.scoring||[],mine=own(side),started=M.first!=null,live=M.status==="active",current=actS();
+ if(!agenda)return '<div class="mis"><b>Primary Mission</b><p class="legend">Chapter Approved / fără Agenda.</p></div>';
+ var h='<div class="mis campaign-primary-score"><b>'+esc(agenda.name)+' · Primary Mission</b>';
+ if(agenda.lore)h+='<p class="campaign-primary-lore">'+esc(agenda.lore)+'</p>';
+ h+='<ul>';
+ scoring.forEach(function(rule,i){var vp=Number(rule.vp)||0,can=!setup&&mine&&live&&started&&current===side&&vp>0;h+='<li><span class="tag">'+esc(rule.when||'Scoring condition')+'</span> '+esc(rule.condition)+' <b>('+vp+' VP)</b>'+(can?'<div class="vpb">'+B('campaignPv',side,'+'+vp+' VP',' data-i="'+i+'" data-v="'+vp+'"')+'</div>':'')+'</li>'});
+ h+='</ul><div class="legend">Punctele se înregistrează în scorul Primar al meciului. Respectă momentul de scoring indicat de Agenda.</div></div>';return h;
+}
+function campaignMissionHtml(agenda){
+ if(!agenda)return '<p class="legend">Chapter Approved / fără Agenda.</p>';
+ var scoring=agenda.primaryMission&&agenda.primaryMission.scoring||[];
+ var achieved=agenda.agendaAchieved||[];
+ return '<div class="campaign-agenda"><h4>'+esc(agenda.name)+'</h4>'+(agenda.lore?'<p>'+esc(agenda.lore)+'</p>':'')+
+ (achieved.length?'<div class="campaign-achieved"><b>Agenda Achieved</b><ul>'+achieved.map(function(x){return '<li>'+esc((x.any||[]).join(" OR "))+'</li>'}).join('')+'</ul></div>':'')+
+ (scoring.length?'<div class="campaign-primary"><b>Primary Mission</b><ul>'+scoring.map(function(x){return '<li><b>'+esc(x.vp)+' VP</b> · '+esc(x.when)+' — '+esc(x.condition)+'</li>'}).join('')+'</ul></div>':'')+'</div>';
+}
+function campaignMatchHtml(m){
+ var campaignStyle='<style>.campaign-match-panel{margin:18px 0;padding:18px;border:1px solid var(--line,#66553a);border-radius:16px;background:rgba(45,35,25,.32)}.campaign-match-title,.campaign-player-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.campaign-match-title h2{margin:5px 0}.campaign-kicker{letter-spacing:.18em;color:var(--brass,#c5a15a);font-size:11px;font-weight:700}.campaign-location-lore,.campaign-player p,.campaign-briefing-card p{color:var(--muted,#aaa)}.campaign-warzone,.campaign-location-bonus,.campaign-briefings,.campaign-players-grid{margin-top:14px}.campaign-briefing-grid,.campaign-players-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.campaign-briefing-card,.campaign-player{padding:14px;border:1px solid var(--line,#66553a);border-radius:12px}.campaign-agenda{margin-top:12px;padding-top:10px;border-top:1px solid rgba(190,160,100,.25)}.campaign-agenda h4{margin:4px 0}.campaign-primary,.campaign-achieved,.campaign-upgrades{margin-top:10px}.campaign-primary ul,.campaign-achieved ul,.campaign-warzone ul{padding-left:20px}.campaign-report-action{margin-top:14px}.campaign-report-action small{display:block;color:var(--muted,#aaa)}</style>';
+ var c=m.campaignContext;if(!c)return '<section class="campaign-match-panel"><b>Dominatus Campaign Match</b><p class="legend">Detaliile campaniei nu sunt disponibile în acest document. Deschide campania pentru informații.</p><a class="button" href="dominatus.html?id='+encodeURIComponent(m.campaignId||"")+'">Deschide campania</a></section>';
+ var loc=c.campaignLocation||{},players=c.campaignPlayers||{},mine=App.me===m.a?"a":App.me===m.b?"b":null,phase=c.campaignPhase||m.campaignPhase||1;
+ function playerCard(side){
+  var p=players[side]||{},up=p.upgrades||[];
+  return '<article class="campaign-player"><div class="campaign-player-head"><b>'+esc(p.id||m[side])+'</b><span>'+esc(p.alliance||"")+'</span></div><small>Force Disposition: '+esc(p.forceDisposition||"—")+'</small>'+campaignMissionHtml(p.agenda)+
+  (up.length?'<div class="campaign-upgrades"><b>Campaign Upgrades</b>'+up.map(function(u){return '<div><strong>'+esc(u.name)+'</strong> · '+esc(u.type)+(u.unit?' · '+esc(u.unit):'')+(u.effect?'<p>'+esc(u.effect)+'</p>':'')+'</div>'}).join('')+'</div>':'<p class="legend">Niciun Upgrade înregistrat pentru acest jucător.</p>')+'</article>';
+ }
+ var achievedControl=mine?'<label class="campaign-achieved-check"><input type="checkbox" id="campaignAgendaAchieved"> Am îndeplinit condiția Agenda Achieved pentru Agenda mea.</label>':'';
+ var reportButton=m.status==="done"&&mine?'<div class="campaign-report-action"><button type="button" class="primary" data-act="campaignReport">Trimite raportul către Warmaster</button><small>Trimite scorul final și confirmarea Agenda Achieved în arhiva campaniei.</small></div>':'';
+ var rules=(loc.warZoneRules||[]).map(function(r){return '<li><b>'+esc(r.name)+'</b> — '+esc(r.summary)+'</li>'}).join('');
+ var allianceLabels={liberators:'Liberators',oppressors:'Oppressors',raiders:'Raiders'};
+ var briefs=(c.campaignBriefings||[]).map(function(b){return '<article class="campaign-briefing-card"><b>'+esc(allianceLabels[b.alliance]||b.alliance)+'</b><span>Phase '+esc(b.phase||phase)+'</span>'+(b.lore?'<p>'+esc(b.lore)+'</p>':'')+(b.strategicObjective?'<small><strong>Strategic Objective:</strong> '+esc(b.strategicObjective)+'</small>':'')+'</article>'}).join('');
+ return campaignStyle+'<section class="campaign-match-panel"><div class="campaign-match-title"><div><span class="campaign-kicker">DOMINATUS · CAMPAIGN OPERATIONS</span><h2>'+esc(c.campaignName||m.campaignName||"Campaign")+'</h2><p>Phase '+esc(phase)+' · Round '+esc(c.campaignRound||m.campaignRound||1)+' · '+esc(loc.name||"Theatre of War")+'</p></div><a href="dominatus.html?id='+encodeURIComponent(m.campaignId)+'">Campaign HQ ↗</a></div>'+
+ (loc.lore?'<p class="campaign-location-lore">'+esc(loc.lore)+'</p>':'')+
+ (loc.bonus&&loc.bonus.name?'<div class="campaign-location-bonus"><b>'+esc(loc.bonus.name)+'</b> · '+esc(loc.bonus.summary||"")+'</div>':'')+
+ (rules?'<div class="campaign-warzone"><b>War Zone Rules</b><ul>'+rules+'</ul></div>':'')+
+ '<div class="campaign-briefings"><b>Alliance Briefings</b><div class="campaign-briefing-grid">'+briefs+'</div></div><div class="campaign-players-grid">'+playerCard("a")+playerCard("b")+'</div>'+
+ achievedControl+reportButton+'</section>';
+}
+
+async function submitCampaignReport(){
+ if(!M||!M.campaignId||!M.campaignBattleId)return;
+ var side=App.me===M.a?"a":App.me===M.b?"b":null;if(!side){alert("Doar participanții pot trimite raportul.");return}
+ if(M.status!=="done"){alert("Raportul poate fi trimis după confirmarea scorului final.");return}
+ var ref=App.db.collection("dominatusCampaigns").doc(M.campaignId).collection("reports").doc(M.campaignBattleId+"_"+App.me);
+ try{
+  var old=await ref.get();if(old.exists){alert("Ai trimis deja raportul pentru acest meci.");return}
+  var own=side==="a"?(M.fta||0):(M.ftb||0),opp=side==="a"?(M.ftb||0):(M.fta||0),winner=M.winner==="draw"?"draw":M[M.winner];
+  var achieved=!!(document.getElementById("campaignAgendaAchieved")||{}).checked;
+  await ref.set({battleId:M.campaignBattleId,matchId:mid,playerId:App.me,playerA:M.a,playerB:M.b,opponent:side==="a"?M.b:M.a,winner:winner,score:own,opponentScore:opp,agendaAchieved:achieved,notes:"Raport generat din Campaign Match.",status:"pending",submittedAt:firebase.firestore.FieldValue.serverTimestamp()});
+  alert("Raport trimis către Warmaster pentru validare.");
+ }catch(e){fail(e)}
+}
+
 function render(){
   var m=M,started=m.first!=null,ended=m.turn>=10,a=actS(),live=m.status==="active";
   ["sa","sb"].forEach(function(k){m[k]=Object.assign(newPS(),m[k])});
   var rdy=!!(m.sa.ready&&m.sb.ready),roleOk=!!m.atk,na=esc(m.pa.name),nb=esc(m.pb.name);
   var h='<h1>'+na+' <span class="vs">vs</span> '+nb+'</h1>';
   h+='<div class="depbar"><div class="info">'+(m.type==="tournament"?"Meci de turneu":m.type==="combat-patrol"?"Combat Patrol · ediție aleasă individual":m.type==="campaign"?"Dominatus · Phase "+esc(m.campaignPhase||"—")+(m.campaignLocationName?" · "+esc(m.campaignLocationName):""):"Meci amical")+(m.deploy?' · Deployment: <b>'+esc(m.deploy)+'</b>'+(DEPNOTE[m.deploy]?'<br><small>'+esc(DEPNOTE[m.deploy])+'</small>':''):'')+(m.twist?' · Twist: <b>'+esc(m.twist)+'</b> – '+esc(TWISTS[m.twist]):'')+'</div>'+(m.deploy?Data.depImg(m.deploy):'')+'</div>';
-  // Campaign Orders are displayed exclusively in the dedicated modal opened by the top button.
+  if(m.type==="campaign")h+=campaignMatchHtml(m);
   if(m.status==="invited"){
     h+='<div class="banner">'+(m.type==="combat-patrol"?"Invitație Combat Patrol în așteptare.":"Invitație în așteptare.")+(App.me===m.b?'<div class="vpb" style="justify-content:center">'+B("acc","","Acceptă","")+B("dec","","Refuză","",false,"ghost")+'</div>':' Așteaptă răspunsul lui '+esc(m.b)+'.'+(App.me===m.a?'<div class="vpb" style="justify-content:center">'+B("dec","","Anulează invitația","",false,"ghost")+'</div>':''))+'</div>';
     $("box").innerHTML=h;return;
@@ -519,6 +577,12 @@ function go(a,el){
   if(a==="campaign-upgrades-save"){try{saveCampaignUpgrades(s)}catch(e){alert(e.message||e)}return}
   if(a==="campaign-orders-save"){try{saveCampaignOrders()}catch(e){alert(e.message||e)}return}
   if(a==="campaign-orders-edit"){campaignOrdersEditorOpen=true;render();return}
+  if(a==="campaignReport"){submitCampaignReport();return}
+  if(a==="campaignPv"){
+    if(!M||M.type!=="campaign"||!own(s)||M.status!=="active"||M.first==null||actS()!==s||v<=0)return;
+    mut(s,function(ps){logAdd(ps,"pri",v,"Campaign Primary Mission · "+(campaignAgendaFor(s)&&campaignAgendaFor(s).name||"Agenda")+" · "+i)});
+    return;
+  }
   if(a==="acc"){upd({status:"active",pa:App.snapOr(M.a,M.pa),pb:App.snapOr(M.b,M.pb)});return}
   if(a==="dec"){upd({status:"declined"});return}
   if(a==="ready"){if(M.type==="combat-patrol"&&(!PS(s).cpEdition||!PS(s).cpPatrolId))return;if(M.type==="campaign"&&!Array.isArray(campaignSideLoadout(s))){alert("Salvează mai întâi upgrade-urile de campanie.");return}mut(s,function(ps){ps.ready=true});return}

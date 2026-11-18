@@ -459,11 +459,9 @@ function campaignPrimaryHtml(side,setup){
 }
 function campaignMissionHtml(agenda){
  if(!agenda)return '<p class="legend">Chapter Approved / fără Agenda.</p>';
- var scoring=agenda.primaryMission&&agenda.primaryMission.scoring||[];
  var achieved=agenda.agendaAchieved||[];
  return '<div class="campaign-agenda"><h4>'+esc(agenda.name)+'</h4>'+(agenda.lore?'<p>'+esc(agenda.lore)+'</p>':'')+
- (achieved.length?'<div class="campaign-achieved"><b>Agenda Achieved</b><ul>'+achieved.map(function(x){return '<li>'+esc((x.any||[]).join(" OR "))+'</li>'}).join('')+'</ul></div>':'')+
- (scoring.length?'<div class="campaign-primary"><b>Primary Mission</b><ul>'+scoring.map(function(x){return '<li><b>'+esc(x.vp)+' VP</b> · '+esc(x.when)+' — '+esc(x.condition)+'</li>'}).join('')+'</ul></div>':'')+'</div>';
+ (achieved.length?'<div class="campaign-achieved"><b>Agenda Achieved</b><ul>'+achieved.map(function(x){return '<li>'+esc((x.any||[]).join(" OR "))+'</li>'}).join('')+'</ul></div>':'')+'</div>';
 }
 function campaignMatchHtml(m){
  var campaignStyle='<style>.campaign-match-panel{margin:18px 0;padding:18px;border:1px solid var(--line,#66553a);border-radius:16px;background:rgba(45,35,25,.32)}.campaign-match-title,.campaign-player-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.campaign-match-title h2{margin:5px 0}.campaign-kicker{letter-spacing:.18em;color:var(--brass,#c5a15a);font-size:11px;font-weight:700}.campaign-location-lore,.campaign-player p,.campaign-briefing-card p{color:var(--muted,#aaa)}.campaign-warzone,.campaign-location-bonus,.campaign-briefings,.campaign-players-grid{margin-top:14px}.campaign-briefing-grid,.campaign-players-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.campaign-briefing-card,.campaign-player{padding:14px;border:1px solid var(--line,#66553a);border-radius:12px}.campaign-agenda{margin-top:12px;padding-top:10px;border-top:1px solid rgba(190,160,100,.25)}.campaign-agenda h4{margin:4px 0}.campaign-primary,.campaign-achieved,.campaign-upgrades{margin-top:10px}.campaign-primary ul,.campaign-achieved ul,.campaign-warzone ul{padding-left:20px}.campaign-report-action{margin-top:14px}.campaign-report-action small{display:block;color:var(--muted,#aaa)}</style>';

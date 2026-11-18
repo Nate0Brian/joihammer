@@ -243,6 +243,13 @@ async function dCreateCampaign(){
  var doc={name:name,status:"setup",createdBy:App.me,createdAt:firebase.firestore.FieldValue.serverTimestamp(),phase:1,phaseStatus:"setup",locationId:loc.location?loc.location.id:"",locationRoll:loc.roll,agendaSelections:agendaSelections,forceDispositions:forceDispositions,players:players,playerIds:players.map(function(p){return p.id}),battles:[],agendaAchieved:{},upgrades:{},phaseHistory:[],notes:"",schemaVersion:1};
  try{var batch=App.db.batch();batch.set(ref,doc);players.forEach(function(p){var access=App.db.collection("dominatusUsers").doc(p.id).collection("campaigns").doc(ref.id);batch.set(access,{campaignId:ref.id,playerId:p.id,campaignName:name,createdAt:firebase.firestore.FieldValue.serverTimestamp()})});await batch.commit();location.href="dominatus.html?id="+ref.id}catch(e){fail(e)}
 }
+function dRandomAutoOrder(){
+ if(Math.random()>=0.30)return null;
+ var types=["buff","debuff","mixed"],type=types[Math.floor(Math.random()*types.length)],items=(window.JH_ORDERS||[]).filter(function(x){return x.type===type});
+ if(!items.length)return null;
+ var item=items[Math.floor(Math.random()*items.length)],rounds=[2,3,4];
+ return {orderId:item.id,round:rounds[Math.floor(Math.random()*rounds.length)]};
+}
 function dShufflePlayers(list){
  var a=(list||[]).slice();
  for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;}
@@ -261,7 +268,7 @@ function dBuildPhaseMatches(c,phase,existing){
     if(score>bestScore){bestScore=score;best=i;}
    }
    var b=pool.splice(best,1)[0],agendaA=(c.agendaSelections||{})[a.id]||"",agendaB=(c.agendaSelections||{})[b.id]||"";
-   created.push({id:"auto_p"+phase+"_r"+round+"_"+stamp+"_"+created.length,phase:Number(phase),round:round,a:a.id,b:b.id,agendaA:agendaA,agendaB:agendaB,locationId:c.locationId||"",battleSize:"Strike Force",status:"scheduled",generated:true,createdAt:Date.now()});
+   created.push({id:"auto_p"+phase+"_r"+round+"_"+stamp+"_"+created.length,phase:Number(phase),round:round,a:a.id,b:b.id,agendaA:agendaA,agendaB:agendaB,locationId:c.locationId||"",battleSize:"Strike Force",orders:{a:dRandomAutoOrder(),b:dRandomAutoOrder()},status:"scheduled",generated:true,createdAt:Date.now()});
   }
  }
  return created;

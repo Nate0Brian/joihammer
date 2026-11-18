@@ -390,6 +390,12 @@ async function dCleanupOrphanCampaignMatches(c){
 }
 function dRenderDetail(c){
  var el=document.getElementById("domApp"),isAdmin=App.isAdmin,mine=(c.players||[]).filter(function(p){return p.id===App.me})[0],loc=dLocation(c);
+ // Alliance sections and standings are rendered from the campaign's actual participants.
+ // Keep this local list explicit; the previous regression referenced an undefined variable,
+ // throwing before the campaign detail could replace the archive loading message.
+ var alliances=["liberators","oppressors","raiders"].filter(function(alliance){
+  return (c.players||[]).some(function(player){return player.alliance===alliance});
+ });
  if(!isAdmin&&!mine){el.innerHTML='<p class="err">Nu faci parte din această campanie.</p>';return}
  if(isAdmin)dCleanupOrphanCampaignMatches(c).catch(function(e){console.warn('Orphan campaign match cleanup:',e)});
  var h='<a class="dom-back" href="dominatus.html">← Campaign Archive</a><section class="dom-hero"><div class="dom-hero-top"><span class="dom-kicker">WAR FOR THE IMPERIUM · DOMINATUS</span><span class="dom-status '+(c.status==="active"?"is-active":"")+'">'+dStatus(c.status)+'</span></div><h2>'+dEsc(c.name)+'</h2><div class="dom-hero-stats"><div><small>CAMPAIGN PHASE</small><b>'+dEsc(c.phase||1)+' / 3</b><span>'+dEsc(dPhaseName(c.phase||1))+'</span></div><div><small>THEATRE OF WAR</small><b>'+(loc?dEsc(loc.name):"Not selected")+'</b><span>'+(c.locationRoll?"D6 roll: "+dEsc(c.locationRoll):"Awaiting location")+'</span></div><div><small>FORCES</small><b>'+dEsc((c.players||[]).length)+' players</b><span>'+dEsc(Object.keys(c.agendaAchieved||{}).reduce(function(a,k){return a+(c.agendaAchieved[k]||0)},0))+' Agenda Achieved</span></div></div></section>';

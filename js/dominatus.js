@@ -388,14 +388,8 @@ async function dCleanupOrphanCampaignMatches(c){
  });
  if(changed)await batch.commit();
 }
-function dRenderDetailUnsafe(c){
+function dRenderDetail(c){
  var el=document.getElementById("domApp"),isAdmin=App.isAdmin,mine=(c.players||[]).filter(function(p){return p.id===App.me})[0],loc=dLocation(c);
- // Alliance sections and standings are rendered from the campaign's actual participants.
- // Keep this local list explicit; the previous regression referenced an undefined variable,
- // throwing before the campaign detail could replace the archive loading message.
- var alliances=["liberators","oppressors","raiders"].filter(function(alliance){
-  return (c.players||[]).some(function(player){return player.alliance===alliance});
- });
  if(!isAdmin&&!mine){el.innerHTML='<p class="err">Nu faci parte din această campanie.</p>';return}
  if(isAdmin)dCleanupOrphanCampaignMatches(c).catch(function(e){console.warn('Orphan campaign match cleanup:',e)});
  var h='<a class="dom-back" href="dominatus.html">← Campaign Archive</a><section class="dom-hero"><div class="dom-hero-top"><span class="dom-kicker">WAR FOR THE IMPERIUM · DOMINATUS</span><span class="dom-status '+(c.status==="active"?"is-active":"")+'">'+dStatus(c.status)+'</span></div><h2>'+dEsc(c.name)+'</h2><div class="dom-hero-stats"><div><small>CAMPAIGN PHASE</small><b>'+dEsc(c.phase||1)+' / 3</b><span>'+dEsc(dPhaseName(c.phase||1))+'</span></div><div><small>THEATRE OF WAR</small><b>'+(loc?dEsc(loc.name):"Not selected")+'</b><span>'+(c.locationRoll?"D6 roll: "+dEsc(c.locationRoll):"Awaiting location")+'</span></div><div><small>FORCES</small><b>'+dEsc((c.players||[]).length)+' players</b><span>'+dEsc(Object.keys(c.agendaAchieved||{}).reduce(function(a,k){return a+(c.agendaAchieved[k]||0)},0))+' Agenda Achieved</span></div></div></section>';
@@ -435,7 +429,7 @@ function dRenderDetailUnsafe(c){
  var battles=c.battles||[];
  function dRoundUnlockedForPlayer(b){
   var round=Number(b.round||1),phase=Number(b.phase||c.phase||1);
-  if(isAdmin||round<=1)return true;
+  if(round<=1)return true;
   return [b.a,b.b].every(function(player){
    var previous=battles.filter(function(x){
     return Number(x.phase||c.phase||1)===phase&&Number(x.round||1)===round-1&&(x.a===player||x.b===player);
@@ -444,8 +438,10 @@ function dRenderDetailUnsafe(c){
   });
  }
  h+='<div class="dom-battle-list">'+(battles.map(function(b){
- var pa=dPlayer(c,b.a),pb=dPlayer(c,b.b),aa=dAgenda(b.agendaA),ab=dAgenda(b.agendaB),unlocked=dRoundUnlockedForPlayer(b),locked=!isAdmin&&!unlocked;
- return '<article class="dom-battle-card '+(locked?'is-round-locked':'')+'"><div class="dom-battle-top"><span class="dom-kicker">PHASE '+dEsc(b.phase)+(b.round?' · ROUND '+dEsc(b.round):'')+' · '+dEsc(b.battleSize||"Strike Force")+(b.generated?' · AUTO':'')+'</span><span class="dom-status '+(b.status==="completed"?"is-active":"")+'">'+(b.status==="completed"?"Completed":locked?"Locked":"Scheduled")+'</span></div><div class="dom-versus"><b>'+dEsc(b.a)+'</b><span>VS</span><b>'+dEsc(b.b)+'</b></div><div class="dom-battle-agendas"><span>'+dEsc(aa?aa.name:"Chapter Approved / no Agenda")+'</span><span>'+dEsc(ab?ab.name:"Chapter Approved / no Agenda")+'</span></div>'+(locked?'<p class="dom-round-lock-note">Disponibil după finalizarea tuturor meciurilor participanților din runda '+(Number(b.round||1)-1)+'.</p>':b.matchId?'<a class="dom-open-match" href="match.html?id='+encodeURIComponent(b.matchId)+'">Deschide meciul ↗</a>':'<span class="dom-muted">Match disponibil după aprobarea fazei.</span>')+(b.status==="completed"?'<p class="dom-muted">Winner: '+dEsc(b.winner==="draw"?"Draw":b.winner)+' · '+dEsc(b.scoreA||0)+' – '+dEsc(b.scoreB||0)+'</p>':'')+((!locked&&!b.matchId&&!isAdmin&&mine&&(mine.id===b.a||mine.id===b.b)&&b.status!=="completed")?'<button class="ghost sm" data-dom-report="'+dEsc(b.id)+'">Raportează rezultatul</button>':'')+(isAdmin&&b.status!=="completed"?'<button class="ghost sm" data-dom-delete-battle="'+dEsc(b.id)+'">Șterge meciul</button>':'')+'</article>'
+ var pa=dPlayer(c,b.a),pb=dPlayer(c,b.b),aa=dAgenda(b.agendaA),ab=dAgenda(b.agendaB),unlocked=dRoundUnlockedForPlayer(b),locked=!unlocked,canStart=isAdmin&&unlocked&&c.phaseStatus==="active"&&!b.matchId&&b.status!=="completed";
+ var stateLabel=b.status==="completed"?"Completed":b.status==="in_progress"?"In Progress":locked?"Locked":"Scheduled";
+ var accessHtml=locked?'<p class="dom-round-lock-note">Disponibil după finalizarea tuturor meciurilor ambilor participanți din runda '+(Number(b.round||1)-1)+'.</p>':b.matchId?'<a class="dom-open-match" href="match.html?id='+encodeURIComponent(b.matchId)+'">Deschide meciul ↗</a>':canStart?'<button class="primary sm" data-dom-start-match="'+dEsc(b.id)+'">Creează / deschide meciul</button>':'<span class="dom-muted">'+(c.phaseStatus==="active"?"Așteaptă inițierea meciului de către Warmaster.":"Meci disponibil după aprobarea fazei.")+'</span>';
+ return '<article class="dom-battle-card '+(locked?'is-round-locked':'')+'"><div class="dom-battle-top"><span class="dom-kicker">PHASE '+dEsc(b.phase)+(b.round?' · ROUND '+dEsc(b.round):'')+' · '+dEsc(b.battleSize||"Strike Force")+(b.generated?' · AUTO':'')+'</span><span class="dom-status '+(b.status==="completed"?"is-active":"")+'">'+stateLabel+'</span></div><div class="dom-versus"><b>'+dEsc(b.a)+'</b><span>VS</span><b>'+dEsc(b.b)+'</div><div class="dom-battle-agendas"><span>'+dEsc(aa?aa.name:"Chapter Approved / no Agenda")+'</span><span>'+dEsc(ab?ab.name:"Chapter Approved / no Agenda")+'</span></div>'+accessHtml+(b.status==="completed"?'<p class="dom-muted">Winner: '+dEsc(b.winner==="draw"?"Draw":b.winner)+' · '+dEsc(b.scoreA||0)+' – '+dEsc(b.scoreB||0)+'</p>':'')+((!locked&&!b.matchId&&!isAdmin&&mine&&(mine.id===b.a||mine.id===b.b)&&b.status!=="completed")?'<span class="dom-muted">Meciul va apărea aici după inițierea de către Warmaster.</span>':'')+(isAdmin&&b.status!=="completed"?'<button class="ghost sm" data-dom-delete-battle="'+dEsc(b.id)+'">Șterge meciul</button>':'')+'</article>'
  }).join("")||'<p class="empty">Nu au fost programate meciuri.</p>')+'</div><div id="domReportForm"></div></section>';
  h+='<section class="dom-panel"><div class="dom-section-head"><div><span class="dom-kicker">ORDER OF BATTLE</span><h3>Players & Alliances</h3></div></div><div class="dom-roster">'+(c.players||[]).map(function(p){var achieved=(c.agendaAchieved||{})[p.id]||0,ups=(c.upgrades||{})[p.id]||[],earned=DOM_REWARDS.filter(function(r){return r.playerId===p.id&&r.status==='selected'});return '<article><div><b>'+dEsc(p.id)+'</b><small>'+dEsc(p.army||"Army not configured")+' · '+dEsc((c.forceDispositions||{})[p.id]||p.fd||"Force Disposition not set")+'</small></div><span class="dom-alliance '+dEsc(p.alliance)+'">'+dEsc(dAllianceName(p.alliance))+'</span><span class="dom-count">'+achieved+'/3 Agenda Achieved</span><small>'+(ups.length+earned.length)+' upgrades</small></article>'}).join("")+'</div></section>';
  h+='<section class="dom-panel"><div class="dom-section-head"><div><span class="dom-kicker">STRATEGIC OVERVIEW</span><h3>Alliance Standings</h3></div></div><div class="dom-standings">'+alliances.map(function(a){var members=(c.players||[]).filter(function(p){return p.alliance===a}),ach=members.reduce(function(n,p){return n+((c.agendaAchieved||{})[p.id]||0)},0),honours=members.reduce(function(n,p){return n+(((c.upgrades||{})[p.id]||[]).filter(function(u){return u.type==="Battle Honour"&&Number(u.phase||c.phase)===Number(c.phase)}).length)+DOM_REWARDS.filter(function(r){return r.playerId===p.id&&r.category==="Battle Honour"&&r.status==="selected"&&Number(r.phase)===Number(c.phase)}).length},0);return '<article><b>'+dEsc(dAllianceName(a))+'</b><span>'+ach+' Agenda Achieved</span><span>'+honours+' Battle Honours this phase</span></article>'}).join("")+'</div><p class="dom-muted">Ascendancy: alianța cu cele mai multe Agenda Achieved în faza curentă. Controlul locației: alianța cu cele mai multe Battle Honours câștigate în fază; egalitățile se rezolvă după totalul campaniei, apoi de Warmaster.</p></section>';
@@ -486,21 +482,6 @@ function dRenderDetailUnsafe(c){
  if(isAdmin){var approve=document.getElementById("domApproveSetup");if(approve)approve.onclick=function(){dApproveRandomSetup(c)};var reroll=document.getElementById("domRerollSetup");if(reroll)reroll.onclick=function(){dRerollRandomSetup(c)};document.getElementById("domRollLocation").onclick=function(){dRollLocation(c)};document.getElementById("domNextPhase").onclick=function(){dAdvancePhase(c)};document.getElementById("domToggleStatus").onclick=function(){dUpdateCampaign(c,{status:c.status==="active"?"completed":"active"})};var delCampaign=document.getElementById("domDeleteCampaignDetail");if(delCampaign)delCampaign.onclick=function(){dDeleteCampaign(c.id)};var addBattle=document.getElementById("domAddBattle");if(addBattle)addBattle.onclick=function(){var f=document.getElementById("domBattleForm");f.hidden=!f.hidden;dRefreshAgendaSelects(c)};var genMatches=document.getElementById("domGeneratePhaseMatches");if(genMatches)genMatches.onclick=function(){dGeneratePhaseMatches(c,false)};document.querySelectorAll("[data-dom-delete-battle]").forEach(function(b){b.onclick=function(){dDeleteScheduledBattle(c,b.getAttribute("data-dom-delete-battle"))}});document.querySelectorAll("[data-dom-start-match]").forEach(function(b){b.onclick=function(){dStartCampaignMatch(c,b.getAttribute("data-dom-start-match"))}});document.getElementById("domCancelBattle").onclick=function(){document.getElementById("domBattleForm").hidden=true};document.getElementById("domBattleA").onchange=function(){dRefreshAgendaSelects(c)};document.getElementById("domBattleB").onchange=function(){dRefreshAgendaSelects(c)};["A","B"].forEach(function(side){document.getElementById("domOrderType"+side).onchange=function(){var sel=document.getElementById("domOrderId"+side);sel.innerHTML=dOrderOptionsHtml(this.value,"")}});document.getElementById("domSaveBattle").onclick=function(){dSaveBattle(c).catch(function(e){alert(e.message||e)})};document.getElementById("domGrantUpgrade").onclick=function(){var f=document.getElementById("domUpgradeForm");f.hidden=!f.hidden;dRefreshUpgradeCards(c)};document.getElementById("domUpgradeType").onchange=function(){dRefreshUpgradeCards(c)};document.getElementById("domUpgradeCard").onchange=function(){dRenderUpgradeConditions(c)};document.getElementById("domSaveUpgrade").onclick=function(){dSaveUpgrade(c)};dLoadReports(c)}
  else {document.querySelectorAll("[data-dom-report]").forEach(function(b){b.onclick=function(){dShowReportForm(c,b.getAttribute("data-dom-report"))}})}
 }
-
-function dRenderDetail(c){
- try{
-  return dRenderDetailUnsafe(c);
- }catch(e){
-  console.error("Dominatus render detail failed:",e);
-  var el=document.getElementById("domApp");
-  if(el){
-   var msg=(e&&e.message)?e.message:String(e);
-   var stack=(e&&e.stack)?String(e.stack).split("\n").slice(0,5).join("\n"):"";
-   el.innerHTML='<section class="dom-panel"><h3>Eroare la afișarea campaniei</h3><p class="err">'+dEsc(msg)+'</p><pre style="white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;opacity:.8">'+dEsc(stack)+'</pre><button class="btn" onclick="location.reload()">Reîncarcă</button></section>';
-  }
- }
-}
-
 function dRefreshAgendaSelects(c){
  ["A","B"].forEach(function(side){var who=document.getElementById("domBattle"+side).value,p=dPlayer(c,who),sel=document.getElementById("domAgenda"+side),opts=dAgendaOptions(p.alliance,c.phase||1),suggested=(c.agendaSelections||{})[who];sel.innerHTML='<option value="">Chapter Approved / no Agenda</option>'+opts.map(function(a){return '<option value="'+dEsc(a.id)+'" '+(a.id===suggested?'selected':'')+'>'+dEsc(a.name)+(a.id===suggested?' · Random':'')+'</option>'}).join("")});
 }
@@ -626,13 +607,8 @@ function dLoadCampaigns(){
  var id=new URLSearchParams(location.search).get("id");
  function render(campaigns){
   DOM_CAMPAIGNS=campaigns;
-  try{
-   if(id){var c=DOM_CAMPAIGNS.filter(function(x){return x.id===id})[0];if(c){DOM_CURRENT=c;dRenderDetail(c)}else document.getElementById("domApp").innerHTML='<p class="empty">Campania nu a fost găsită sau nu ai acces. Dacă este o campanie veche, cere Warmaster-ului să deschidă o dată arhiva pentru sincronizarea accesului.</p>'}
-   else dRenderHome();
-  }catch(e){
-   console.error("Dominatus campaign render failed:",e);
-   document.getElementById("domApp").innerHTML='<p class="err">Eroare la încărcarea campaniei: '+dEsc(e&&e.message||e)+'</p>';
-  }
+  if(id){var c=DOM_CAMPAIGNS.filter(function(x){return x.id===id})[0];if(c){DOM_CURRENT=c;dRenderDetail(c)}else document.getElementById("domApp").innerHTML='<p class="empty">Campania nu a fost găsită sau nu ai acces. Dacă este o campanie veche, cere Warmaster-ului să deschidă o dată arhiva pentru sincronizarea accesului.</p>'}
+  else dRenderHome();
  }
  if(App.isAdmin){
   App.db.collection(DOM_COLL).onSnapshot(function(s){
